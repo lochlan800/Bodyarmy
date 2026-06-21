@@ -3,164 +3,329 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Body Army — what happens in your body</title>
+<title>Body Army</title>
 <style>
   :root {
     --bg:#0e1016; --panel:#171a24; --panel-2:#1f2330; --text:#e7ebf3;
     --muted:#8b93a7; --good:#46d39a; --bad:#ff6b6b; --army:#5aa9ff; --line:#2a2f3d;
   }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    background:radial-gradient(1200px 800px at 70% -10%, #1a2030, var(--bg)); color:var(--text); min-height:100vh; }
-  header { padding:24px 20px 6px; text-align:center; }
-  header h1 { margin:0; font-size:26px; letter-spacing:.5px; }
-  header p { margin:6px 0 0; color:var(--muted); font-size:14px; }
-  .wrap { max-width:980px; margin:0 auto; padding:16px 20px 60px;
-    display:grid; grid-template-columns:1.1fr 1fr; gap:20px; }
-  @media (max-width:820px){ .wrap{ grid-template-columns:1fr; } }
-  .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; }
-  .panel h2 { margin:0 0 14px; font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(1200px 800px at 70% -10%, #1a2030, var(--bg));
+    color:var(--text); min-height:100vh; }
 
-  /* Real anatomy image body */
-  .body { position:relative; height:480px; border-radius:14px; overflow:hidden;
-    border:1px solid var(--line);
-    background:var(--bg); }
-  .body img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center top; display:block; }
-  /* flash overlay */
-  #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:14px;
-    transition:opacity .1s ease; z-index:3; }
+  header { padding:22px 20px 4px; text-align:center; }
+  header h1 { font-size:24px; letter-spacing:.4px; }
+  header p { margin-top:5px; color:var(--muted); font-size:13px; }
 
-  @keyframes pulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.18);} }
+  /* 3-column layout: body | units | input+log */
+  .wrap { max-width:1100px; margin:0 auto; padding:14px 16px 60px;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start; }
+  @media (max-width:900px){ .wrap{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .wrap{ grid-template-columns:1fr; } }
 
-  .stat { margin-bottom:14px; }
-  .stat .row { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; }
-  .stat .row b { font-variant-numeric:tabular-nums; }
-  .bar { height:12px; border-radius:8px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
-  .bar > span { display:block; height:100%; transition:width .5s ease; }
-  .bar.army > span { background:linear-gradient(90deg,#3d7fd6,var(--army)); }
-  .bar.enemy > span { background:linear-gradient(90deg,#c64b4b,var(--bad)); }
-  .bar.health > span { background:linear-gradient(90deg,#2fa372,var(--good)); }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .panel-title { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:12px; }
 
+  /* ── Body image ── */
+  .bodyWrap { position:relative; border-radius:12px; overflow:hidden;
+    border:1px solid var(--line); background:var(--bg); height:520px; }
+  .bodyWrap img { position:absolute; inset:0; width:100%; height:100%;
+    object-fit:contain; object-position:center top; display:block; }
+  #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0;
+    border-radius:12px; transition:opacity .1s; z-index:3; }
+
+  /* Overall score badge under body */
+  .score-row { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
+  .score-label { font-size:13px; color:var(--muted); }
+  .score-value { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .score-bar { height:8px; border-radius:6px; background:#11141d; overflow:hidden; border:1px solid var(--line); margin-top:6px; }
+  .score-bar span { display:block; height:100%; transition:width .5s ease;
+    background:linear-gradient(90deg,#2fa372,var(--good)); }
+
+  /* ── Military units ── */
+  .units { display:flex; flex-direction:column; gap:10px; }
+  .unit { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  .unit-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .unit-left { display:flex; align-items:center; gap:8px; }
+  .unit-emoji { font-size:18px; line-height:1; }
+  .unit-name { font-size:13px; font-weight:600; }
+  .unit-desc { font-size:11px; color:var(--muted); margin-top:1px; }
+  .unit-val { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; min-width:28px; text-align:right; }
+  .unit-bar { height:7px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
+  .unit-bar span { display:block; height:100%; transition:width .5s ease; border-radius:5px; }
+
+  /* ── Input + log ── */
   .inputRow { display:flex; gap:8px; }
   .inputRow input { flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
-    padding:13px 14px; color:var(--text); font-size:15px; }
+    padding:12px 14px; color:var(--text); font-size:15px; }
   .inputRow input:focus { outline:none; border-color:#3a4a66; }
   .inputRow button { background:linear-gradient(90deg,#3d7fd6,var(--army)); border:none; color:#fff;
-    font-weight:600; padding:0 18px; border-radius:12px; cursor:pointer; font-size:15px; }
-  .chips { margin-top:12px; display:flex; flex-wrap:wrap; gap:8px; }
+    font-weight:600; padding:0 16px; border-radius:12px; cursor:pointer; font-size:15px; white-space:nowrap; }
+  .chips { margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }
   .chips button { background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
-    border-radius:999px; padding:7px 12px; font-size:13px; cursor:pointer; }
+    border-radius:999px; padding:6px 11px; font-size:12px; cursor:pointer; }
   .chips button:hover { color:var(--text); border-color:#3a4a66; }
 
-  .log { margin-top:6px; max-height:240px; overflow:auto; font-size:13px; }
-  .log div { padding:8px; border-bottom:1px solid var(--line); color:var(--muted); }
-  .log div b { color:var(--text); }
-  .log .delta { float:right; font-variant-numeric:tabular-nums; font-size:12px; }
-  .log .up { color:var(--good); } .log .down { color:var(--bad); }
-  .footer-note { text-align:center; color:var(--muted); font-size:12px; margin-top:18px; }
+  .log { margin-top:6px; max-height:280px; overflow:auto; font-size:13px; }
+  .log-entry { padding:8px 6px; border-bottom:1px solid var(--line); color:var(--muted); }
+  .log-entry b { color:var(--text); }
+  .log-entry .sci { font-size:11px; color:#5a6480; margin-top:3px; }
+  .changes { float:right; font-size:11px; line-height:1.6; text-align:right; max-width:120px; }
+  .up { color:var(--good); } .dn { color:var(--bad); }
+  .footer-note { text-align:center; color:#3a4060; font-size:11px; margin-top:14px; }
 </style>
 </head>
 <body>
-  <header>
-    <h1>🛡️ Body Army</h1>
-    <p>Type anything you do or put on/in your body — see what happens inside.</p>
-  </header>
+<header>
+  <h1>🛡️ Body Army</h1>
+  <p>Type anything you do or put on/in your body — see what happens inside.</p>
+</header>
 
-  <div class="wrap">
-    <div class="panel">
-      <h2>Inside the body</h2>
-      <div class="body" id="body">
-        <img src="body.png?v=3" alt="human body with organs" />
-        <div id="bodyFlash"></div>
-      </div>
-      <div style="margin-top:18px">
-        <div class="stat"><div class="row"><span>🛡️ Army strength</span><b id="armyVal">50</b></div>
-          <div class="bar army"><span id="armyBar" style="width:50%"></span></div></div>
-        <div class="stat"><div class="row"><span>🦠 Invaders</span><b id="enemyVal">10</b></div>
-          <div class="bar enemy"><span id="enemyBar" style="width:10%"></span></div></div>
-        <div class="stat"><div class="row"><span>❤️ Overall health</span><b id="healthVal">80</b></div>
-          <div class="bar health"><span id="healthBar" style="width:80%"></span></div></div>
-      </div>
+<div class="wrap">
+
+  <!-- COLUMN 1: body image -->
+  <div class="panel">
+    <div class="panel-title">Inside the body</div>
+    <div class="bodyWrap" id="body">
+      <img src="body.png?v=3" alt="human body with organs" />
+      <div id="bodyFlash"></div>
     </div>
-
-    <div class="panel">
-      <h2>What did you do?</h2>
-      <div class="inputRow">
-        <input id="inp" placeholder="e.g. drank kefir, ate pizza, went for a run..." autocomplete="off" />
-        <button id="go">Do it</button>
+    <div class="score-row">
+      <div>
+        <div class="score-label">Overall Defence</div>
+        <div class="score-bar"><span id="scoreBar" style="width:62%"></span></div>
       </div>
-      <div class="chips" id="chips"></div>
-
-      <h2 style="margin-top:20px">What happened</h2>
-      <div class="log" id="log"></div>
-      <div class="footer-note">Prototype • understands food, drink, exercise, sleep, substances, injuries & more</div>
+      <div class="score-value" id="scoreVal">62</div>
     </div>
   </div>
 
+  <!-- COLUMN 2: military strength units -->
+  <div class="panel">
+    <div class="panel-title">Military Strength</div>
+    <div class="units" id="units"></div>
+  </div>
+
+  <!-- COLUMN 3: input + log -->
+  <div class="panel">
+    <div class="panel-title">What did you do?</div>
+    <div class="inputRow">
+      <input id="inp" placeholder="e.g. drank kefir, ran 5k, smoked…" autocomplete="off" />
+      <button id="go">Log it</button>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <div class="panel-title" style="margin-top:18px">Battle report</div>
+    <div class="log" id="log"></div>
+    <div class="footer-note">Scientifically based • each unit maps to a real immune system component</div>
+  </div>
+
+</div>
+
 <script>
-const state = { army:50, enemy:10, health:80 };
-const clamp = v => Math.max(0, Math.min(100, v));
-
-// Each entry: keywords -> effect on the body.
-// army = immune strength, enemy = invaders/pathogens, health = overall.
-const RULES = [
-  // --- Gut / good foods ---
-  { k:['kefir','yogurt','yoghurt','kimchi','sauerkraut','kombucha','probiotic','miso'], emoji:'🥛',
-    army:+12, enemy:-3, health:+2, msg:'Good bacteria reinforce your gut. Fresh troops recruited!' },
-  { k:['vegetable','veg','salad','broccoli','spinach','kale','greens','fruit','apple','berries','banana'], emoji:'🥦',
-    army:+7, enemy:-3, health:+5, msg:'Fibre and nutrients fuel the army.' },
-  { k:['orange','vitamin c','lemon','citrus','kiwi'], emoji:'🍊',
-    army:+6, enemy:-4, health:+3, msg:'Vitamin C shields the front line.' },
-  { k:['garlic','ginger','turmeric','honey'], emoji:'🧄',
-    army:+5, enemy:-5, health:+2, msg:'Natural antimicrobials hit the invaders.' },
-  { k:['water','hydrate','drank water'], emoji:'💧',
-    army:+3, enemy:-1, health:+4, msg:'Supply lines flowing — everything works better hydrated.' },
-  { k:['protein','chicken','eggs','fish','beans','tofu'], emoji:'🍳',
-    army:+6, enemy:0, health:+4, msg:'Building blocks delivered — troops rebuilt.' },
-
-  // --- Junk / harmful intake ---
-  { k:['sugar','candy','sweets','soda','cola','chocolate','cake','donut'], emoji:'🍬',
-    army:-3, enemy:+10, health:-4, msg:'Sugar feeds the invaders. Enemy reinforcements!' },
-  { k:['junk','fast food','pizza','burger','fries','chips','crisps'], emoji:'🍔',
-    army:-4, enemy:+9, health:-5, msg:'Greasy fuel — invaders move in, army slows.' },
-  { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'], emoji:'🍺',
-    army:-8, enemy:+6, health:-7, msg:'Alcohol dulls the troops and lowers defences.' },
-  { k:['smoke','cigarette','vape','nicotine','smoking'], emoji:'🚬',
-    army:-9, enemy:+8, health:-8, msg:'Smoke damages the lungs — front-line guards choke.' },
-  { k:['coffee','caffeine','energy drink'], emoji:'☕',
-    army:+1, enemy:+1, health:-1, msg:'Quick alertness, but jittery troops — small cost.' },
-
-  // --- Rest / lifestyle ---
-  { k:['sleep','slept','nap','rest','8 hours'], emoji:'😴',
-    army:+9, enemy:-5, health:+6, msg:'Troops rested and healed overnight.' },
-  { k:['no sleep','stayed up','late night','insomnia','tired'], emoji:'🌙',
-    army:-9, enemy:+6, health:-6, msg:'No reinforcements arrived. Lines thin out.' },
-  { k:['exercise','run','ran','gym','workout','walk','cycling','swim','jog'], emoji:'🏃',
-    army:+7, enemy:-2, health:+5, msg:'Circulation up — soldiers patrol faster.' },
-  { k:['stress','stressed','anxious','overwhelmed','panic'], emoji:'😣',
-    army:-7, enemy:+5, health:-5, msg:'Cortisol exhausts the troops.' },
-  { k:['sun','sunlight','vitamin d','outside','fresh air'], emoji:'☀️',
-    army:+5, enemy:-2, health:+4, msg:'Vitamin D from sunlight boosts the commanders.' },
-  { k:['meditate','meditation','relax','breathing','calm'], emoji:'🧘',
-    army:+4, enemy:-2, health:+4, msg:'Stress drops — the army regroups calmly.' },
-
-  // --- Hygiene / external ---
-  { k:['wash hands','washed','soap','shower','clean','hygiene'], emoji:'🧼',
-    army:+2, enemy:-8, health:+2, msg:'Pathogens washed away before they get in.' },
-  { k:['sunscreen','sun cream','spf'], emoji:'🧴',
-    army:0, enemy:-3, health:+2, msg:'Skin barrier protected from UV damage.' },
-  { k:['cut','wound','scrape','graze','bleed'], emoji:'🩹',
-    army:-2, enemy:+7, health:-3, msg:'Skin breached — invaders rush the wound. Army mobilises.' },
-  { k:['cold','flu','sick','virus','infection','fever'], emoji:'🤧',
-    army:-3, enemy:+14, health:-8, msg:'A pathogen invades! Full battle begins.' },
-  { k:['vaccine','vaccinated','jab','flu shot'], emoji:'💉',
-    army:+10, enemy:0, health:0, msg:'Army trained to recognise a specific enemy in advance.' },
-  { k:['medicine','antibiotic','paracetamol','painkiller','vitamin'], emoji:'💊',
-    army:+3, enemy:-6, health:+3, msg:'Backup arrives to help fight the invaders.' },
+// ─── Defence units ────────────────────────────────────────────────────────────
+// Each maps to a real body system. val = 0-100.
+const UNITS = [
+  { id:'gut',    emoji:'🦠', name:'Gut Microbiome',   desc:'Good bacteria (probiotic army)',    val:60, color:'#4ade80' },
+  { id:'neutro', emoji:'⚡', name:'Neutrophils',       desc:'First-responder white blood cells', val:55, color:'#60a5fa' },
+  { id:'tcell',  emoji:'🎯', name:'T-Cells',           desc:'Adaptive immune — learn & destroy', val:50, color:'#a78bfa' },
+  { id:'nk',     emoji:'🗡️', name:'NK Cells',          desc:'Natural killers — virus & cancer',  val:50, color:'#fbbf24' },
+  { id:'skin',   emoji:'🛡️', name:'Skin Barrier',      desc:'Physical perimeter defence',        val:72, color:'#fb923c' },
+  { id:'lung',   emoji:'🫁', name:'Lung Defence',      desc:'Mucociliary airway patrol',         val:65, color:'#2dd4bf' },
+  { id:'liver',  emoji:'🔧', name:'Liver',             desc:'Detox & toxin filtration',          val:68, color:'#f59e0b' },
+  { id:'inflam', emoji:'🌡️', name:'Inflammation Control', desc:'Low chronic inflammation = better', val:65, color:'#f87171' },
 ];
 
-const clampFx = (cur,amt) => clamp(cur+amt);
+// Build a lookup map
+const unitMap = {};
+UNITS.forEach(u => unitMap[u.id] = u);
 
+const clamp = v => Math.max(0, Math.min(100, v));
+
+// ─── Rules ───────────────────────────────────────────────────────────────────
+// effects: { unitId: delta } — scientifically based deltas
+const RULES = [
+  { k:['kefir','yogurt','yoghurt','kimchi','sauerkraut','kombucha','probiotic','miso'],
+    emoji:'🥛', msg:'Probiotics seed the gut microbiome — your immune system\'s largest organ.',
+    sci:'~70% of immune cells live in the gut. Lactobacillus strains directly activate neutrophils.',
+    fx:{ gut:+15, neutro:+4, inflam:+6 } },
+
+  { k:['vegetable','veg','salad','broccoli','spinach','kale','greens','fruit','apple','berries','banana'],
+    emoji:'🥦', msg:'Fibre feeds beneficial gut bacteria. Antioxidants neutralise free radicals.',
+    sci:'Dietary fibre produces short-chain fatty acids that regulate T-cell differentiation.',
+    fx:{ gut:+8, tcell:+5, inflam:+8, neutro:+3 } },
+
+  { k:['orange','vitamin c','lemon','citrus','kiwi'],
+    emoji:'🍊', msg:'Vitamin C supercharges neutrophils and protects skin collagen.',
+    sci:'Neutrophils accumulate vitamin C at 50-100× plasma concentration to fight pathogens.',
+    fx:{ neutro:+10, skin:+5, inflam:+5, tcell:+3 } },
+
+  { k:['garlic','ginger','turmeric','honey'],
+    emoji:'🧄', msg:'Natural antimicrobials lower inflammation and directly inhibit pathogens.',
+    sci:'Curcumin (turmeric) inhibits NF-κB signalling, reducing pro-inflammatory cytokines.',
+    fx:{ inflam:+14, neutro:+5, gut:+4 } },
+
+  { k:['omega','fish oil','salmon','sardine','walnut','flaxseed'],
+    emoji:'🐟', msg:'Omega-3 fats dampen chronic inflammation and sharpen NK cell activity.',
+    sci:'EPA/DHA shift prostaglandin production from pro- to anti-inflammatory pathways.',
+    fx:{ inflam:+12, nk:+6, tcell:+4 } },
+
+  { k:['water','hydrate','drank water'],
+    emoji:'💧', msg:'Hydration keeps mucous membranes — the body\'s first barrier — intact.',
+    sci:'Mucosal surfaces trap 90% of pathogens before they reach the bloodstream.',
+    fx:{ skin:+5, lung:+6, liver:+5, inflam:+3 } },
+
+  { k:['protein','chicken','eggs','fish','beans','tofu','meat','steak','turkey'],
+    emoji:'🍳', msg:'Amino acids are the raw materials for antibodies and immune cells.',
+    sci:'Glutamine is the primary fuel for rapidly dividing lymphocytes and neutrophils.',
+    fx:{ neutro:+5, tcell:+6, nk:+4 } },
+
+  { k:['zinc','supplement','multivitamin'],
+    emoji:'💊', msg:'Zinc is essential for T-cell maturation and the skin\'s repair process.',
+    sci:'Even mild zinc deficiency reduces T-cell count and impairs NK cell cytotoxicity.',
+    fx:{ tcell:+8, nk:+5, skin:+5 } },
+
+  // ─── Bad stuff ───
+  { k:['sugar','candy','sweets','soda','cola','cake','donut','chocolate','ice cream'],
+    emoji:'🍬', msg:'Sugar spikes suppress neutrophils for up to 5 hours after eating.',
+    sci:'100g glucose reduces neutrophil phagocytic capacity by ~50% (Sanchez et al., 1973).',
+    fx:{ neutro:-8, gut:-10, inflam:-14, tcell:-4 } },
+
+  { k:['junk','fast food','pizza','burger','fries','chips','crisps','fried'],
+    emoji:'🍔', msg:'Ultra-processed food disrupts gut flora and triggers systemic inflammation.',
+    sci:'Emulsifiers (polysorbate-80, CMC) degrade the gut mucus layer within days.',
+    fx:{ gut:-8, inflam:-12, liver:-5, neutro:-4 } },
+
+  { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'],
+    emoji:'🍺', msg:'Alcohol damages the gut lining, suppresses NK cells and overloads the liver.',
+    sci:'Ethanol reduces NK cell cytotoxicity by 75% within hours and depletes gut flora diversity.',
+    fx:{ liver:-16, gut:-10, nk:-10, neutro:-6, inflam:-8 } },
+
+  { k:['smok','cigarette','vape','nicotine'],
+    emoji:'🚬', msg:'Smoke paralyses the lung\'s mucociliary escalator and kills NK cells.',
+    sci:'A single cigarette impairs mucociliary clearance for ~30 minutes; chronic use is permanent.',
+    fx:{ lung:-20, nk:-10, inflam:-12, skin:-5 } },
+
+  { k:['antibiotic'],
+    emoji:'💊', msg:'Antibiotics kill the infection target — but wipe out gut flora as collateral.',
+    sci:'A single course of antibiotics can reduce gut microbiome diversity for up to 12 months.',
+    fx:{ gut:-20, neutro:+5 } },
+
+  // ─── Lifestyle ───
+  { k:['sleep','slept','nap','8 hours','nine hours','10 hours'],
+    emoji:'😴', msg:'Sleep is when T-cells release integrins to hunt infected cells. Critical.',
+    sci:'During sleep, T-cells upregulate LFA-1 — a key adhesion molecule for killing viruses.',
+    fx:{ tcell:+12, nk:+10, neutro:+6, inflam:+8, gut:+4 } },
+
+  { k:['no sleep','stayed up','late night','insomnia','didn\'t sleep','4 hours','3 hours'],
+    emoji:'🌙', msg:'Sleep deprivation crashes NK cell activity by 70% after just one bad night.',
+    sci:'One night of 4h sleep reduces NK cell count by 70% (Irwin et al., 1994).',
+    fx:{ tcell:-10, nk:-12, neutro:-6, inflam:-8 } },
+
+  { k:['exercise','run','ran','gym','workout','walk','cycling','swim','jog','hiit','yoga','weights'],
+    emoji:'🏃', msg:'Exercise mobilises NK cells and neutrophils into the blood within minutes.',
+    sci:'A 30-min brisk walk increases NK cell count by ~40% and boosts T-cell proliferation.',
+    fx:{ nk:+10, neutro:+7, tcell:+6, lung:+6, inflam:+6 } },
+
+  { k:['stress','stressed','anxious','overwhelmed','panic','cortisol'],
+    emoji:'😣', msg:'Cortisol suppresses T-cells and NK cells — the reason stress makes you ill.',
+    sci:'Chronic cortisol downregulates IL-2, blocking T-cell proliferation and NK activation.',
+    fx:{ tcell:-10, nk:-8, neutro:-5, inflam:-10, gut:-5 } },
+
+  { k:['sun','sunlight','vitamin d','outside','fresh air'],
+    emoji:'☀️', msg:'Vitamin D activates T-cell receptors and reduces auto-immune inflammation.',
+    sci:'The vitamin D receptor (VDR) is expressed on nearly every immune cell type.',
+    fx:{ tcell:+9, nk:+6, inflam:+7 } },
+
+  { k:['meditat','relax','breathing','calm','mindful'],
+    emoji:'🧘', msg:'Mindfulness lowers cortisol, directly rescuing suppressed T-cells.',
+    sci:'8-week MBSR programmes increase telomerase activity and NK cell function.',
+    fx:{ tcell:+6, nk:+5, inflam:+8, gut:+3 } },
+
+  // ─── Physical / hygiene ───
+  { k:['wash hands','washed hands','soap','shower','clean'],
+    emoji:'🧼', msg:'Removes surface pathogens before they can breach the skin barrier.',
+    sci:'Handwashing cuts respiratory infections by 21% and GI infections by 31% (CDC).',
+    fx:{ skin:+3 } },
+
+  { k:['sunscreen','sun cream','spf'],
+    emoji:'🧴', msg:'UV radiation degrades skin-barrier proteins and can suppress local immunity.',
+    sci:'UV-B directly damages Langerhans cells — the skin\'s resident immune sentinels.',
+    fx:{ skin:+8 } },
+
+  { k:['cut','wound','scrape','graze','bleed'],
+    emoji:'🩹', msg:'Breach in the skin — neutrophils swarm the wound within minutes.',
+    sci:'Neutrophils arrive at wounds within 30-60 minutes via CXCL8 chemokine gradient.',
+    fx:{ skin:-14, inflam:-8, neutro:-3 } },
+
+  { k:['cold','flu','sick','virus','infection','fever'],
+    emoji:'🤧', msg:'Active infection — NK cells and neutrophils are in full battle.',
+    sci:'Fever at 38.5°C increases lymphocyte proliferation rate by ~20-fold.',
+    fx:{ neutro:-6, tcell:-4, nk:-5, inflam:-15 } },
+
+  { k:['vaccine','vaccinated','jab','flu shot','booster'],
+    emoji:'💉', msg:'T-cells trained to recognise a pathogen before real infection.',
+    sci:'Memory T-cells persist for decades, enabling 1000× faster recall responses.',
+    fx:{ tcell:+18, nk:+5 } },
+
+  { k:['coffee','caffeine','energy drink'],
+    emoji:'☕', msg:'Caffeine mildly inhibits inflammation but can disrupt sleep quality.',
+    sci:'Caffeine blocks adenosine receptors, temporarily reducing inflammatory cytokines.',
+    fx:{ inflam:+3, neutro:+2 } },
+];
+
+// ─── Render units ─────────────────────────────────────────────────────────────
+function buildUnits(){
+  const el = document.getElementById('units');
+  el.innerHTML = '';
+  UNITS.forEach(u => {
+    el.innerHTML += `
+      <div class="unit" id="unit-${u.id}">
+        <div class="unit-head">
+          <div class="unit-left">
+            <span class="unit-emoji">${u.emoji}</span>
+            <div><div class="unit-name">${u.name}</div><div class="unit-desc">${u.desc}</div></div>
+          </div>
+          <div class="unit-val" id="uv-${u.id}">${Math.round(u.val)}</div>
+        </div>
+        <div class="unit-bar"><span id="ub-${u.id}" style="width:${u.val}%;background:${u.color}"></span></div>
+      </div>`;
+  });
+}
+
+function updateUnit(id, val){
+  document.getElementById('uv-'+id).textContent = Math.round(clamp(val));
+  document.getElementById('ub-'+id).style.width = clamp(val)+'%';
+}
+
+function overallScore(){
+  const vals = UNITS.map(u => clamp(u.val));
+  return Math.round(vals.reduce((a,b)=>a+b,0) / UNITS.length);
+}
+
+function renderScore(){
+  const s = overallScore();
+  document.getElementById('scoreVal').textContent = s;
+  document.getElementById('scoreBar').style.width = s+'%';
+  const col = s > 65 ? '#46d39a' : s > 40 ? '#fbbf24' : '#ff6b6b';
+  document.getElementById('scoreBar').style.background = `linear-gradient(90deg,${col}99,${col})`;
+}
+
+function flashBody(good){
+  const f = document.getElementById('bodyFlash');
+  f.style.background = good ? 'rgba(70,211,154,.28)' : 'rgba(255,107,107,.28)';
+  f.style.opacity = 1;
+  setTimeout(()=>f.style.opacity=0, 420);
+}
+
+function flashUnit(id, good){
+  const el = document.getElementById('unit-'+id);
+  if(!el) return;
+  el.style.background = good ? 'rgba(70,211,154,.15)' : 'rgba(255,107,107,.12)';
+  setTimeout(()=>el.style.background='', 500);
+}
+
+// ─── Classify & apply ────────────────────────────────────────────────────────
 function classify(text){
   const t = text.toLowerCase();
   for(const r of RULES){
@@ -169,23 +334,34 @@ function classify(text){
   return null;
 }
 
-function setBar(id,val){ document.getElementById(id+'Bar').style.width=clamp(val)+'%';
-  document.getElementById(id+'Val').textContent=Math.round(val); }
-function render(){ setBar('army',state.army); setBar('enemy',state.enemy); setBar('health',state.health); renderCells(); }
-
-function renderCells(){}
-function flashBody(good){
-  const f=document.getElementById('bodyFlash');
-  f.style.background = good ? 'rgba(70,211,154,.30)' : 'rgba(255,107,107,.30)';
-  f.style.opacity=1;
-  setTimeout(()=>f.style.opacity=0, 400);
+function applyRule(label, r){
+  const changes = [];
+  let netGood = 0;
+  Object.entries(r.fx).forEach(([id, delta]) => {
+    const u = unitMap[id];
+    if(!u) return;
+    const before = u.val;
+    u.val = clamp(u.val + delta);
+    updateUnit(id, u.val);
+    flashUnit(id, delta > 0);
+    netGood += delta;
+    const diff = Math.round(u.val - before);
+    if(diff !== 0) changes.push(`<span class="${diff>0?'up':'dn'}">${diff>0?'▲':'▼'} ${u.emoji} ${u.name}</span>`);
+  });
+  renderScore();
+  flashBody(netGood >= 0);
+  logLine(label, r, changes, netGood >= 0);
 }
-function logLine(label,r){
-  const log=document.getElementById('log'); const d=document.createElement('div');
-  const dir = (r.army+ -r.enemy + r.health) >= 0 ? 'up':'down';
-  const sign = dir==='up'?'▲':'▼';
-  d.innerHTML = `<span class="delta ${dir}">${sign} 🛡️${r.army>=0?'+':''}${r.army} 🦠${r.enemy>=0?'+':''}${r.enemy}</span>`
-    + `${r.emoji} <b>${label}</b><br><span style="font-size:12px">${r.msg}</span>`;
+
+function logLine(label, r, changes, good){
+  const log = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = 'log-entry';
+  d.innerHTML =
+    `<div class="changes">${changes.join('<br>')}</div>`+
+    `${r.emoji} <b>${label}</b>`+
+    `<div class="sci">${r.msg}</div>`+
+    `<div class="sci" style="color:#3a4878;margin-top:2px">${r.sci}</div>`;
   log.prepend(d);
 }
 
@@ -193,24 +369,30 @@ function submit(text){
   text = text.trim(); if(!text) return;
   const r = classify(text);
   if(!r){
-    const log=document.getElementById('log'); const d=document.createElement('div');
-    d.innerHTML = `🤔 <b>${text}</b><br><span style="font-size:12px">The body shrugs — I don't recognise that one yet. Try food, drink, exercise, sleep, hygiene, or an injury.</span>`;
+    const log = document.getElementById('log');
+    const d = document.createElement('div'); d.className='log-entry';
+    d.innerHTML = `🤔 <b>${text}</b><div class="sci">Not recognised — try food, drink, exercise, sleep, substances, or an injury.</div>`;
     log.prepend(d); return;
   }
-  state.army=clampFx(state.army,r.army);
-  state.enemy=clampFx(state.enemy,r.enemy);
-  state.health=clamp(state.health + r.health + (state.army-state.enemy)/40);
-  flashBody((r.army - r.enemy + r.health) >= 0);
-  logLine(text,r); render();
+  applyRule(text, r);
 }
 
-document.getElementById('go').onclick=()=>{ const i=document.getElementById('inp'); submit(i.value); i.value=''; i.focus(); };
-document.getElementById('inp').addEventListener('keydown',e=>{ if(e.key==='Enter'){ submit(e.target.value); e.target.value=''; } });
+document.getElementById('go').onclick = () => {
+  const i = document.getElementById('inp'); submit(i.value); i.value=''; i.focus();
+};
+document.getElementById('inp').addEventListener('keydown', e => {
+  if(e.key==='Enter'){ submit(e.target.value); e.target.value=''; }
+});
 
-['drank kefir','ate pizza','went for a run','slept 8 hours','smoked a cigarette','got a cut','washed hands','stressed out']
-  .forEach(ex=>{ const b=document.createElement('button'); b.textContent=ex; b.onclick=()=>submit(ex); document.getElementById('chips').appendChild(b); });
+['drank kefir','ate pizza','went for a run','slept 8 hours','smoked','got a cut','stressed out','took antibiotics']
+  .forEach(ex => {
+    const b = document.createElement('button'); b.textContent = ex;
+    b.onclick = () => submit(ex);
+    document.getElementById('chips').appendChild(b);
+  });
 
-render();
+buildUnits();
+renderScore();
 </script>
 </body>
 </html>
