@@ -194,6 +194,28 @@
   .toast-mini-fill { height:100%; border-radius:3px; transition:width .4s ease; }
   .toast-up   { color:var(--good); }
   .toast-dn   { color:var(--bad); }
+
+  /* ── Fullscreen patrol overlay ── */
+  #fsBod { display:none; position:fixed; inset:0; background:var(--bg); z-index:150; flex-direction:row; }
+  #fsBodWrap { position:relative; flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #fsImg { height:100vh; width:auto; display:block; user-select:none; }
+  #fsCanvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #fsClose {
+    position:absolute; top:14px; right:14px; z-index:10;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  #fsClose:hover { border-color:#3a4a66; }
+  #fsLegend { width:230px; background:var(--panel); border-left:1px solid var(--line); padding:16px 14px 40px; overflow-y:auto; flex-shrink:0; }
+  .fs-leg-title { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:12px; }
+  .fs-leg-item { display:flex; align-items:flex-start; gap:10px; padding:9px 10px; border-radius:10px; border:1px solid var(--line); background:var(--panel-2); margin-bottom:6px; }
+  .fs-leg-emoji { font-size:18px; flex-shrink:0; line-height:1.4; }
+  .fs-leg-info  { flex:1; min-width:0; }
+  .fs-leg-name  { font-size:12px; font-weight:600; }
+  .fs-leg-sub   { font-size:10px; color:var(--muted); margin-top:1px; line-height:1.4; }
+  .fs-leg-count { font-size:11px; font-weight:700; margin-top:4px; }
+  .fs-open-btn  { font-size:11px; padding:3px 8px; border-radius:7px; border:1px solid var(--line); background:var(--panel-2); color:var(--muted); cursor:pointer; }
+  .fs-open-btn:hover { color:var(--text); border-color:#3a4a66; }
 </style>
 </head>
 <body>
@@ -216,6 +238,19 @@
   <div class="hist-list" id="histList"></div>
 </div>
 
+<!-- Fullscreen patrol overlay -->
+<div id="fsBod">
+  <div id="fsBodWrap">
+    <img id="fsImg" src="body.png?v=3" alt="body patrol view" />
+    <canvas id="fsCanvas"></canvas>
+  </div>
+  <div id="fsLegend">
+    <div class="fs-leg-title">⚔️ Patrol Status</div>
+    <div id="fsLegendList"></div>
+  </div>
+  <button id="fsClose" onclick="closeFullscreen()">✕ Close</button>
+</div>
+
 <header>
   <h1>⚔️ Body Army</h1>
   <p>Tell your army what you did today — watch them fight for you!</p>
@@ -226,7 +261,10 @@
 
   <!-- COL 1: body image + overall scores -->
   <div class="panel">
-    <div class="panel-title">🏰 Your Kingdom</div>
+    <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
+      🏰 Your Kingdom
+      <button class="fs-open-btn" onclick="openFullscreen()">⛶ Full View</button>
+    </div>
     <div class="bodyWrap" id="body">
       <img src="body.png?v=3" alt="human body with organs" />
       <div id="bodyFlash"></div>
@@ -1044,6 +1082,235 @@ document.getElementById('inpAct').addEventListener('keydown', e=>{
       container.appendChild(b);
     });
   });
+
+// ─── Fullscreen patrol view ───────────────────────────────────────────────────
+
+// Body outline path in body.png pixel space (387 wide × 1536 tall)
+// Used to position Skin Barrier shields as an actual wall around the perimeter
+const SKIN_PATH = [
+  {x:158,y:4},{x:193,y:2},{x:228,y:4},
+  {x:260,y:35},{x:268,y:90},{x:258,y:155},
+  {x:228,y:175},{x:258,y:205},{x:308,y:228},
+  {x:348,y:268},{x:363,y:360},{x:352,y:455},
+  {x:325,y:488},{x:308,y:535},{x:302,y:580},{x:312,y:640},
+  {x:285,y:700},{x:298,y:830},{x:285,y:960},{x:265,y:1105},
+  {x:252,y:1255},{x:244,y:1405},{x:238,y:1505},
+  {x:252,y:1532},{x:298,y:1535},
+  {x:92,y:1535},{x:138,y:1532},
+  {x:146,y:1505},{x:140,y:1405},{x:132,y:1255},
+  {x:118,y:1105},{x:98,y:960},{x:84,y:830},{x:98,y:700},
+  {x:78,y:640},{x:72,y:580},{x:68,y:535},{x:52,y:488},
+  {x:25,y:455},{x:14,y:360},{x:28,y:268},
+  {x:68,y:228},{x:118,y:205},{x:148,y:175},
+  {x:122,y:155},{x:112,y:90},{x:120,y:35},
+];
+
+// Patrol definitions — zone coords match body.png pixel space
+const FS_DEF = {
+  gut:         { emoji:'🦠', color:'#4ade80',
+                 zone:{x:97,y:592,w:192,h:216}, speed:0.5,  behavior:'wander',
+                 role:'Colonising the gut fortress — your largest immune base' },
+  neutro:      { emoji:'⚡', color:'#60a5fa',
+                 zone:{x:60,y:150,w:267,h:720}, speed:2.8,  behavior:'dart',
+                 role:'Racing through the bloodstream — first to every battle' },
+  tcell:       { emoji:'🎯', color:'#a78bfa',
+                 zone:{x:100,y:350,w:190,h:400}, speed:0.9, behavior:'patrol',
+                 role:'Patrolling lymph nodes — memorising every enemy' },
+  nk:          { emoji:'🗡️', color:'#fbbf24',
+                 zone:{x:196,y:456,w:130,h:250}, speed:1.1, behavior:'stalk',
+                 role:'Stalking through the liver — hunting infected cells' },
+  skin:        { emoji:'🛡️', color:'#fb923c',
+                 behavior:'wall',
+                 role:'Guarding every inch of the castle walls' },
+  lung:        { emoji:'🌬️', color:'#2dd4bf',
+                 zone:{x:69,y:300,w:249,h:176}, speed:0.7,  behavior:'patrol',
+                 role:'Sweeping invaders from the airways' },
+  liver:       { emoji:'🔧', color:'#f59e0b',
+                 zone:{x:196,y:456,w:124,h:104}, speed:0.4, behavior:'wander',
+                 role:'Filtering and detoxifying the blood supply' },
+  inflam:      { emoji:'🧯', color:'#f87171',
+                 zone:{x:90,y:250,w:207,h:600}, speed:0.5,  behavior:'wander',
+                 role:'Calming excess inflammation across the kingdom' },
+  prefrontal:  { emoji:'🧠', color:'#818cf8',
+                 zone:{x:148,y:10,w:100,h:65},  speed:0.25, behavior:'wander',
+                 role:'The command post — directing the whole brain' },
+  hippocampus: { emoji:'💾', color:'#34d399',
+                 zone:{x:158,y:52,w:72,h:48},   speed:0.2,  behavior:'wander',
+                 role:'Filing memories as they arrive' },
+  amygdala:    { emoji:'😌', color:'#f472b6',
+                 zone:{x:155,y:68,w:78,h:60},   speed:0.35, behavior:'wander',
+                 role:'Keeping the kingdom from panicking' },
+  dopamine:    { emoji:'✨', color:'#fde68a',
+                 zone:{x:138,y:15,w:115,h:95},  speed:0.8,  behavior:'dart',
+                 role:'Spreading motivation and reward signals' },
+  serotonin:   { emoji:'☀️', color:'#fdba74',
+                 zone:{x:130,y:20,w:130,h:100}, speed:0.5,  behavior:'wander',
+                 role:'Lifting mood throughout the brain' },
+  bdnf:        { emoji:'🌱', color:'#6ee7b7',
+                 zone:{x:142,y:20,w:108,h:105}, speed:0.22, behavior:'wander',
+                 role:'Growing new connections between neurons' },
+};
+
+function fsSoldierCount(val){ return Math.max(0, Math.ceil(val / 100 * 8)); }
+
+function pathLen(pts){
+  let l=0;
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i],b=pts[(i+1)%pts.length];
+    l+=Math.hypot(b.x-a.x,b.y-a.y);
+  }
+  return l;
+}
+function ptOnPath(pts,t){
+  const total=pathLen(pts);
+  let rem=(((t%1)+1)%1)*total;
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i],b=pts[(i+1)%pts.length];
+    const seg=Math.hypot(b.x-a.x,b.y-a.y);
+    if(rem<=seg){ const f=seg?rem/seg:0; return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f}; }
+    rem-=seg;
+  }
+  return pts[0];
+}
+
+class FsSoldier{
+  constructor(def){
+    this.def=def;
+    const z=def.zone;
+    this.x=z.x+Math.random()*z.w;
+    this.y=z.y+Math.random()*z.h;
+    this.vx=(Math.random()-.5)*def.speed*2;
+    this.vy=(Math.random()-.5)*def.speed*2;
+    this.timer=Math.random()*120;
+    this.nextChange=80+Math.random()*120;
+    this.tx=z.x+Math.random()*z.w;
+    this.ty=z.y+Math.random()*z.h;
+    this.alpha=0;
+  }
+  update(){
+    const z=this.def.zone;
+    this.timer++;
+    this.alpha=Math.min(1,this.alpha+0.025);
+    if(this.def.behavior==='dart'){
+      const dx=this.tx-this.x,dy=this.ty-this.y,dist=Math.hypot(dx,dy);
+      if(dist<8||this.timer>this.nextChange){
+        this.tx=z.x+Math.random()*z.w; this.ty=z.y+Math.random()*z.h;
+        this.nextChange=50+Math.random()*70; this.timer=0;
+      }
+      if(dist>1){this.x+=dx/dist*this.def.speed;this.y+=dy/dist*this.def.speed;}
+    } else if(this.def.behavior==='stalk'){
+      if(this.timer>this.nextChange){
+        this.tx=z.x+Math.random()*z.w; this.ty=z.y+Math.random()*z.h;
+        this.nextChange=160+Math.random()*200; this.timer=0;
+      }
+      const dx=this.tx-this.x,dy=this.ty-this.y,dist=Math.hypot(dx,dy);
+      if(dist>2){this.x+=dx/dist*this.def.speed;this.y+=dy/dist*this.def.speed;}
+    } else {
+      if(this.timer>this.nextChange){
+        this.vx=(Math.random()-.5)*this.def.speed*2;
+        this.vy=(Math.random()-.5)*this.def.speed*2;
+        this.nextChange=100+Math.random()*150; this.timer=0;
+      }
+      this.x+=this.vx; this.y+=this.vy;
+    }
+    if(this.x<z.x){this.x=z.x;this.vx=Math.abs(this.vx);}
+    if(this.x>z.x+z.w){this.x=z.x+z.w;this.vx=-Math.abs(this.vx);}
+    if(this.y<z.y){this.y=z.y;this.vy=Math.abs(this.vy);}
+    if(this.y>z.y+z.h){this.y=z.y+z.h;this.vy=-Math.abs(this.vy);}
+  }
+  draw(ctx,ox,oy,scale){
+    const sx=ox+this.x*scale, sy=oy+this.y*scale;
+    const sz=Math.max(10,Math.round(16*scale));
+    ctx.save();
+    ctx.globalAlpha=this.alpha;
+    ctx.font=sz+'px serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor=this.def.color; ctx.shadowBlur=10*scale;
+    ctx.fillText(this.def.emoji,sx,sy);
+    ctx.restore();
+  }
+}
+
+let fsAnimId=null, fsSoldiers=[], fsWallPts=[];
+
+function fsImgBounds(){
+  const wrap=document.getElementById('fsBodWrap');
+  const wW=wrap.clientWidth, wH=wrap.clientHeight;
+  const scale=wH/1536;
+  const imgW=387*scale;
+  return{ox:(wW-imgW)/2, oy:0, scale};
+}
+
+function initFsAnim(){
+  const canvas=document.getElementById('fsCanvas');
+  const wrap=document.getElementById('fsBodWrap');
+  canvas.width=wrap.clientWidth;
+  canvas.height=wrap.clientHeight;
+
+  fsSoldiers=[];
+  [...BODY_UNITS,...BRAIN_UNITS].forEach(unit=>{
+    const def=FS_DEF[unit.id]; if(!def||def.behavior==='wall') return;
+    const n=fsSoldierCount(unit.val);
+    for(let i=0;i<n;i++) fsSoldiers.push(new FsSoldier(def));
+  });
+
+  const skinVal=BODY_UNITS.find(u=>u.id==='skin').val;
+  const wCount=Math.max(1,Math.round(skinVal/100*38));
+  fsWallPts=[];
+  for(let i=0;i<wCount;i++) fsWallPts.push(ptOnPath(SKIN_PATH,i/wCount));
+
+  renderFsLegend();
+
+  if(fsAnimId) cancelAnimationFrame(fsAnimId);
+  (function tick(){
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const{ox,oy,scale}=fsImgBounds();
+
+    // Skin Barrier — shields around the body perimeter (the actual wall)
+    const wSz=Math.max(8,Math.round(13*scale));
+    ctx.save();
+    ctx.font=wSz+'px serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='#fb923c'; ctx.shadowBlur=5*scale;
+    fsWallPts.forEach(p=>ctx.fillText('🛡️',ox+p.x*scale,oy+p.y*scale));
+    ctx.restore();
+
+    // All other soldiers
+    fsSoldiers.forEach(s=>{s.update();s.draw(ctx,ox,oy,scale);});
+
+    fsAnimId=requestAnimationFrame(tick);
+  })();
+}
+
+function openFullscreen(){
+  document.getElementById('fsBod').style.display='flex';
+  requestAnimationFrame(initFsAnim);
+}
+function closeFullscreen(){
+  document.getElementById('fsBod').style.display='none';
+  if(fsAnimId){cancelAnimationFrame(fsAnimId);fsAnimId=null;}
+}
+
+function renderFsLegend(){
+  const el=document.getElementById('fsLegendList');
+  el.innerHTML='';
+  [...BODY_UNITS,...BRAIN_UNITS].forEach(unit=>{
+    const def=FS_DEF[unit.id]; if(!def) return;
+    const isWall=def.behavior==='wall';
+    const rawCount=isWall?Math.max(1,Math.round(unit.val/100*38)):fsSoldierCount(unit.val);
+    const countStr=isWall?rawCount+' shields':rawCount+(rawCount===1?' unit':' units');
+    const col=unit.val>=65?'#46d39a':unit.val>=40?'#fbbf24':'#ff6b6b';
+    el.innerHTML+=`<div class="fs-leg-item">
+      <div class="fs-leg-emoji">${def.emoji}</div>
+      <div class="fs-leg-info">
+        <div class="fs-leg-name">${unit.name}</div>
+        <div class="fs-leg-sub">${def.role}</div>
+        <div class="fs-leg-count" style="color:${col}">${unit.val}/100 · ${countStr}</div>
+      </div>
+    </div>`;
+  });
+}
 
 buildUnits(BODY_UNITS, 'bodyUnits');
 buildUnits(BRAIN_UNITS, 'brainUnits');
