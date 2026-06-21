@@ -21,14 +21,39 @@
   .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; }
   .panel h2 { margin:0 0 14px; font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
-  .body { position:relative; height:320px; border-radius:14px;
-    background:radial-gradient(120px 160px at 50% 35%, rgba(90,169,255,.10), transparent), var(--panel-2);
-    overflow:hidden; border:1px solid var(--line); }
-  .figure { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-    font-size:120px; filter:drop-shadow(0 0 18px rgba(90,169,255,.25)); }
-  .cell { position:absolute; width:16px; height:16px; border-radius:50%; transition:opacity .4s ease; }
-  .cell.army { background:radial-gradient(circle at 30% 30%, #bcdcff, var(--army)); box-shadow:0 0 10px rgba(90,169,255,.7); }
-  .cell.enemy { background:radial-gradient(circle at 30% 30%, #ffc2c2, var(--bad)); box-shadow:0 0 10px rgba(255,107,107,.7); }
+  /* Inside-the-body view: a cross-section of tissue / bloodstream */
+  .body { position:relative; height:320px; border-radius:14px; overflow:hidden;
+    border:1px solid var(--line);
+    background:
+      radial-gradient(180px 140px at 25% 20%, rgba(255,120,120,.12), transparent),
+      radial-gradient(220px 180px at 80% 85%, rgba(255,90,120,.14), transparent),
+      radial-gradient(160px 120px at 60% 40%, rgba(120,40,60,.25), transparent),
+      linear-gradient(160deg, #3a1620, #2a0e18 60%, #1e0a12); }
+  /* soft vessel wall along the edges */
+  .body::before { content:''; position:absolute; inset:0; border-radius:14px; pointer-events:none;
+    box-shadow: inset 0 0 60px rgba(120,20,40,.55), inset 0 0 12px rgba(0,0,0,.4); }
+  /* plasma haze */
+  .body::after { content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(600px 300px at 50% 50%, rgba(255,180,190,.05), transparent); }
+
+  .cell { position:absolute; border-radius:50%; transition:opacity .5s ease; }
+  /* ambient red blood cells drifting in the plasma */
+  .rbc { width:18px; height:18px;
+    background:radial-gradient(circle at 35% 30%, #ff9a9a, #c0303f 70%, #8d1f2c);
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,.35), inset 3px 3px 5px rgba(255,255,255,.25);
+    opacity:.55; animation:drift linear infinite; }
+  /* white blood cells = your army */
+  .army { width:20px; height:20px;
+    background:radial-gradient(circle at 32% 30%, #eaf4ff, #9fc6ff 60%, #5aa9ff);
+    box-shadow:0 0 12px rgba(90,169,255,.8), inset -2px -2px 4px rgba(60,110,180,.5);
+    animation:pulse 2.6s ease-in-out infinite; }
+  /* pathogens = invaders */
+  .enemy { width:14px; height:14px; background:radial-gradient(circle at 30% 30%, #ffd27a, #ff7a3c 60%, #b23b1e);
+    box-shadow:0 0 10px rgba(255,120,60,.8);
+    /* spiky germ look */
+    clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  @keyframes pulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.12);} }
+  @keyframes drift { from{ transform:translate(0,0);} to{ transform:translate(14px,-10px);} }
 
   .stat { margin-bottom:14px; }
   .stat .row { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; }
@@ -67,7 +92,7 @@
   <div class="wrap">
     <div class="panel">
       <h2>Inside the body</h2>
-      <div class="body" id="body"><div class="figure">🧍</div></div>
+      <div class="body" id="body"></div>
       <div style="margin-top:18px">
         <div class="stat"><div class="row"><span>🛡️ Army strength</span><b id="armyVal">50</b></div>
           <div class="bar army"><span id="armyBar" style="width:50%"></span></div></div>
@@ -168,15 +193,27 @@ function setBar(id,val){ document.getElementById(id+'Bar').style.width=clamp(val
   document.getElementById(id+'Val').textContent=Math.round(val); }
 function render(){ setBar('army',state.army); setBar('enemy',state.enemy); setBar('health',state.health); renderCells(); }
 
+let ambientDone=false;
 function renderCells(){
   const body=document.getElementById('body');
-  body.querySelectorAll('.cell').forEach(c=>c.remove());
+  // ambient red blood cells: drawn once so they drift steadily in the background
+  if(!ambientDone){
+    for(let i=0;i<10;i++){
+      const el=document.createElement('div'); el.className='cell rbc';
+      el.style.left=(5+Math.random()*90)+'%'; el.style.top=(5+Math.random()*90)+'%';
+      el.style.animationDuration=(5+Math.random()*5)+'s';
+      el.style.animationDirection = Math.random()<.5?'alternate':'alternate-reverse';
+      body.appendChild(el);
+    }
+    ambientDone=true;
+  }
+  body.querySelectorAll('.army,.enemy').forEach(c=>c.remove());
   for(let i=0;i<Math.round(state.army/10);i++) spawnCell(body,'army');
   for(let i=0;i<Math.round(state.enemy/10);i++) spawnCell(body,'enemy');
 }
 function spawnCell(body,kind){
   const el=document.createElement('div'); el.className='cell '+kind;
-  el.style.left=(10+Math.random()*80)+'%'; el.style.top=(10+Math.random()*80)+'%'; el.style.opacity=0;
+  el.style.left=(8+Math.random()*84)+'%'; el.style.top=(8+Math.random()*84)+'%'; el.style.opacity=0;
   body.appendChild(el); requestAnimationFrame(()=>el.style.opacity=1);
 }
 function flashBody(good){
