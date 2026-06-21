@@ -380,7 +380,6 @@
   .achieve-desc  { font-size:12px; color:var(--muted); margin-top:3px; }
 
   /* ── Organ info panel (body tab) ── */
-  #organClickLayer { position:absolute; inset:0; z-index:4; cursor:pointer; }
   #organInfoOverlay { position:fixed; inset:0; z-index:190; background:rgba(0,0,0,.45);
     opacity:0; pointer-events:none; transition:opacity .25s; }
   #organInfoOverlay.open { opacity:1; pointer-events:auto; }
@@ -478,15 +477,15 @@
         <img src="body.png?v=3" alt="human body with organs" />
         <div id="bodyFlash"></div>
         <svg id="organSvg" viewBox="0 0 387 1536" preserveAspectRatio="xMidYMin meet">
-          <ellipse id="org-brain"   class="org" cx="193" cy="82"  rx="68"  ry="78"/>
-          <ellipse id="org-lung-l"  class="org" cx="127" cy="388" rx="58"  ry="88"/>
-          <ellipse id="org-lung-r"  class="org" cx="258" cy="388" rx="58"  ry="88"/>
-          <ellipse id="org-heart"   class="org" cx="183" cy="368" rx="36"  ry="44"/>
-          <ellipse id="org-liver"   class="org" cx="258" cy="508" rx="62"  ry="52"/>
-          <ellipse id="org-stomach" class="org" cx="153" cy="528" rx="48"  ry="52"/>
-          <ellipse id="org-gut"     class="org" cx="193" cy="700" rx="96"  ry="108"/>
+          <!-- largest first = lowest z-order; smallest last = topmost, wins overlapping taps -->
+          <ellipse id="org-gut"     class="org" cx="193" cy="700" rx="96"  ry="108" style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('gut')"/>
+          <ellipse id="org-brain"   class="org" cx="193" cy="82"  rx="68"  ry="78"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('brain')"/>
+          <ellipse id="org-lung-l"  class="org" cx="127" cy="388" rx="58"  ry="88"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('lung-l')"/>
+          <ellipse id="org-lung-r"  class="org" cx="258" cy="388" rx="58"  ry="88"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('lung-r')"/>
+          <ellipse id="org-liver"   class="org" cx="258" cy="508" rx="62"  ry="52"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('liver')"/>
+          <ellipse id="org-stomach" class="org" cx="153" cy="528" rx="48"  ry="52"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('stomach')"/>
+          <ellipse id="org-heart"   class="org" cx="183" cy="368" rx="36"  ry="44"  style="pointer-events:all;cursor:pointer;fill:transparent" onclick="onBodyOrganClick('heart')"/>
         </svg>
-        <div id="organClickLayer" onclick="handleBodyOrganClick(event)"></div>
       </div>
       <div class="score-row" style="margin-top:14px">
         <div class="score-block">
@@ -2021,35 +2020,20 @@ function hideOrganTooltip(){
 }
 
 // ── Organ info panel — My Body tab ───────────────────────────────────────────
-const BODY_ORGAN_INFO=[
-  {cx:183,cy:368,rx:36,ry:44,  emoji:'❤️',name:'Heart',          unitIds:['neutro'],                                         color:'#f87171',desc:'A muscular pump that beats 100,000 times a day, pushing oxygen-rich blood to every cell in your body.'},
-  {cx:153,cy:528,rx:48,ry:52,  emoji:'🫀',name:'Stomach',        unitIds:['gut'],                                            color:'#86efac',desc:'A muscular bag that churns food with strong acid, breaking it into a liquid paste ready for the intestines.'},
-  {cx:258,cy:508,rx:62,ry:52,  emoji:'🔧',name:'Liver',          unitIds:['liver'],                                          color:'#f59e0b',desc:'Your largest internal organ — filters toxins from the blood, stores energy, and produces bile for digestion.'},
-  {cx:127,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Left Lung',      unitIds:['lung'],                                           color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
-  {cx:258,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Right Lung',     unitIds:['lung'],                                           color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
-  {cx:193,cy:82, rx:68,ry:78,  emoji:'🧠',name:'Brain',          unitIds:['prefrontal','hippocampus','amygdala','dopamine','serotonin','bdnf'], color:'#818cf8',desc:'Your body\'s command centre — 86 billion neurons control every thought, memory, movement and emotion you have.'},
-  {cx:193,cy:700,rx:96,ry:108, emoji:'🦠',name:'Gut/Intestines', unitIds:['gut'],                                            color:'#4ade80',desc:'A 9-metre tube that absorbs nutrients and houses trillions of bacteria that control 70% of your immune system.'},
-];
+// SVG ellipses carry pointer-events:all so the browser does the hit-testing natively.
+const BODY_ORGAN_MAP={
+  brain:   {emoji:'🧠',name:'Brain',          unitIds:['prefrontal','hippocampus','amygdala','dopamine','serotonin','bdnf'],color:'#818cf8',desc:'Your body\'s command centre — 86 billion neurons control every thought, memory, movement and emotion you have.'},
+  heart:   {emoji:'❤️',name:'Heart',           unitIds:['neutro'],  color:'#f87171',desc:'A muscular pump that beats 100,000 times a day, pushing oxygen-rich blood to every cell in your body.'},
+  'lung-l':{emoji:'🫁',name:'Left Lung',       unitIds:['lung'],    color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  'lung-r':{emoji:'🫁',name:'Right Lung',      unitIds:['lung'],    color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  liver:   {emoji:'🔧',name:'Liver',           unitIds:['liver'],   color:'#f59e0b',desc:'Your largest internal organ — filters toxins from the blood, stores energy, and produces bile for digestion.'},
+  stomach: {emoji:'🫀',name:'Stomach',         unitIds:['gut'],     color:'#86efac',desc:'A muscular bag that churns food with strong acid, breaking it into a liquid paste ready for the intestines.'},
+  gut:     {emoji:'🦠',name:'Gut/Intestines',  unitIds:['gut'],     color:'#4ade80',desc:'A 9-metre tube that absorbs nutrients and houses trillions of bacteria that control 70% of your immune system.'},
+};
 
-function handleBodyOrganClick(e){
-  const wrap=document.getElementById('body');
-  const rect=wrap.getBoundingClientRect();
-  const mx=e.clientX-rect.left;
-  const my=e.clientY-rect.top;
-  // body.png is 387×1536, rendered with object-fit:contain object-position:center top
-  const wW=rect.width, wH=rect.height;
-  const scale=Math.min(wW/387, wH/1536);
-  const ox=(wW-387*scale)/2;
-  const oy=0; // top-aligned
-  const bx=(mx-ox)/scale;
-  const by=(my-oy)/scale;
-  let hit=null;
-  for(const o of BODY_ORGAN_INFO){
-    const dx=(bx-o.cx)/o.rx, dy=(by-o.cy)/o.ry;
-    if(dx*dx+dy*dy<=1){hit=o;break;}
-  }
-  if(!hit){hideOrganInfoPanel();return;}
-  showOrganInfoPanel(hit);
+function onBodyOrganClick(key){
+  const organ=BODY_ORGAN_MAP[key];
+  if(organ) showOrganInfoPanel(organ);
 }
 
 function showOrganInfoPanel(organ){
