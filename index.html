@@ -90,6 +90,14 @@
   .inputRow input:focus { outline:none; border-color:#3a4a66; }
   .inputRow button { background:linear-gradient(90deg,#3d7fd6,var(--army)); border:none;
     color:#fff; font-weight:600; padding:0 16px; border-radius:12px; cursor:pointer; font-size:15px; }
+  .amtRow { display:flex; gap:8px; margin-bottom:8px; }
+  .amtRow input[type=number] { width:78px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:10px; padding:9px 10px; color:var(--text); font-size:14px; }
+  .amtRow input[type=number]:focus { outline:none; border-color:#3a4a66; }
+  .amtRow input[type=number]::placeholder { color:var(--muted); }
+  .amtRow select { flex:1; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:10px; padding:9px 10px; color:var(--text); font-size:14px; cursor:pointer; }
+  .amtRow select:focus { outline:none; border-color:#3a4a66; }
   .chips { margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }
   .chips button { background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
     border-radius:999px; padding:6px 11px; font-size:12px; cursor:pointer; }
@@ -323,8 +331,17 @@
   <!-- COL 3: input + log -->
   <div class="panel">
     <div class="panel-title">🍎 Food &amp; Drink</div>
+    <div class="amtRow">
+      <input type="number" id="amtNum" min="0.25" step="0.25" placeholder="Amount" />
+      <select id="amtUnit">
+        <option value="">— no unit —</option>
+        <option value="tablespoon">tablespoon</option>
+        <option value="teaspoon">teaspoon</option>
+        <option value="grams">grams</option>
+      </select>
+    </div>
     <div class="inputRow">
-      <input id="inpFood" placeholder="e.g. drank kefir, ate broccoli, coffee…" autocomplete="off" />
+      <input id="inpFood" placeholder="e.g. chia seeds, kefir, broccoli…" autocomplete="off" />
       <button id="goFood">Add!</button>
     </div>
     <div class="chips" id="chipsFood"></div>
@@ -349,9 +366,13 @@ const clampScale = v => Math.min(Math.max(v, 0.25), 4);
 
 function parseQuantity(text) {
   const t = text.toLowerCase();
-  const m = t.match(/(\d+\.?\d*)\s*(cups?|glasses?|litres?|liters?|ml|oz|hours?|hrs?|mins?|minutes?|kms?|miles?|pieces?|slices?|cans?|bottles?|bowls?|plates?|servings?|shots?)/);
+  const m = t.match(/(\d+\.?\d*)\s*(tablespoons?|tbsps?|teaspoons?|tsps?|grams?|kg|cups?|glasses?|litres?|liters?|ml|oz|hours?|hrs?|mins?|minutes?|kms?|miles?|pieces?|slices?|cans?|bottles?|bowls?|plates?|servings?|shots?)/);
   if (m) {
-    const n = parseFloat(m[1]), u = m[2].replace(/s$/, '');
+    const n = parseFloat(m[1]), u = m[2].replace(/s$/, '').replace(/p$/, 'p');
+    if (u==='tablespoon'||u==='tbsp') return clampScale(n);
+    if (u==='teaspoon'||u==='tsp') return clampScale(n * 0.33);
+    if (u==='gram') return clampScale(n / 30);
+    if (u==='kg') return clampScale(n * 33);
     if (u==='min'||u==='minute') return clampScale(n / 30);
     if (u==='hour'||u==='hr') return clampScale(n);
     if (u==='km') return clampScale(n / 3);
@@ -462,6 +483,85 @@ const RULES = [
     msg:'Green tea gives The Commander a superpower — calm and focused at the same time! No jitters!',
     sci:'Fun fact: Green tea has a special ingredient that makes you alert AND relaxed — like a chill superhero!',
     fx:{ prefrontal:+8, amygdala:+7, serotonin:+6, dopamine:+4, inflam:+5 } },
+
+  // ── Seeds ──
+  { k:['chia seed','chia'],
+    type:'food', emoji:'🫧',
+    msg:'Chia seeds are tiny armour pellets for the Gut Microbiome! They expand into a gel that feeds good bacteria all day long!',
+    sci:'Fun fact: Just 2 tablespoons of chia seeds contains more omega-3 than most fish — and they turn into a gel in your gut that feeds your immune soldiers for hours!',
+    fx:{ gut:+9, inflam:+8, bdnf:+5, neutro:+4, skin:+3 } },
+
+  { k:['flax seed','flaxseed','linseed','flax'],
+    type:'food', emoji:'🌿',
+    msg:'Flax seeds are the plant kingdom\'s top omega-3 weapon! They arm the T-Cells and calm the Fire Brigade!',
+    sci:'Fun fact: Flaxseeds are the richest plant source of omega-3 on Earth — one tablespoon gives your T-Cells major firepower against inflammation!',
+    fx:{ inflam:+9, tcell:+6, gut:+7, bdnf:+5, skin:+3 } },
+
+  { k:['hemp seed','hemp'],
+    type:'food', emoji:'💚',
+    msg:'Hemp seeds are complete protein packets — every one of the 9 essential amino acids your soldiers need to rebuild after battle!',
+    sci:'Fun fact: Hemp seeds have the perfect 3:1 ratio of omega-6 to omega-3 — the exact balance that keeps the Fire Brigade from going out of control!',
+    fx:{ gut:+6, inflam:+8, neutro:+5, skin:+6, tcell:+4 } },
+
+  { k:['pumpkin seed','pepita'],
+    type:'food', emoji:'🎃',
+    msg:'Pumpkin seeds are the zinc bomb — Hunter Corps and Speed Squad both get a massive upgrade from just a handful!',
+    sci:'Fun fact: A 30g serving of pumpkin seeds delivers almost half your daily zinc — the mineral your T-Cells absolutely cannot train without!',
+    fx:{ tcell:+10, neutro:+7, nk:+6, inflam:+6, bdnf:+4 } },
+
+  { k:['sunflower seed'],
+    type:'food', emoji:'🌻',
+    msg:'Sunflower seeds coat NK Cells in vitamin E armour — they become nearly unstoppable virus hunters!',
+    sci:'Fun fact: NK Cells store vitamin E inside their walls — sunflower seeds give them the biggest vitamin E top-up of any common food!',
+    fx:{ nk:+8, skin:+7, inflam:+6, neutro:+4 } },
+
+  { k:['sesame seed','sesame','tahini'],
+    type:'food', emoji:'⚪',
+    msg:'Sesame seeds have secret anti-inflammatory chemicals called lignans — they tell the Fire Brigade to calm right down and stop burning the kingdom!',
+    sci:'Fun fact: Sesamin from sesame seeds is so anti-inflammatory that researchers study it as a natural painkiller — and it helps T-Cells communicate better!',
+    fx:{ inflam:+8, tcell:+5, skin:+5, bdnf:+4 } },
+
+  { k:['black seed','nigella','kalonji','black cumin','nigella sativa'],
+    type:'food', emoji:'🖤',
+    msg:'Black seeds are legendary warrior seeds — the compound thymoquinone is one of nature\'s most powerful anti-infection weapons!',
+    sci:'Fun fact: Nigella sativa has been studied in over 600 scientific papers — thymoquinone boosts NK Cells, calms inflammation AND acts as a natural antibiotic!',
+    fx:{ nk:+9, neutro:+8, inflam:+10, tcell:+6, gut:+5 } },
+
+  { k:['poppy seed'],
+    type:'food', emoji:'🔵',
+    msg:'Poppy seeds bring calcium and magnesium to strengthen the Wall Guards and keep the kingdom\'s structure solid!',
+    sci:'Fun fact: Poppy seeds are surprisingly rich in calcium and magnesium — both minerals help immune cells send signals to each other faster!',
+    fx:{ skin:+4, neutro:+3, inflam:+3, serotonin:+3 } },
+
+  { k:['fenugreek seed','fenugreek'],
+    type:'food', emoji:'🟡',
+    msg:'Fenugreek seeds steady the kingdom\'s sugar supply so Neutrophils don\'t get weakened by sugar spikes!',
+    sci:'Fun fact: Fenugreek seeds contain a special fibre that slows sugar entering the blood — keeping your Neutrophils at full fighting strength all day!',
+    fx:{ inflam:+6, gut:+6, neutro:+4, tcell:+3 } },
+
+  { k:['fennel seed','fennel'],
+    type:'food', emoji:'🌱',
+    msg:'Fennel seeds are the Gut Microbiome\'s peace-makers — they calm cramps and help good bacteria thrive in the gut fortress!',
+    sci:'Fun fact: Anethole in fennel is anti-inflammatory AND antibacterial — it helps your gut soldiers by clearing out the bad guys while keeping good bacteria safe!',
+    fx:{ gut:+6, inflam:+5, lung:+3, serotonin:+3 } },
+
+  { k:['cumin seed','cumin'],
+    type:'food', emoji:'🟤',
+    msg:'Cumin seeds are antioxidant warriors that help Cleanup Crew filter the blood faster — ancient kingdoms knew this secret for thousands of years!',
+    sci:'Fun fact: Cumin contains thymol — a natural antifungal that helps your Liver soldiers neutralise harmful compounds before they reach the bloodstream!',
+    fx:{ liver:+6, inflam:+5, gut:+5, neutro:+3 } },
+
+  { k:['coriander seed','coriander'],
+    type:'food', emoji:'🌿',
+    msg:'Coriander seeds help the Cleanup Crew flush heavy metals and toxins — they\'re the detox specialists of the spice world!',
+    sci:'Fun fact: Coriander seeds bind to heavy metal molecules in the blood and help the Liver soldiers carry them safely out of the kingdom!',
+    fx:{ liver:+7, inflam:+5, gut:+4 } },
+
+  { k:['seed mix','mixed seeds','seed'],
+    type:'food', emoji:'🌱',
+    msg:'A seed mix is like sending a full squad of reinforcements! Every type of seed brings its own special power to the kingdom!',
+    sci:'Fun fact: Mixing different seeds gives you zinc, omega-3, vitamin E, and fibre all in one — the ultimate immune starter pack!',
+    fx:{ gut:+7, inflam:+7, tcell:+5, nk:+4, skin:+4, bdnf:+4 } },
 
   // ── Lifestyle — positive ──
   { k:['sleep','slept','nap','8 hours','nine hours','ten hours'],
@@ -1058,11 +1158,20 @@ function submit(text, type){
   applyRule(text, r, scale);
 }
 
+function buildFoodText(raw){
+  const n = parseFloat(document.getElementById('amtNum').value);
+  const u = document.getElementById('amtUnit').value;
+  if(!isNaN(n) && n > 0 && u) return n + ' ' + u + ' ' + raw.trim();
+  return raw.trim();
+}
+
 document.getElementById('goFood').onclick = ()=>{
-  const i=document.getElementById('inpFood'); submit(i.value,'food'); i.value=''; i.focus();
+  const i=document.getElementById('inpFood');
+  submit(buildFoodText(i.value),'food');
+  i.value=''; i.focus();
 };
 document.getElementById('inpFood').addEventListener('keydown', e=>{
-  if(e.key==='Enter'){ submit(e.target.value,'food'); e.target.value=''; }
+  if(e.key==='Enter'){ submit(buildFoodText(e.target.value),'food'); e.target.value=''; }
 });
 
 document.getElementById('goAct').onclick = ()=>{
@@ -1072,7 +1181,7 @@ document.getElementById('inpAct').addEventListener('keydown', e=>{
   if(e.key==='Enter'){ submit(e.target.value,'activity'); e.target.value=''; }
 });
 
-[[['drank kefir','2 glasses of water','ate avocado','mushrooms','blueberries','dark chocolate','3 cups green tea','ate junk food','2 beers'],'food'],
+[[['drank kefir','2 glasses of water','pumpkin seeds','chia seeds','blueberries','dark chocolate','ate junk food','2 beers'],'food'],
  [['30 minutes running','slept 8 hours','cold shower','danced','read a book','meditated','stressed out','sat all day'],'activity']]
   .forEach(([examples, type])=>{
     const container = document.getElementById(type==='food'?'chipsFood':'chipsAct');
