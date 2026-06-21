@@ -352,6 +352,20 @@
   .clock-desc { font-size:11px; color:var(--muted); }
   .clock-peak { font-size:10px; padding:2px 7px; border-radius:999px; font-weight:600; flex-shrink:0; }
 
+  /* ── Organ tap tooltip ── */
+  #organTooltip {
+    display:none; position:fixed; z-index:300;
+    background:#1a2236; border:1px solid #2a4a6a;
+    border-radius:12px; padding:10px 14px; max-width:250px;
+    box-shadow:0 6px 24px rgba(0,0,0,.55); pointer-events:none;
+    animation:fadeIn .15s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+  #organTooltipHead { display:flex; align-items:center; gap:7px; margin-bottom:5px; }
+  #organTooltipEmoji { font-size:20px; line-height:1; }
+  #organTooltipName  { font-size:13px; font-weight:700; color:var(--text); }
+  #organTooltipDesc  { font-size:12px; color:var(--muted); line-height:1.5; }
+
   /* ── Achievement pop-up ── */
   #achieveToast {
     position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(120%);
@@ -367,6 +381,11 @@
 </style>
 </head>
 <body>
+
+<div id="organTooltip">
+  <div id="organTooltipHead"><span id="organTooltipEmoji"></span><span id="organTooltipName"></span></div>
+  <div id="organTooltipDesc"></div>
+</div>
 
 <div id="achieveToast">
   <div class="achieve-title">🏆 Achievement Unlocked!</div>
@@ -1913,7 +1932,54 @@ class FsSoldier{
   }
 }
 
+// Organ click info — sorted smallest→largest so inner organs win overlapping hits
+const ORGAN_INFO=[
+  {cx:183,cy:368,rx:36,ry:44,  emoji:'❤️',name:'Heart',           desc:'A muscular pump that beats 100,000 times a day, pushing oxygen-rich blood to every cell in your body.'},
+  {cx:153,cy:528,rx:48,ry:52,  emoji:'🫀',name:'Stomach',         desc:'A muscular bag that churns food with strong acid, breaking it into a liquid paste ready for the intestines.'},
+  {cx:258,cy:508,rx:62,ry:52,  emoji:'🔧',name:'Liver',           desc:'Your largest internal organ — filters toxins from the blood, stores energy, and produces bile for digestion.'},
+  {cx:127,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Left Lung',       desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  {cx:258,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Right Lung',      desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  {cx:193,cy:82, rx:68,ry:78,  emoji:'🧠',name:'Brain',           desc:'Your body\'s command centre — 86 billion neurons control every thought, memory, movement and emotion you have.'},
+  {cx:193,cy:700,rx:96,ry:108, emoji:'🦠',name:'Gut / Intestines',desc:'A 9-metre tube that absorbs nutrients and houses trillions of bacteria that control 70% of your immune system.'},
+];
+
 let fsAnimId=null, fsSoldiers=[], fsWallPts=[], fsReinitTimer=null;
+let organTooltipTimer=null;
+
+function handlePatrolClick(e){
+  const wrap=document.getElementById('fsBodWrap');
+  const rect=wrap.getBoundingClientRect();
+  const {ox,oy,scale}=fsImgBounds();
+  const bx=(e.clientX-rect.left-ox)/scale;
+  const by=(e.clientY-rect.top -oy)/scale;
+
+  let hit=null;
+  for(const o of ORGAN_INFO){
+    const dx=(bx-o.cx)/o.rx, dy=(by-o.cy)/o.ry;
+    if(dx*dx+dy*dy<=1){hit=o;break;}
+  }
+  if(!hit){hideOrganTooltip();return;}
+
+  clearTimeout(organTooltipTimer);
+  const tip=document.getElementById('organTooltip');
+  document.getElementById('organTooltipEmoji').textContent=hit.emoji;
+  document.getElementById('organTooltipName').textContent=hit.name;
+  document.getElementById('organTooltipDesc').textContent=hit.desc;
+
+  // Position near tap, nudge on-screen
+  const tipW=260, tipH=90;
+  let tx=e.clientX+14, ty=e.clientY-20;
+  if(tx+tipW>window.innerWidth-8)  tx=e.clientX-tipW-14;
+  if(ty+tipH>window.innerHeight-8) ty=window.innerHeight-tipH-8;
+  if(ty<8) ty=8;
+  tip.style.left=tx+'px'; tip.style.top=ty+'px';
+  tip.style.display='block';
+  organTooltipTimer=setTimeout(hideOrganTooltip,4500);
+}
+function hideOrganTooltip(){
+  const t=document.getElementById('organTooltip');
+  if(t) t.style.display='none';
+}
 
 // ── Body-shape fat layer ─────────────────────────────────────────────────────
 // Derived from inflammation control + gut + liver → "metabolic health"
@@ -2013,6 +2079,9 @@ function initFsAnim(){
   for(let i=0;i<wCount;i++) fsWallPts.push(ptOnPath(SKIN_PATH,i/wCount));
 
   renderFsLegend();
+
+  // Attach organ-click handler once (replace any previous)
+  wrap.onclick=handlePatrolClick;
 
   if(fsAnimId) cancelAnimationFrame(fsAnimId);
   (function tick(){
