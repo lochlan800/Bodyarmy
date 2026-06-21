@@ -216,16 +216,11 @@
   .toast-dn   { color:var(--bad); }
 
   /* ── Fullscreen patrol overlay ── */
-  #fsBod { display:none; position:fixed; inset:0; background:var(--bg); z-index:150; flex-direction:row; }
+  #fsBod { display:flex; flex-direction:row; width:100%; height:78vh; min-height:420px;
+    border-radius:14px; overflow:hidden; border:1px solid var(--line); }
   #fsBodWrap { position:relative; flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  #fsImg { height:100vh; width:auto; display:block; user-select:none; }
+  #fsImg { height:100%; width:auto; display:block; user-select:none; }
   #fsCanvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-  #fsClose {
-    position:absolute; top:14px; right:14px; z-index:10;
-    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
-    border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;
-  }
-  #fsClose:hover { border-color:#3a4a66; }
   #fsLegend { width:170px; background:var(--panel); border-left:1px solid var(--line); padding:10px 10px 40px; overflow-y:auto; flex-shrink:0; }
   .fs-leg-title { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
   .fs-leg-item { display:flex; align-items:center; gap:6px; padding:5px 7px; border-radius:8px; border:1px solid var(--line); background:var(--panel-2); margin-bottom:4px; }
@@ -391,18 +386,6 @@
   <div class="hist-list" id="histList"></div>
 </div>
 
-<!-- Fullscreen patrol overlay -->
-<div id="fsBod">
-  <div id="fsBodWrap">
-    <img id="fsImg" src="body.png?v=3" alt="body patrol view" />
-    <canvas id="fsCanvas"></canvas>
-  </div>
-  <div id="fsLegend">
-    <div class="fs-leg-title">⚔️ Patrol Status</div>
-    <div id="fsLegendList"></div>
-  </div>
-  <button id="fsClose" onclick="closeFullscreen()">✕ Close</button>
-</div>
 
 <header>
   <h1>⚔️ Body Army</h1>
@@ -418,6 +401,7 @@
   <button class="main-nav-btn"        id="mnav-supplies"  onclick="switchMainTab('supplies')">💊 Supplies</button>
   <button class="main-nav-btn"        id="mnav-badges"    onclick="switchMainTab('badges')">🏆 Badges</button>
   <button class="main-nav-btn"        id="mnav-intel"     onclick="switchMainTab('intel')">🦠 Intel</button>
+  <button class="main-nav-btn"        id="mnav-patrol"    onclick="switchMainTab('patrol')">⛶ Patrol</button>
 </nav>
 
 <div class="wrap">
@@ -425,10 +409,7 @@
   <!-- TAB: My Body -->
   <div class="mtab active" id="mtab-body">
     <div class="panel">
-      <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
-        🏰 Your Kingdom
-        <button class="fs-open-btn" onclick="openFullscreen()">⛶ Full View</button>
-      </div>
+      <div class="panel-title">🏰 Your Kingdom</div>
       <div class="bodyWrap" id="body">
         <img src="body.png?v=3" alt="human body with organs" />
         <div id="bodyFlash"></div>
@@ -616,6 +597,20 @@
       </div>
       <div id="intelEnemy" class="enemy-list"></div>
       <div id="intelClock" class="clock-list" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- TAB: Patrol -->
+  <div class="mtab" id="mtab-patrol">
+    <div id="fsBod">
+      <div id="fsBodWrap">
+        <img id="fsImg" src="body.png?v=3" alt="body patrol view" />
+        <canvas id="fsCanvas"></canvas>
+      </div>
+      <div id="fsLegend">
+        <div class="fs-leg-title">⚔️ Patrol Status</div>
+        <div id="fsLegendList"></div>
+      </div>
     </div>
   </div>
 
@@ -1302,11 +1297,16 @@ function showTab(tab){
 }
 
 function switchMainTab(name){
-  const tabs = ['body','troops','log','orders','supplies','badges','intel'];
+  const tabs = ['body','troops','log','orders','supplies','badges','intel','patrol'];
   tabs.forEach(t => {
     document.getElementById('mtab-'+t).classList.toggle('active', t===name);
     document.getElementById('mnav-'+t).classList.toggle('active', t===name);
   });
+  if(name==='patrol'){
+    requestAnimationFrame(initFsAnim);
+  } else {
+    if(fsAnimId){cancelAnimationFrame(fsAnimId);fsAnimId=null;}
+  }
 }
 
 // ─── Organ flash ─────────────────────────────────────────────────────────────
@@ -1953,14 +1953,8 @@ function initFsAnim(){
   })();
 }
 
-function openFullscreen(){
-  document.getElementById('fsBod').style.display='flex';
-  requestAnimationFrame(initFsAnim);
-}
-function closeFullscreen(){
-  document.getElementById('fsBod').style.display='none';
-  if(fsAnimId){cancelAnimationFrame(fsAnimId);fsAnimId=null;}
-}
+function openFullscreen(){ switchMainTab('patrol'); }
+function closeFullscreen(){ switchMainTab('body'); }
 
 function renderFsLegend(){
   const el=document.getElementById('fsLegendList');
