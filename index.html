@@ -53,6 +53,16 @@
   .score-bar span { display:block; height:100%; transition:width .5s, background .5s; border-radius:5px; }
   .score-num { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
 
+  /* ── Virus risk block ── */
+  .risk-block { margin-top:12px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .risk-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .risk-main  { display:flex; align-items:center; gap:10px; }
+  .risk-bar-wrap { flex:1; }
+  .risk-bar { height:8px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
+  .risk-bar span { display:block; height:100%; transition:width .5s,background .5s; border-radius:5px; }
+  .risk-pct { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; min-width:48px; text-align:right; transition:color .5s; }
+  .risk-status { font-size:12px; color:var(--muted); margin-top:5px; }
+
   /* ── Tabs ── */
   .tabs { display:flex; gap:8px; margin-bottom:14px; }
   .tab-btn { flex:1; padding:8px 6px; border-radius:10px; border:1px solid var(--line);
@@ -244,6 +254,16 @@
         <div class="score-bar"><span id="brainScoreBar" style="width:55%"></span></div>
       </div>
       <div class="score-num" id="brainScoreVal">55</div>
+    </div>
+    <div class="risk-block">
+      <div class="risk-label">🦠 Chance of Catching a Virus</div>
+      <div class="risk-main">
+        <div class="risk-bar-wrap">
+          <div class="risk-bar"><span id="riskBar" style="width:43%"></span></div>
+        </div>
+        <div class="risk-pct" id="riskPct">43%</div>
+      </div>
+      <div class="risk-status" id="riskStatus">💪 Average protection</div>
     </div>
   </div>
 
@@ -734,6 +754,21 @@ function avgScore(arr){
   return Math.round(arr.reduce((s,u)=>s+clamp(u.val),0)/arr.length);
 }
 
+function calcVirusRisk(){
+  const g = id => BODY_UNITS.find(u=>u.id===id).val;
+  // Weighted immune strength — gut/neutro/tcell/nk are the dominant factors scientifically
+  const strength =
+    g('gut')    * 0.25 +
+    g('neutro') * 0.20 +
+    g('tcell')  * 0.18 +
+    g('nk')     * 0.15 +
+    g('skin')   * 0.10 +
+    g('inflam') * 0.07 +
+    g('lung')   * 0.04 +
+    g('liver')  * 0.01;
+  return Math.round(clamp(100 - strength));
+}
+
 function renderScores(){
   const bs = avgScore(BODY_UNITS);
   const br = avgScore(BRAIN_UNITS);
@@ -746,6 +781,22 @@ function renderScores(){
   document.getElementById('brainScoreBar').style.width = br+'%';
   document.getElementById('brainScoreBar').style.background =
     br>65?'linear-gradient(90deg,#4338ca,#818cf8)':br>40?'linear-gradient(90deg,#b45309,#fbbf24)':'linear-gradient(90deg,#991b1b,#ff6b6b)';
+
+  const risk = calcVirusRisk();
+  const riskColor = risk<25?'#46d39a':risk<50?'#fbbf24':risk<70?'#fb923c':'#ff6b6b';
+  const riskGrad  = risk<25?'linear-gradient(90deg,#2fa372,#46d39a)'
+                  : risk<50?'linear-gradient(90deg,#b45309,#fbbf24)'
+                  : risk<70?'linear-gradient(90deg,#c2410c,#fb923c)'
+                  :         'linear-gradient(90deg,#991b1b,#ff6b6b)';
+  document.getElementById('riskBar').style.width      = risk+'%';
+  document.getElementById('riskBar').style.background = riskGrad;
+  document.getElementById('riskPct').textContent      = risk+'%';
+  document.getElementById('riskPct').style.color      = riskColor;
+  document.getElementById('riskStatus').textContent   =
+    risk<25 ? '🛡️ Strong defences — hard to infect!'
+  : risk<50 ? '💪 Average protection'
+  : risk<70 ? '⚠️ Defences weakened — take care'
+  :           '🚨 High risk — immune system under strain!';
 }
 
 function flashBody(good){
