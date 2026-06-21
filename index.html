@@ -27,6 +27,13 @@
 
   .wrap { max-width:720px; margin:0 auto; padding:14px 16px 60px; }
 
+  /* ── Nav notification badge ── */
+  .nav-badge { position:absolute; top:6px; right:6px; min-width:16px; height:16px;
+    background:#ef4444; color:#fff; font-size:10px; font-weight:800;
+    border-radius:999px; padding:0 4px; line-height:16px; text-align:center;
+    pointer-events:none; }
+  .main-nav-btn { position:relative; }
+
   /* ── Main navigation tabs ── */
   .main-nav { display:flex; overflow-x:auto; scrollbar-width:none;
     border-bottom:1px solid var(--line); background:var(--panel);
@@ -397,7 +404,7 @@
   <button class="main-nav-btn active" id="mnav-body"      onclick="switchMainTab('body')">🏰 My Body</button>
   <button class="main-nav-btn"        id="mnav-troops"    onclick="switchMainTab('troops')">⚔️ Troops</button>
   <button class="main-nav-btn"        id="mnav-log"       onclick="switchMainTab('log')">📋 Log</button>
-  <button class="main-nav-btn"        id="mnav-orders"    onclick="switchMainTab('orders')">🎯 Orders</button>
+  <button class="main-nav-btn"        id="mnav-orders"    onclick="switchMainTab('orders')">🎯 Orders<span class="nav-badge" id="ordersBadge" style="display:none"></span></button>
   <button class="main-nav-btn"        id="mnav-supplies"  onclick="switchMainTab('supplies')">💊 Supplies</button>
   <button class="main-nav-btn"        id="mnav-badges"    onclick="switchMainTab('badges')">🏆 Badges</button>
   <button class="main-nav-btn"        id="mnav-intel"     onclick="switchMainTab('intel')">🦠 Intel</button>
@@ -2277,6 +2284,9 @@ function renderMissions(){
   if(footer) footer.textContent=data.done.length===data.ids.length
     ?'🎖️ All missions complete! New orders tomorrow!'
     :'Complete missions for bonus army boosts! Resets tomorrow.';
+  const remaining=data.ids.length-data.done.length;
+  const badge=document.getElementById('ordersBadge');
+  if(badge){ badge.textContent=remaining; badge.style.display=remaining>0?'':'none'; }
 }
 
 // ─── Achievements ────────────────────────────────────────────────────────────
