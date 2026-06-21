@@ -16,67 +16,74 @@
 
   header { padding:22px 20px 4px; text-align:center; }
   header h1 { font-size:24px; letter-spacing:.4px; }
-  header p { margin-top:5px; color:var(--muted); font-size:13px; }
+  header p  { margin-top:5px; color:var(--muted); font-size:13px; }
 
-  /* 3-column layout: body | units | input+log */
-  .wrap { max-width:1100px; margin:0 auto; padding:14px 16px 60px;
+  .wrap { max-width:1160px; margin:0 auto; padding:14px 16px 60px;
     display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:start; }
-  @media (max-width:900px){ .wrap{ grid-template-columns:1fr 1fr; } }
-  @media (max-width:560px){ .wrap{ grid-template-columns:1fr; } }
+  @media(max-width:900px){ .wrap{ grid-template-columns:1fr 1fr; } }
+  @media(max-width:560px){ .wrap{ grid-template-columns:1fr; } }
 
   .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
   .panel-title { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:12px; }
 
   /* ── Body image ── */
   .bodyWrap { position:relative; border-radius:12px; overflow:hidden;
-    border:1px solid var(--line); background:var(--bg); height:520px; }
+    border:1px solid var(--line); background:var(--bg); height:500px; }
   .bodyWrap img { position:absolute; inset:0; width:100%; height:100%;
-    object-fit:contain; object-position:center top; display:block; }
+    object-fit:contain; object-position:center top; }
   #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0;
     border-radius:12px; transition:opacity .1s; z-index:3; }
 
-  /* Overall score badge under body */
-  .score-row { display:flex; align-items:center; justify-content:space-between; margin-top:12px; }
-  .score-label { font-size:13px; color:var(--muted); }
-  .score-value { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
-  .score-bar { height:8px; border-radius:6px; background:#11141d; overflow:hidden; border:1px solid var(--line); margin-top:6px; }
-  .score-bar span { display:block; height:100%; transition:width .5s ease;
-    background:linear-gradient(90deg,#2fa372,var(--good)); }
+  .score-row { display:flex; align-items:center; justify-content:space-between; margin-top:12px; gap:10px; }
+  .score-block { flex:1; }
+  .score-label { font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .score-bar { height:7px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
+  .score-bar span { display:block; height:100%; transition:width .5s, background .5s; border-radius:5px; }
+  .score-num { font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
 
-  /* ── Military units ── */
-  .units { display:flex; flex-direction:column; gap:10px; }
-  .unit { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  /* ── Tabs ── */
+  .tabs { display:flex; gap:8px; margin-bottom:14px; }
+  .tab-btn { flex:1; padding:8px 6px; border-radius:10px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--muted); cursor:pointer; font-size:13px;
+    font-weight:600; transition:all .15s; }
+  .tab-btn.active { background:#1e2d4a; color:var(--army); border-color:#2a4a7a; }
+
+  /* ── Units ── */
+  .units { display:flex; flex-direction:column; gap:9px; }
+  .unit { background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px 12px; transition:background .4s; }
   .unit-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
   .unit-left { display:flex; align-items:center; gap:8px; }
-  .unit-emoji { font-size:18px; line-height:1; }
-  .unit-name { font-size:13px; font-weight:600; }
-  .unit-desc { font-size:11px; color:var(--muted); margin-top:1px; }
-  .unit-val { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; min-width:28px; text-align:right; }
-  .unit-bar { height:7px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
-  .unit-bar span { display:block; height:100%; transition:width .5s ease; border-radius:5px; }
+  .unit-emoji { font-size:17px; line-height:1; }
+  .unit-name  { font-size:13px; font-weight:600; }
+  .unit-desc  { font-size:11px; color:var(--muted); margin-top:1px; }
+  .unit-val   { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; min-width:26px; text-align:right; }
+  .unit-bar   { height:7px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
+  .unit-bar span { display:block; height:100%; transition:width .5s; border-radius:5px; }
 
   /* ── Input + log ── */
   .inputRow { display:flex; gap:8px; }
-  .inputRow input { flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
-    padding:12px 14px; color:var(--text); font-size:15px; }
+  .inputRow input { flex:1; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:12px; padding:12px 14px; color:var(--text); font-size:15px; }
   .inputRow input:focus { outline:none; border-color:#3a4a66; }
-  .inputRow button { background:linear-gradient(90deg,#3d7fd6,var(--army)); border:none; color:#fff;
-    font-weight:600; padding:0 16px; border-radius:12px; cursor:pointer; font-size:15px; white-space:nowrap; }
+  .inputRow button { background:linear-gradient(90deg,#3d7fd6,var(--army)); border:none;
+    color:#fff; font-weight:600; padding:0 16px; border-radius:12px; cursor:pointer; font-size:15px; }
   .chips { margin-top:10px; display:flex; flex-wrap:wrap; gap:7px; }
   .chips button { background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
     border-radius:999px; padding:6px 11px; font-size:12px; cursor:pointer; }
   .chips button:hover { color:var(--text); border-color:#3a4a66; }
 
-  .log { margin-top:6px; max-height:280px; overflow:auto; font-size:13px; }
+  .log { margin-top:6px; max-height:300px; overflow:auto; font-size:13px; }
   .log-entry { padding:8px 6px; border-bottom:1px solid var(--line); color:var(--muted); }
   .log-entry b { color:var(--text); }
-  .log-entry .sci { font-size:11px; color:#5a6480; margin-top:3px; }
-  .changes { float:right; font-size:11px; line-height:1.6; text-align:right; max-width:120px; }
+  .changes { float:right; font-size:11px; line-height:1.7; text-align:right; max-width:130px; margin-left:8px; }
   .up { color:var(--good); } .dn { color:var(--bad); }
+  .sci { font-size:11px; color:#5a6480; margin-top:3px; }
   .footer-note { text-align:center; color:#3a4060; font-size:11px; margin-top:14px; }
 </style>
 </head>
 <body>
+
 <header>
   <h1>🛡️ Body Army</h1>
   <p>Type anything you do or put on/in your body — see what happens inside.</p>
@@ -84,201 +91,310 @@
 
 <div class="wrap">
 
-  <!-- COLUMN 1: body image -->
+  <!-- COL 1: body image + overall scores -->
   <div class="panel">
     <div class="panel-title">Inside the body</div>
     <div class="bodyWrap" id="body">
       <img src="body.png?v=3" alt="human body with organs" />
       <div id="bodyFlash"></div>
     </div>
-    <div class="score-row">
-      <div>
-        <div class="score-label">Overall Defence</div>
-        <div class="score-bar"><span id="scoreBar" style="width:62%"></span></div>
+    <div class="score-row" style="margin-top:14px">
+      <div class="score-block">
+        <div class="score-label">🛡️ Body Defence</div>
+        <div class="score-bar"><span id="bodyScoreBar" style="width:60%"></span></div>
       </div>
-      <div class="score-value" id="scoreVal">62</div>
+      <div class="score-num" id="bodyScoreVal">60</div>
+    </div>
+    <div class="score-row" style="margin-top:10px">
+      <div class="score-block">
+        <div class="score-label">🧠 Brain Health</div>
+        <div class="score-bar"><span id="brainScoreBar" style="width:55%"></span></div>
+      </div>
+      <div class="score-num" id="brainScoreVal">55</div>
     </div>
   </div>
 
-  <!-- COLUMN 2: military strength units -->
+  <!-- COL 2: military strength tabs -->
   <div class="panel">
-    <div class="panel-title">Military Strength</div>
-    <div class="units" id="units"></div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-body-btn" onclick="showTab('body')">🛡️ Body Defence</button>
+      <button class="tab-btn"        id="tab-brain-btn" onclick="showTab('brain')">🧠 Brain</button>
+    </div>
+
+    <div id="tab-body">
+      <div class="units" id="bodyUnits"></div>
+    </div>
+    <div id="tab-brain" style="display:none">
+      <div class="units" id="brainUnits"></div>
+    </div>
   </div>
 
-  <!-- COLUMN 3: input + log -->
+  <!-- COL 3: input + log -->
   <div class="panel">
     <div class="panel-title">What did you do?</div>
     <div class="inputRow">
-      <input id="inp" placeholder="e.g. drank kefir, ran 5k, smoked…" autocomplete="off" />
+      <input id="inp" placeholder="e.g. drank kefir, ran 5k, read a book…" autocomplete="off" />
       <button id="go">Log it</button>
     </div>
     <div class="chips" id="chips"></div>
 
     <div class="panel-title" style="margin-top:18px">Battle report</div>
     <div class="log" id="log"></div>
-    <div class="footer-note">Scientifically based • each unit maps to a real immune system component</div>
+    <div class="footer-note">Scientifically accurate • body defence + brain health</div>
   </div>
 
 </div>
 
 <script>
-// ─── Defence units ────────────────────────────────────────────────────────────
-// Each maps to a real body system. val = 0-100.
-const UNITS = [
-  { id:'gut',    emoji:'🦠', name:'Gut Microbiome',   desc:'Good bacteria (probiotic army)',    val:60, color:'#4ade80' },
-  { id:'neutro', emoji:'⚡', name:'Neutrophils',       desc:'First-responder white blood cells', val:55, color:'#60a5fa' },
-  { id:'tcell',  emoji:'🎯', name:'T-Cells',           desc:'Adaptive immune — learn & destroy', val:50, color:'#a78bfa' },
-  { id:'nk',     emoji:'🗡️', name:'NK Cells',          desc:'Natural killers — virus & cancer',  val:50, color:'#fbbf24' },
-  { id:'skin',   emoji:'🛡️', name:'Skin Barrier',      desc:'Physical perimeter defence',        val:72, color:'#fb923c' },
-  { id:'lung',   emoji:'🫁', name:'Lung Defence',      desc:'Mucociliary airway patrol',         val:65, color:'#2dd4bf' },
-  { id:'liver',  emoji:'🔧', name:'Liver',             desc:'Detox & toxin filtration',          val:68, color:'#f59e0b' },
-  { id:'inflam', emoji:'🌡️', name:'Inflammation Control', desc:'Low chronic inflammation = better', val:65, color:'#f87171' },
-];
-
-// Build a lookup map
-const unitMap = {};
-UNITS.forEach(u => unitMap[u.id] = u);
-
 const clamp = v => Math.max(0, Math.min(100, v));
 
-// ─── Rules ───────────────────────────────────────────────────────────────────
-// effects: { unitId: delta } — scientifically based deltas
+// ─── Body defence units ────────────────────────────────────────────────────────
+const BODY_UNITS = [
+  { id:'gut',    emoji:'🦠', name:'Gut Microbiome',      desc:'Good bacteria — 70% of immunity lives here', val:60, color:'#4ade80' },
+  { id:'neutro', emoji:'⚡', name:'Neutrophils',          desc:'First-responder white blood cells',           val:55, color:'#60a5fa' },
+  { id:'tcell',  emoji:'🎯', name:'T-Cells',              desc:'Adaptive immunity — learn & destroy',         val:50, color:'#a78bfa' },
+  { id:'nk',     emoji:'🗡️', name:'NK Cells',             desc:'Natural killers — hunt viruses & cancer',     val:50, color:'#fbbf24' },
+  { id:'skin',   emoji:'🛡️', name:'Skin Barrier',         desc:'Physical perimeter defence',                  val:72, color:'#fb923c' },
+  { id:'lung',   emoji:'🫁', name:'Lung Defence',         desc:'Mucociliary airway patrol',                   val:65, color:'#2dd4bf' },
+  { id:'liver',  emoji:'🔧', name:'Liver',                desc:'Detox & toxin filtration',                    val:68, color:'#f59e0b' },
+  { id:'inflam', emoji:'🌡️', name:'Inflammation Control', desc:'Low chronic inflammation = healthier',        val:65, color:'#f87171' },
+];
+
+// ─── Brain units ───────────────────────────────────────────────────────────────
+const BRAIN_UNITS = [
+  { id:'prefrontal',  emoji:'🧠', name:'Prefrontal Cortex', desc:'Focus, planning & self-control',             val:55, color:'#818cf8' },
+  { id:'hippocampus', emoji:'💾', name:'Hippocampus',       desc:'Memory formation & learning',                val:55, color:'#34d399' },
+  { id:'amygdala',    emoji:'😌', name:'Stress Regulation', desc:'Amygdala calm (higher = better regulated)',  val:60, color:'#f472b6' },
+  { id:'dopamine',    emoji:'✨', name:'Dopamine System',   desc:'Motivation, drive & reward',                 val:55, color:'#fde68a' },
+  { id:'serotonin',   emoji:'🌤️', name:'Serotonin',         desc:'Mood, wellbeing & emotional balance',        val:55, color:'#fdba74' },
+  { id:'bdnf',        emoji:'🌱', name:'BDNF',              desc:'Brain growth factor — builds new connections',val:50, color:'#6ee7b7' },
+];
+
+const ALL_UNITS = [...BODY_UNITS, ...BRAIN_UNITS];
+const unitMap = {};
+ALL_UNITS.forEach(u => unitMap[u.id] = u);
+
+// ─── Rules — keywords → effects on body + brain units ────────────────────────
 const RULES = [
+  // ── Good food & drink ──
   { k:['kefir','yogurt','yoghurt','kimchi','sauerkraut','kombucha','probiotic','miso'],
-    emoji:'🥛', msg:'Probiotics seed the gut microbiome — your immune system\'s largest organ.',
-    sci:'~70% of immune cells live in the gut. Lactobacillus strains directly activate neutrophils.',
-    fx:{ gut:+15, neutro:+4, inflam:+6 } },
+    emoji:'🥛',
+    msg:'Probiotics seed the gut — your immune system\'s largest organ. 90% of serotonin is made in the gut.',
+    sci:'Lactobacillus strains activate neutrophils & produce serotonin precursors via the gut-brain axis.',
+    fx:{ gut:+15, neutro:+4, inflam:+6, serotonin:+8, amygdala:+4 } },
 
   { k:['vegetable','veg','salad','broccoli','spinach','kale','greens','fruit','apple','berries','banana'],
-    emoji:'🥦', msg:'Fibre feeds beneficial gut bacteria. Antioxidants neutralise free radicals.',
-    sci:'Dietary fibre produces short-chain fatty acids that regulate T-cell differentiation.',
-    fx:{ gut:+8, tcell:+5, inflam:+8, neutro:+3 } },
+    emoji:'🥦',
+    msg:'Fibre feeds gut flora. Antioxidants reduce inflammation that harms both body and brain.',
+    sci:'Dietary fibre → short-chain fatty acids → regulate T-cell differentiation and BDNF expression.',
+    fx:{ gut:+8, tcell:+5, inflam:+8, neutro:+3, bdnf:+5, hippocampus:+4 } },
+
+  { k:['blueberr','berry','berries'],
+    emoji:'🫐',
+    msg:'Blueberry flavonoids cross the blood-brain barrier and directly stimulate BDNF production.',
+    sci:'Anthocyanins increase BDNF in the hippocampus and improve spatial memory in human trials.',
+    fx:{ bdnf:+12, hippocampus:+9, inflam:+7, gut:+4 } },
 
   { k:['orange','vitamin c','lemon','citrus','kiwi'],
-    emoji:'🍊', msg:'Vitamin C supercharges neutrophils and protects skin collagen.',
-    sci:'Neutrophils accumulate vitamin C at 50-100× plasma concentration to fight pathogens.',
-    fx:{ neutro:+10, skin:+5, inflam:+5, tcell:+3 } },
+    emoji:'🍊',
+    msg:'Vitamin C supercharges neutrophils. In the brain, it\'s a co-factor for dopamine synthesis.',
+    sci:'Neutrophils accumulate vitamin C at 50-100× plasma concentration. Dopamine β-hydroxylase requires vitamin C.',
+    fx:{ neutro:+10, skin:+5, inflam:+5, tcell:+3, dopamine:+5 } },
+
+  { k:['dark chocolate','cacao','cocoa'],
+    emoji:'🍫',
+    msg:'Cacao flavonoids boost BDNF, serotonin and dopamine — but only dark/high-cacao varieties.',
+    sci:'Epicatechin in cacao increases cerebral blood flow to the hippocampus and upregulates BDNF.',
+    fx:{ bdnf:+8, serotonin:+7, dopamine:+6, hippocampus:+5, inflam:+5 } },
 
   { k:['garlic','ginger','turmeric','honey'],
-    emoji:'🧄', msg:'Natural antimicrobials lower inflammation and directly inhibit pathogens.',
-    sci:'Curcumin (turmeric) inhibits NF-κB signalling, reducing pro-inflammatory cytokines.',
-    fx:{ inflam:+14, neutro:+5, gut:+4 } },
+    emoji:'🧄',
+    msg:'Curcumin (turmeric) crosses the blood-brain barrier and boosts BDNF — nature\'s antidepressant.',
+    sci:'Curcumin inhibits NF-κB (inflammation) and upregulates BDNF at doses found in dietary turmeric.',
+    fx:{ inflam:+14, neutro:+5, gut:+4, bdnf:+8, amygdala:+5 } },
 
-  { k:['omega','fish oil','salmon','sardine','walnut','flaxseed'],
-    emoji:'🐟', msg:'Omega-3 fats dampen chronic inflammation and sharpen NK cell activity.',
-    sci:'EPA/DHA shift prostaglandin production from pro- to anti-inflammatory pathways.',
-    fx:{ inflam:+12, nk:+6, tcell:+4 } },
+  { k:['omega','fish oil','salmon','mackerel','sardine','walnut','flaxseed'],
+    emoji:'🐟',
+    msg:'Omega-3 is the main structural fat of brain cell membranes — critical for every brain region.',
+    sci:'DHA makes up 40% of brain cell membrane fat. EPA reduces neuroinflammation and boosts serotonin.',
+    fx:{ inflam:+12, nk:+6, tcell:+4, bdnf:+10, prefrontal:+7, hippocampus:+7, serotonin:+6 } },
 
   { k:['water','hydrate','drank water'],
-    emoji:'💧', msg:'Hydration keeps mucous membranes — the body\'s first barrier — intact.',
-    sci:'Mucosal surfaces trap 90% of pathogens before they reach the bloodstream.',
-    fx:{ skin:+5, lung:+6, liver:+5, inflam:+3 } },
+    emoji:'💧',
+    msg:'Even 2% dehydration measurably impairs memory, focus and mood — the brain is 75% water.',
+    sci:'Mild dehydration (-1.4%) in women reduced mood, increased anxiety and impaired concentration (Ganio 2011).',
+    fx:{ skin:+5, lung:+6, liver:+5, inflam:+3, prefrontal:+5, hippocampus:+4, amygdala:+4 } },
 
-  { k:['protein','chicken','eggs','fish','beans','tofu','meat','steak','turkey'],
-    emoji:'🍳', msg:'Amino acids are the raw materials for antibodies and immune cells.',
-    sci:'Glutamine is the primary fuel for rapidly dividing lymphocytes and neutrophils.',
-    fx:{ neutro:+5, tcell:+6, nk:+4 } },
+  { k:['protein','chicken','turkey','eggs','fish','beans','tofu','meat','steak','lentil'],
+    emoji:'🍳',
+    msg:'Amino acids build antibodies and are raw material for dopamine and serotonin neurotransmitters.',
+    sci:'Tryptophan (eggs, turkey) is converted to serotonin. Tyrosine (chicken, eggs) is converted to dopamine.',
+    fx:{ neutro:+5, tcell:+6, nk:+4, dopamine:+6, serotonin:+6 } },
 
-  { k:['zinc','supplement','multivitamin'],
-    emoji:'💊', msg:'Zinc is essential for T-cell maturation and the skin\'s repair process.',
-    sci:'Even mild zinc deficiency reduces T-cell count and impairs NK cell cytotoxicity.',
-    fx:{ tcell:+8, nk:+5, skin:+5 } },
+  { k:['zinc','magnesium','supplement','multivitamin','vitamin b','b12'],
+    emoji:'💊',
+    msg:'Zinc and magnesium are essential for T-cell function, BDNF signalling and serotonin production.',
+    sci:'Zinc deficiency reduces T-cells and impairs BDNF/TrkB signalling. Magnesium regulates NMDA receptors.',
+    fx:{ tcell:+8, nk:+5, skin:+5, bdnf:+6, serotonin:+5, hippocampus:+5 } },
 
-  // ─── Bad stuff ───
-  { k:['sugar','candy','sweets','soda','cola','cake','donut','chocolate','ice cream'],
-    emoji:'🍬', msg:'Sugar spikes suppress neutrophils for up to 5 hours after eating.',
-    sci:'100g glucose reduces neutrophil phagocytic capacity by ~50% (Sanchez et al., 1973).',
-    fx:{ neutro:-8, gut:-10, inflam:-14, tcell:-4 } },
+  { k:['green tea','matcha'],
+    emoji:'🍵',
+    msg:'L-theanine in green tea boosts alpha brain waves — calm focus without the caffeine jitters.',
+    sci:'L-theanine increases GABA, serotonin and dopamine and synergises with caffeine for sustained focus.',
+    fx:{ prefrontal:+8, amygdala:+7, serotonin:+6, dopamine:+4, inflam:+5 } },
 
-  { k:['junk','fast food','pizza','burger','fries','chips','crisps','fried'],
-    emoji:'🍔', msg:'Ultra-processed food disrupts gut flora and triggers systemic inflammation.',
-    sci:'Emulsifiers (polysorbate-80, CMC) degrade the gut mucus layer within days.',
-    fx:{ gut:-8, inflam:-12, liver:-5, neutro:-4 } },
+  // ── Lifestyle — positive ──
+  { k:['sleep','slept','nap','8 hours','nine hours','ten hours'],
+    emoji:'😴',
+    msg:'Sleep is when memory consolidates, T-cells hunt, and the brain\'s glymphatic system flushes toxins.',
+    sci:'During sleep T-cells upregulate LFA-1 to kill viruses. Hippocampus replays memories into cortex for storage.',
+    fx:{ tcell:+12, nk:+10, neutro:+6, inflam:+8, gut:+4,
+         hippocampus:+14, prefrontal:+10, amygdala:+10, bdnf:+8, serotonin:+6 } },
 
-  { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'],
-    emoji:'🍺', msg:'Alcohol damages the gut lining, suppresses NK cells and overloads the liver.',
-    sci:'Ethanol reduces NK cell cytotoxicity by 75% within hours and depletes gut flora diversity.',
-    fx:{ liver:-16, gut:-10, nk:-10, neutro:-6, inflam:-8 } },
+  { k:['exercise','run','ran','gym','workout','walk','cycling','swim','jog','hiit','yoga','weights','lifting'],
+    emoji:'🏃',
+    msg:'Exercise is the single most powerful trigger of BDNF — the brain\'s own growth hormone. Also mobilises NK cells within minutes.',
+    sci:'A 30-min run increases hippocampal BDNF by 200-300% and NK cell count by ~40% within hours.',
+    fx:{ nk:+10, neutro:+7, tcell:+6, lung:+6, inflam:+6,
+         bdnf:+14, hippocampus:+10, prefrontal:+8, dopamine:+10, serotonin:+8, amygdala:+7 } },
 
-  { k:['smok','cigarette','vape','nicotine'],
-    emoji:'🚬', msg:'Smoke paralyses the lung\'s mucociliary escalator and kills NK cells.',
-    sci:'A single cigarette impairs mucociliary clearance for ~30 minutes; chronic use is permanent.',
-    fx:{ lung:-20, nk:-10, inflam:-12, skin:-5 } },
+  { k:['sun','sunlight','vitamin d','outside','fresh air','nature'],
+    emoji:'☀️',
+    msg:'Sunlight triggers serotonin release in seconds and vitamin D activates T-cells and BDNF.',
+    sci:'Bright light (>10,000 lux) suppresses melatonin and activates serotonin transporter in 20 mins.',
+    fx:{ tcell:+9, nk:+6, inflam:+7, serotonin:+12, dopamine:+7, amygdala:+8, bdnf:+6 } },
 
-  { k:['antibiotic'],
-    emoji:'💊', msg:'Antibiotics kill the infection target — but wipe out gut flora as collateral.',
-    sci:'A single course of antibiotics can reduce gut microbiome diversity for up to 12 months.',
-    fx:{ gut:-20, neutro:+5 } },
+  { k:['meditat','mindful','relax','breathing','calm','breathwork'],
+    emoji:'🧘',
+    msg:'Mindfulness thickens the prefrontal cortex and literally shrinks the amygdala over time.',
+    sci:'8-week MBSR increases grey matter in hippocampus and PFC, reduces amygdala volume and cortisol.',
+    fx:{ tcell:+6, nk:+5, inflam:+8, gut:+3,
+         prefrontal:+10, amygdala:+14, hippocampus:+7, serotonin:+8, bdnf:+7 } },
 
-  // ─── Lifestyle ───
-  { k:['sleep','slept','nap','8 hours','nine hours','10 hours'],
-    emoji:'😴', msg:'Sleep is when T-cells release integrins to hunt infected cells. Critical.',
-    sci:'During sleep, T-cells upregulate LFA-1 — a key adhesion molecule for killing viruses.',
-    fx:{ tcell:+12, nk:+10, neutro:+6, inflam:+8, gut:+4 } },
+  { k:['read','reading','book','studied','study','learn','learning','course','practice'],
+    emoji:'📚',
+    msg:'Learning grows new neural connections in the hippocampus and strengthens the prefrontal cortex.',
+    sci:'Neurogenesis in the adult hippocampus is driven by cognitive challenge, novelty and BDNF.',
+    fx:{ hippocampus:+10, prefrontal:+9, bdnf:+8, dopamine:+5 } },
 
-  { k:['no sleep','stayed up','late night','insomnia','didn\'t sleep','4 hours','3 hours'],
-    emoji:'🌙', msg:'Sleep deprivation crashes NK cell activity by 70% after just one bad night.',
-    sci:'One night of 4h sleep reduces NK cell count by 70% (Irwin et al., 1994).',
-    fx:{ tcell:-10, nk:-12, neutro:-6, inflam:-8 } },
+  { k:['social','friends','family','socialised','conversation','talked','people','laughed','laugh'],
+    emoji:'🤝',
+    msg:'Social bonding releases oxytocin which calms the amygdala and boosts serotonin and dopamine.',
+    sci:'Positive social contact reduces cortisol, increases serotonin, and activates the brain\'s reward circuit.',
+    fx:{ serotonin:+10, dopamine:+8, amygdala:+10, prefrontal:+5 } },
 
-  { k:['exercise','run','ran','gym','workout','walk','cycling','swim','jog','hiit','yoga','weights'],
-    emoji:'🏃', msg:'Exercise mobilises NK cells and neutrophils into the blood within minutes.',
-    sci:'A 30-min brisk walk increases NK cell count by ~40% and boosts T-cell proliferation.',
-    fx:{ nk:+10, neutro:+7, tcell:+6, lung:+6, inflam:+6 } },
+  { k:['music','listened to music','sang','singing','played instrument'],
+    emoji:'🎵',
+    msg:'Music activates the nucleus accumbens (reward), releases dopamine and reduces cortisol.',
+    sci:'Anticipatory music chills increase dopamine by up to 9% in the striatum (Salimpoor 2011).',
+    fx:{ dopamine:+10, serotonin:+7, amygdala:+8, prefrontal:+4 } },
 
-  { k:['stress','stressed','anxious','overwhelmed','panic','cortisol'],
-    emoji:'😣', msg:'Cortisol suppresses T-cells and NK cells — the reason stress makes you ill.',
-    sci:'Chronic cortisol downregulates IL-2, blocking T-cell proliferation and NK activation.',
-    fx:{ tcell:-10, nk:-8, neutro:-5, inflam:-10, gut:-5 } },
-
-  { k:['sun','sunlight','vitamin d','outside','fresh air'],
-    emoji:'☀️', msg:'Vitamin D activates T-cell receptors and reduces auto-immune inflammation.',
-    sci:'The vitamin D receptor (VDR) is expressed on nearly every immune cell type.',
-    fx:{ tcell:+9, nk:+6, inflam:+7 } },
-
-  { k:['meditat','relax','breathing','calm','mindful'],
-    emoji:'🧘', msg:'Mindfulness lowers cortisol, directly rescuing suppressed T-cells.',
-    sci:'8-week MBSR programmes increase telomerase activity and NK cell function.',
-    fx:{ tcell:+6, nk:+5, inflam:+8, gut:+3 } },
-
-  // ─── Physical / hygiene ───
-  { k:['wash hands','washed hands','soap','shower','clean'],
-    emoji:'🧼', msg:'Removes surface pathogens before they can breach the skin barrier.',
-    sci:'Handwashing cuts respiratory infections by 21% and GI infections by 31% (CDC).',
+  { k:['wash hands','washed','soap','shower','clean','hygiene'],
+    emoji:'🧼',
+    msg:'Removes surface pathogens before they breach the skin barrier.',
+    sci:'Handwashing reduces respiratory infections by 21% and GI infections by 31% (CDC data).',
     fx:{ skin:+3 } },
 
   { k:['sunscreen','sun cream','spf'],
-    emoji:'🧴', msg:'UV radiation degrades skin-barrier proteins and can suppress local immunity.',
-    sci:'UV-B directly damages Langerhans cells — the skin\'s resident immune sentinels.',
+    emoji:'🧴',
+    msg:'UV-B radiation degrades skin barrier proteins and suppresses local Langerhans immune cells.',
+    sci:'Langerhans cells — skin\'s resident immune sentinels — are directly damaged by UV exposure.',
     fx:{ skin:+8 } },
 
+  { k:['vaccine','vaccinated','jab','flu shot','booster'],
+    emoji:'💉',
+    msg:'T-cells are trained to recognise a specific threat — enabling 1000× faster recall responses.',
+    sci:'Memory T-cells and B-cells can persist for decades following vaccination.',
+    fx:{ tcell:+18, nk:+5 } },
+
+  // ── Harmful ──
+  { k:['sugar','candy','sweets','soda','cola','cake','donut','ice cream','biscuit','cookie'],
+    emoji:'🍬',
+    msg:'Sugar suppresses neutrophils for 5 hours and creates dopamine spikes followed by crashes.',
+    sci:'100g glucose reduces neutrophil phagocytic capacity ~50% (Sanchez 1973). Dopamine spike/crash = craving loop.',
+    fx:{ neutro:-8, gut:-10, inflam:-14, tcell:-4, dopamine:-8, serotonin:-5, bdnf:-4 } },
+
+  { k:['junk','fast food','pizza','burger','fries','chips','crisps','fried','takeaway','processed'],
+    emoji:'🍔',
+    msg:'Ultra-processed food disrupts gut flora, inflames the body and reduces BDNF in the brain.',
+    sci:'Emulsifiers (polysorbate-80) degrade gut mucus. High-fat Western diet reduces hippocampal BDNF.',
+    fx:{ gut:-8, inflam:-12, liver:-5, neutro:-4, bdnf:-6, hippocampus:-5, serotonin:-4 } },
+
+  { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'],
+    emoji:'🍺',
+    msg:'Alcohol suppresses NK cells, devastates gut flora, overloads the liver, and blocks memory formation.',
+    sci:'Ethanol blocks NMDA receptors in hippocampus (anterograde amnesia) and reduces serotonin within 24 hours.',
+    fx:{ liver:-16, gut:-10, nk:-10, neutro:-6, inflam:-8,
+         prefrontal:-10, hippocampus:-12, serotonin:-10, dopamine:-6, amygdala:-8, bdnf:-6 } },
+
+  { k:['smok','cigarette','vape','nicotine'],
+    emoji:'🚬',
+    msg:'Smoke paralyses lung defences and kills NK cells. Nicotine initially spikes then depletes dopamine.',
+    sci:'A single cigarette impairs mucociliary clearance for ~30 mins. Chronic use depletes dopamine receptors.',
+    fx:{ lung:-20, nk:-10, inflam:-12, skin:-5, dopamine:-8, bdnf:-7, prefrontal:-5 } },
+
+  { k:['weed','cannabis','marijuana','thc'],
+    emoji:'🌿',
+    msg:'THC gives short-term dopamine release but impairs hippocampal memory encoding and reduces BDNF long-term.',
+    sci:'CB1 receptors dense in hippocampus — THC disrupts LTP (long-term potentiation), the basis of memory.',
+    fx:{ dopamine:+5, hippocampus:-10, prefrontal:-8, bdnf:-7, amygdala:-6 } },
+
+  { k:['antibiotic'],
+    emoji:'💊',
+    msg:'Antibiotics destroy the infection but wipe out gut flora — and gut bacteria produce 90% of serotonin.',
+    sci:'A single antibiotic course reduces gut microbiome diversity for up to 12 months (Jernberg 2010).',
+    fx:{ gut:-20, neutro:+5, serotonin:-8 } },
+
+  { k:['stress','stressed','anxious','overwhelmed','panic','cortisol','anxiety'],
+    emoji:'😣',
+    msg:'Cortisol suppresses T-cells and NK cells, physically shrinks the hippocampus, and overactivates the amygdala.',
+    sci:'Chronic cortisol: downregulates IL-2 (blocks T-cells) + reduces hippocampal volume by ~5% over years.',
+    fx:{ tcell:-10, nk:-8, neutro:-5, inflam:-10, gut:-5,
+         amygdala:-14, hippocampus:-8, prefrontal:-8, bdnf:-8, serotonin:-7, dopamine:-5 } },
+
+  { k:['no sleep','stayed up','late night','insomnia','sleep deprived','4 hours','3 hours','didn\'t sleep'],
+    emoji:'🌙',
+    msg:'One bad night crashes NK cells by 70% and impairs hippocampal memory consolidation.',
+    sci:'4h sleep reduces NK cells by 70% (Irwin 1994). Hippocampus cannot replay memories without deep sleep.',
+    fx:{ tcell:-10, nk:-12, neutro:-6, inflam:-8,
+         hippocampus:-12, prefrontal:-10, amygdala:-10, bdnf:-8, serotonin:-6 } },
+
+  { k:['phone','social media','scrolled','tiktok','instagram','doom','screen'],
+    emoji:'📱',
+    msg:'Variable-reward scrolling hijacks the dopamine system — the same circuit as gambling addiction.',
+    sci:'Unpredictable rewards (likes, new posts) trigger dopamine spikes via the nucleus accumbens, causing compulsion.',
+    fx:{ dopamine:-10, prefrontal:-7, amygdala:-6, serotonin:-5 } },
+
   { k:['cut','wound','scrape','graze','bleed'],
-    emoji:'🩹', msg:'Breach in the skin — neutrophils swarm the wound within minutes.',
-    sci:'Neutrophils arrive at wounds within 30-60 minutes via CXCL8 chemokine gradient.',
+    emoji:'🩹',
+    msg:'Skin breached — neutrophils swarm the wound within 30-60 minutes.',
+    sci:'Neutrophils arrive via CXCL8 chemokine gradient within 30-60 minutes of wounding.',
     fx:{ skin:-14, inflam:-8, neutro:-3 } },
 
   { k:['cold','flu','sick','virus','infection','fever'],
-    emoji:'🤧', msg:'Active infection — NK cells and neutrophils are in full battle.',
-    sci:'Fever at 38.5°C increases lymphocyte proliferation rate by ~20-fold.',
-    fx:{ neutro:-6, tcell:-4, nk:-5, inflam:-15 } },
-
-  { k:['vaccine','vaccinated','jab','flu shot','booster'],
-    emoji:'💉', msg:'T-cells trained to recognise a pathogen before real infection.',
-    sci:'Memory T-cells persist for decades, enabling 1000× faster recall responses.',
-    fx:{ tcell:+18, nk:+5 } },
+    emoji:'🤧',
+    msg:'Active infection — immune system mobilises, but battle fatigue hits all units.',
+    sci:'Fever at 38.5°C increases lymphocyte proliferation 20-fold, but sustained illness depletes all resources.',
+    fx:{ neutro:-6, tcell:-4, nk:-5, inflam:-15, bdnf:-5, serotonin:-5 } },
 
   { k:['coffee','caffeine','energy drink'],
-    emoji:'☕', msg:'Caffeine mildly inhibits inflammation but can disrupt sleep quality.',
-    sci:'Caffeine blocks adenosine receptors, temporarily reducing inflammatory cytokines.',
-    fx:{ inflam:+3, neutro:+2 } },
+    emoji:'☕',
+    msg:'Caffeine blocks adenosine (tiredness) and temporarily boosts dopamine and focus.',
+    sci:'Caffeine is an adenosine receptor antagonist. Increases prefrontal dopamine release for ~3-5 hours.',
+    fx:{ inflam:+3, neutro:+2, prefrontal:+6, dopamine:+5, amygdala:-3 } },
+
+  { k:['isolated','lonely','alone','isolation'],
+    emoji:'🫂',
+    msg:'Loneliness activates the amygdala\'s threat response and significantly reduces serotonin and BDNF.',
+    sci:'Chronic loneliness upregulates inflammatory genes and reduces hippocampal BDNF expression.',
+    fx:{ serotonin:-10, dopamine:-7, amygdala:-10, bdnf:-7, inflam:-8 } },
 ];
 
-// ─── Render units ─────────────────────────────────────────────────────────────
-function buildUnits(){
-  const el = document.getElementById('units');
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+function buildUnits(arr, containerId){
+  const el = document.getElementById(containerId);
   el.innerHTML = '';
-  UNITS.forEach(u => {
+  arr.forEach(u => {
     el.innerHTML += `
       <div class="unit" id="unit-${u.id}">
         <div class="unit-head">
@@ -294,42 +410,55 @@ function buildUnits(){
 }
 
 function updateUnit(id, val){
-  document.getElementById('uv-'+id).textContent = Math.round(clamp(val));
-  document.getElementById('ub-'+id).style.width = clamp(val)+'%';
-}
-
-function overallScore(){
-  const vals = UNITS.map(u => clamp(u.val));
-  return Math.round(vals.reduce((a,b)=>a+b,0) / UNITS.length);
-}
-
-function renderScore(){
-  const s = overallScore();
-  document.getElementById('scoreVal').textContent = s;
-  document.getElementById('scoreBar').style.width = s+'%';
-  const col = s > 65 ? '#46d39a' : s > 40 ? '#fbbf24' : '#ff6b6b';
-  document.getElementById('scoreBar').style.background = `linear-gradient(90deg,${col}99,${col})`;
-}
-
-function flashBody(good){
-  const f = document.getElementById('bodyFlash');
-  f.style.background = good ? 'rgba(70,211,154,.28)' : 'rgba(255,107,107,.28)';
-  f.style.opacity = 1;
-  setTimeout(()=>f.style.opacity=0, 420);
+  const v = clamp(val);
+  document.getElementById('uv-'+id).textContent = Math.round(v);
+  document.getElementById('ub-'+id).style.width = v+'%';
 }
 
 function flashUnit(id, good){
   const el = document.getElementById('unit-'+id);
   if(!el) return;
   el.style.background = good ? 'rgba(70,211,154,.15)' : 'rgba(255,107,107,.12)';
-  setTimeout(()=>el.style.background='', 500);
+  setTimeout(()=>{ el.style.background=''; }, 550);
 }
 
-// ─── Classify & apply ────────────────────────────────────────────────────────
+function avgScore(arr){
+  return Math.round(arr.reduce((s,u)=>s+clamp(u.val),0)/arr.length);
+}
+
+function renderScores(){
+  const bs = avgScore(BODY_UNITS);
+  const br = avgScore(BRAIN_UNITS);
+  document.getElementById('bodyScoreVal').textContent = bs;
+  document.getElementById('bodyScoreBar').style.width = bs+'%';
+  document.getElementById('bodyScoreBar').style.background =
+    bs>65?'linear-gradient(90deg,#2fa372,#46d39a)':bs>40?'linear-gradient(90deg,#b45309,#fbbf24)':'linear-gradient(90deg,#991b1b,#ff6b6b)';
+
+  document.getElementById('brainScoreVal').textContent = br;
+  document.getElementById('brainScoreBar').style.width = br+'%';
+  document.getElementById('brainScoreBar').style.background =
+    br>65?'linear-gradient(90deg,#4338ca,#818cf8)':br>40?'linear-gradient(90deg,#b45309,#fbbf24)':'linear-gradient(90deg,#991b1b,#ff6b6b)';
+}
+
+function flashBody(good){
+  const f = document.getElementById('bodyFlash');
+  f.style.background = good ? 'rgba(70,211,154,.28)' : 'rgba(255,107,107,.28)';
+  f.style.opacity = 1;
+  setTimeout(()=>{ f.style.opacity=0; }, 420);
+}
+
+function showTab(tab){
+  document.getElementById('tab-body').style.display   = tab==='body'  ? '' : 'none';
+  document.getElementById('tab-brain').style.display  = tab==='brain' ? '' : 'none';
+  document.getElementById('tab-body-btn').classList.toggle('active',  tab==='body');
+  document.getElementById('tab-brain-btn').classList.toggle('active', tab==='brain');
+}
+
+// ─── Classify + apply ─────────────────────────────────────────────────────────
 function classify(text){
   const t = text.toLowerCase();
   for(const r of RULES){
-    if(r.k.some(word => t.includes(word))) return r;
+    if(r.k.some(w => t.includes(w))) return r;
   }
   return null;
 }
@@ -337,26 +466,33 @@ function classify(text){
 function applyRule(label, r){
   const changes = [];
   let netGood = 0;
+  // Which tab gets affected? Auto-switch if only brain or only body is affected
+  const hasBrain = Object.keys(r.fx).some(id => BRAIN_UNITS.find(u=>u.id===id));
+  const hasBody  = Object.keys(r.fx).some(id => BODY_UNITS.find(u=>u.id===id));
+
   Object.entries(r.fx).forEach(([id, delta]) => {
-    const u = unitMap[id];
-    if(!u) return;
-    const before = u.val;
+    const u = unitMap[id]; if(!u) return;
     u.val = clamp(u.val + delta);
     updateUnit(id, u.val);
     flashUnit(id, delta > 0);
     netGood += delta;
-    const diff = Math.round(u.val - before);
-    if(diff !== 0) changes.push(`<span class="${diff>0?'up':'dn'}">${diff>0?'▲':'▼'} ${u.emoji} ${u.name}</span>`);
+    const sign = delta>0?'▲':'▼';
+    changes.push(`<span class="${delta>0?'up':'dn'}">${sign} ${u.emoji} ${u.name}</span>`);
   });
-  renderScore();
+
+  renderScores();
   flashBody(netGood >= 0);
-  logLine(label, r, changes, netGood >= 0);
+
+  // Auto-switch tab to show the most-affected system
+  if(hasBrain && !hasBody) showTab('brain');
+  else showTab('body');
+
+  logLine(label, r, changes);
 }
 
-function logLine(label, r, changes, good){
+function logLine(label, r, changes){
   const log = document.getElementById('log');
-  const d = document.createElement('div');
-  d.className = 'log-entry';
+  const d = document.createElement('div'); d.className='log-entry';
   d.innerHTML =
     `<div class="changes">${changes.join('<br>')}</div>`+
     `${r.emoji} <b>${label}</b>`+
@@ -371,28 +507,30 @@ function submit(text){
   if(!r){
     const log = document.getElementById('log');
     const d = document.createElement('div'); d.className='log-entry';
-    d.innerHTML = `🤔 <b>${text}</b><div class="sci">Not recognised — try food, drink, exercise, sleep, substances, or an injury.</div>`;
+    d.innerHTML=`🤔 <b>${text}</b><div class="sci">Not recognised — try food, drink, exercise, sleep, substances, social activity, or an injury.</div>`;
     log.prepend(d); return;
   }
   applyRule(text, r);
 }
 
-document.getElementById('go').onclick = () => {
-  const i = document.getElementById('inp'); submit(i.value); i.value=''; i.focus();
+document.getElementById('go').onclick = ()=>{
+  const i=document.getElementById('inp'); submit(i.value); i.value=''; i.focus();
 };
-document.getElementById('inp').addEventListener('keydown', e => {
+document.getElementById('inp').addEventListener('keydown', e=>{
   if(e.key==='Enter'){ submit(e.target.value); e.target.value=''; }
 });
 
-['drank kefir','ate pizza','went for a run','slept 8 hours','smoked','got a cut','stressed out','took antibiotics']
-  .forEach(ex => {
-    const b = document.createElement('button'); b.textContent = ex;
-    b.onclick = () => submit(ex);
+['drank kefir','went for a run','slept 8 hours','read a book','listened to music',
+ 'ate junk food','drank alcohol','scrolled social media','stressed out','smoked']
+  .forEach(ex=>{
+    const b=document.createElement('button'); b.textContent=ex;
+    b.onclick=()=>submit(ex);
     document.getElementById('chips').appendChild(b);
   });
 
-buildUnits();
-renderScore();
+buildUnits(BODY_UNITS, 'bodyUnits');
+buildUnits(BRAIN_UNITS, 'brainUnits');
+renderScores();
 </script>
 </body>
 </html>
