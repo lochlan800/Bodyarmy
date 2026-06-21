@@ -41,6 +41,11 @@
   #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0;
     border-radius:12px; transition:opacity .1s; z-index:3; }
 
+  /* SVG organ overlay */
+  #organSvg { position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:2; }
+  .org { opacity:0; transition:opacity .9s ease; }
+
   .score-row { display:flex; align-items:center; justify-content:space-between; margin-top:12px; gap:10px; }
   .score-block { flex:1; }
   .score-label { font-size:11px; color:var(--muted); margin-bottom:4px; }
@@ -209,6 +214,16 @@
     <div class="bodyWrap" id="body">
       <img src="body.png?v=3" alt="human body with organs" />
       <div id="bodyFlash"></div>
+      <!-- organ highlight overlay — viewBox matches cropped body.png (387×1536) -->
+      <svg id="organSvg" viewBox="0 0 387 1536" preserveAspectRatio="xMidYMin meet">
+        <ellipse id="org-brain"   class="org" cx="193" cy="82"  rx="68"  ry="78"/>
+        <ellipse id="org-lung-l"  class="org" cx="127" cy="388" rx="58"  ry="88"/>
+        <ellipse id="org-lung-r"  class="org" cx="258" cy="388" rx="58"  ry="88"/>
+        <ellipse id="org-heart"   class="org" cx="183" cy="368" rx="36"  ry="44"/>
+        <ellipse id="org-liver"   class="org" cx="258" cy="508" rx="62"  ry="52"/>
+        <ellipse id="org-stomach" class="org" cx="153" cy="528" rx="48"  ry="52"/>
+        <ellipse id="org-gut"     class="org" cx="193" cy="700" rx="96"  ry="108"/>
+      </svg>
     </div>
     <div class="score-row" style="margin-top:14px">
       <div class="score-block">
@@ -566,6 +581,47 @@ function showTab(tab){
   document.getElementById('tab-brain-btn').classList.toggle('active', tab==='brain');
 }
 
+// ─── Organ flash ─────────────────────────────────────────────────────────────
+// Maps each unit ID to the SVG organ element(s) it affects
+const UNIT_ORGANS = {
+  gut:         ['org-gut', 'org-stomach'],
+  neutro:      ['org-heart'],
+  tcell:       ['org-gut'],
+  nk:          ['org-liver'],
+  skin:        [],
+  lung:        ['org-lung-l', 'org-lung-r'],
+  liver:       ['org-liver'],
+  inflam:      ['org-gut', 'org-stomach', 'org-liver'],
+  prefrontal:  ['org-brain'],
+  hippocampus: ['org-brain'],
+  amygdala:    ['org-brain'],
+  dopamine:    ['org-brain'],
+  serotonin:   ['org-brain', 'org-gut'],
+  bdnf:        ['org-brain'],
+};
+
+const orgTimers = {};
+
+function flashOrgans(unitId, val) {
+  const orgIds = UNIT_ORGANS[unitId] || [];
+  // Color based on current health of the unit after the change
+  const color = val >= 65 ? '#46d39a' : val >= 40 ? '#fbbf24' : '#ff6b6b';
+  orgIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Cancel any fade-out in progress so the new flash wins
+    clearTimeout(orgTimers[id]);
+    el.style.transition = 'none';
+    el.style.fill = color;
+    el.style.opacity = '0.45';
+    // Fade back out after 1.2 s
+    orgTimers[id] = setTimeout(() => {
+      el.style.transition = 'opacity 1s ease';
+      el.style.opacity = '0';
+    }, 1200);
+  });
+}
+
 // ─── History storage ──────────────────────────────────────────────────────────
 const history = [];   // { label, r, changedUnits, time }
 let currentHistTab = 'food';
@@ -676,6 +732,7 @@ function applyRule(label, r){
     u.val = clamp(u.val + delta);
     updateUnit(id, u.val);
     flashUnit(id, delta > 0);
+    flashOrgans(id, u.val);
     netGood += delta;
     const sign = delta>0?'▲':'▼';
     changes.push(`<span class="${delta>0?'up':'dn'}">${sign} ${u.emoji} ${u.name}</span>`);
