@@ -201,8 +201,8 @@
 </div>
 
 <header>
-  <h1>🛡️ Body Army</h1>
-  <p>Type anything you do or put on/in your body — see what happens inside.</p>
+  <h1>⚔️ Body Army</h1>
+  <p>Tell your army what you did today — watch them fight for you!</p>
   <button id="historyBtn" onclick="openHistory()">📋 History</button>
 </header>
 
@@ -210,7 +210,7 @@
 
   <!-- COL 1: body image + overall scores -->
   <div class="panel">
-    <div class="panel-title">Inside the body</div>
+    <div class="panel-title">🏰 Your Kingdom</div>
     <div class="bodyWrap" id="body">
       <img src="body.png?v=3" alt="human body with organs" />
       <div id="bodyFlash"></div>
@@ -227,14 +227,14 @@
     </div>
     <div class="score-row" style="margin-top:14px">
       <div class="score-block">
-        <div class="score-label">🛡️ Body Defence</div>
+        <div class="score-label">⚔️ Army Strength</div>
         <div class="score-bar"><span id="bodyScoreBar" style="width:60%"></span></div>
       </div>
       <div class="score-num" id="bodyScoreVal">60</div>
     </div>
     <div class="score-row" style="margin-top:10px">
       <div class="score-block">
-        <div class="score-label">🧠 Brain Health</div>
+        <div class="score-label">🧠 Brain Command</div>
         <div class="score-bar"><span id="brainScoreBar" style="width:55%"></span></div>
       </div>
       <div class="score-num" id="brainScoreVal">55</div>
@@ -244,8 +244,8 @@
   <!-- COL 2: military strength tabs -->
   <div class="panel">
     <div class="tabs">
-      <button class="tab-btn active" id="tab-body-btn" onclick="showTab('body')">🛡️ Body Defence</button>
-      <button class="tab-btn"        id="tab-brain-btn" onclick="showTab('brain')">🧠 Brain</button>
+      <button class="tab-btn active" id="tab-body-btn" onclick="showTab('body')">⚔️ Body Troops</button>
+      <button class="tab-btn"        id="tab-brain-btn" onclick="showTab('brain')">🧠 Brain Command</button>
     </div>
 
     <div id="tab-body">
@@ -258,16 +258,16 @@
 
   <!-- COL 3: input + log -->
   <div class="panel">
-    <div class="panel-title">What did you do?</div>
+    <div class="panel-title">🗡️ What did you do today?</div>
     <div class="inputRow">
-      <input id="inp" placeholder="e.g. drank kefir, ran 5k, read a book…" autocomplete="off" />
-      <button id="go">Log it</button>
+      <input id="inp" placeholder="e.g. drank kefir, went for a run, read a book…" autocomplete="off" />
+      <button id="go">Send!</button>
     </div>
     <div class="chips" id="chips"></div>
 
-    <div class="panel-title" style="margin-top:18px">Battle report</div>
+    <div class="panel-title" style="margin-top:18px">📜 Mission Report</div>
     <div class="log" id="log"></div>
-    <div class="footer-note">Scientifically accurate • body defence + brain health</div>
+    <div class="footer-note">⚔️ Every choice trains your army — make them strong!</div>
   </div>
 
 </div>
@@ -277,24 +277,24 @@ const clamp = v => Math.max(0, Math.min(100, v));
 
 // ─── Body defence units ────────────────────────────────────────────────────────
 const BODY_UNITS = [
-  { id:'gut',    emoji:'🦠', name:'Gut Microbiome',      desc:'Good bacteria — 70% of immunity lives here', val:60, color:'#4ade80' },
-  { id:'neutro', emoji:'⚡', name:'Neutrophils',          desc:'First-responder white blood cells',           val:55, color:'#60a5fa' },
-  { id:'tcell',  emoji:'🎯', name:'T-Cells',              desc:'Adaptive immunity — learn & destroy',         val:50, color:'#a78bfa' },
-  { id:'nk',     emoji:'🗡️', name:'NK Cells',             desc:'Natural killers — hunt viruses & cancer',     val:50, color:'#fbbf24' },
-  { id:'skin',   emoji:'🛡️', name:'Skin Barrier',         desc:'Physical perimeter defence',                  val:72, color:'#fb923c' },
-  { id:'lung',   emoji:'🫁', name:'Lung Defence',         desc:'Mucociliary airway patrol',                   val:65, color:'#2dd4bf' },
-  { id:'liver',  emoji:'🔧', name:'Liver',                desc:'Detox & toxin filtration',                    val:68, color:'#f59e0b' },
-  { id:'inflam', emoji:'🌡️', name:'Inflammation Control', desc:'Low chronic inflammation = healthier',        val:65, color:'#f87171' },
+  { id:'gut',    emoji:'🏰', name:'Belly Battalion',   desc:'Tiny soldiers who guard your tummy fortress!',       val:60, color:'#4ade80' },
+  { id:'neutro', emoji:'⚡', name:'Speed Squad',       desc:'Super-fast fighters who rush to battle germs!',      val:55, color:'#60a5fa' },
+  { id:'tcell',  emoji:'🎯', name:'Hunter Corps',      desc:'Smart warriors who remember every enemy they\'ve seen!', val:50, color:'#a78bfa' },
+  { id:'nk',     emoji:'🗡️', name:'Shadow Strikers',  desc:'Secret agents who sneak up on viruses and destroy them!', val:50, color:'#fbbf24' },
+  { id:'skin',   emoji:'🛡️', name:'Wall Guards',      desc:'Brave soldiers who protect the castle walls — your skin!', val:72, color:'#fb923c' },
+  { id:'lung',   emoji:'🌬️', name:'Air Patrol',       desc:'Airborne troops who keep invaders out of your airways!', val:65, color:'#2dd4bf' },
+  { id:'liver',  emoji:'🔧', name:'Cleanup Crew',     desc:'Engineers who remove poison from the kingdom!',       val:68, color:'#f59e0b' },
+  { id:'inflam', emoji:'🧯', name:'Fire Brigade',     desc:'Stop too much fire in the kingdom — calm wins battles!', val:65, color:'#f87171' },
 ];
 
 // ─── Brain units ───────────────────────────────────────────────────────────────
 const BRAIN_UNITS = [
-  { id:'prefrontal',  emoji:'🧠', name:'Prefrontal Cortex', desc:'Focus, planning & self-control',             val:55, color:'#818cf8' },
-  { id:'hippocampus', emoji:'💾', name:'Hippocampus',       desc:'Memory formation & learning',                val:55, color:'#34d399' },
-  { id:'amygdala',    emoji:'😌', name:'Stress Regulation', desc:'Amygdala calm (higher = better regulated)',  val:60, color:'#f472b6' },
-  { id:'dopamine',    emoji:'✨', name:'Dopamine System',   desc:'Motivation, drive & reward',                 val:55, color:'#fde68a' },
-  { id:'serotonin',   emoji:'🌤️', name:'Serotonin',         desc:'Mood, wellbeing & emotional balance',        val:55, color:'#fdba74' },
-  { id:'bdnf',        emoji:'🌱', name:'BDNF',              desc:'Brain growth factor — builds new connections',val:50, color:'#6ee7b7' },
+  { id:'prefrontal',  emoji:'👑', name:'The Commander',    desc:'The general of your brain — keeps you focused and in charge!', val:55, color:'#818cf8' },
+  { id:'hippocampus', emoji:'📜', name:'Memory Keepers',  desc:'Scribes who write down everything you learn so you never forget!', val:55, color:'#34d399' },
+  { id:'amygdala',    emoji:'🏯', name:'Calm Guard',      desc:'Soldiers who stop the kingdom from panicking — cool heads win!', val:60, color:'#f472b6' },
+  { id:'dopamine',    emoji:'✨', name:'Reward Rangers',  desc:'Cheerleaders who give the whole army energy and motivation!',    val:55, color:'#fde68a' },
+  { id:'serotonin',   emoji:'☀️', name:'Sunshine Squad',  desc:'Happy soldiers who boost everyone\'s mood and spirit!',         val:55, color:'#fdba74' },
+  { id:'bdnf',        emoji:'🌱', name:'The Builders',    desc:'Construction crew who build new bridges so soldiers work better!', val:50, color:'#6ee7b7' },
 ];
 
 const ALL_UNITS = [...BODY_UNITS, ...BRAIN_UNITS];
@@ -306,214 +306,214 @@ const RULES = [
   // ── Good food & drink ──
   { k:['kefir','yogurt','yoghurt','kimchi','sauerkraut','kombucha','probiotic','miso'],
     type:'food', emoji:'🥛',
-    msg:'Probiotics seed the gut — your immune system\'s largest organ. 90% of serotonin is made in the gut.',
-    sci:'Lactobacillus strains activate neutrophils & produce serotonin precursors via the gut-brain axis.',
+    msg:'New recruits join the Belly Battalion! Good bacteria soldiers pour into the tummy fortress!',
+    sci:'Fun fact: 70% of your entire immune army lives in your gut — it\'s the biggest battlefield in your body!',
     fx:{ gut:+15, neutro:+4, inflam:+6, serotonin:+8, amygdala:+4 } },
 
   { k:['vegetable','veg','salad','broccoli','spinach','kale','greens','fruit','apple','berries','banana'],
     type:'food', emoji:'🥦',
-    msg:'Fibre feeds gut flora. Antioxidants reduce inflammation that harms both body and brain.',
-    sci:'Dietary fibre → short-chain fatty acids → regulate T-cell differentiation and BDNF expression.',
+    msg:'The Belly Battalion gets a feast! Fibre is like a power-up meal for your tummy soldiers.',
+    sci:'Fun fact: When gut soldiers eat fibre they produce acids that help the Hunter Corps get stronger too!',
     fx:{ gut:+8, tcell:+5, inflam:+8, neutro:+3, bdnf:+5, hippocampus:+4 } },
 
   { k:['blueberr','berry','berries'],
     type:'food', emoji:'🫐',
-    msg:'Blueberry flavonoids cross the blood-brain barrier and directly stimulate BDNF production.',
-    sci:'Anthocyanins increase BDNF in the hippocampus and improve spatial memory in human trials.',
+    msg:'The Builders in your brain get new materials! Blueberries help them construct new paths!',
+    sci:'Fun fact: The special blue colour in blueberries travels all the way to your brain to help Memory Keepers work better!',
     fx:{ bdnf:+12, hippocampus:+9, inflam:+7, gut:+4 } },
 
   { k:['orange','vitamin c','lemon','citrus','kiwi'],
     type:'food', emoji:'🍊',
-    msg:'Vitamin C supercharges neutrophils. In the brain, it\'s a co-factor for dopamine synthesis.',
-    sci:'Neutrophils accumulate vitamin C at 50-100× plasma concentration. Dopamine β-hydroxylase requires vitamin C.',
+    msg:'Vitamin C gives the Speed Squad armour! They charge into battle with 50× more power!',
+    sci:'Fun fact: Speed Squad soldiers store up to 100 times more vitamin C than the blood around them — they love it!',
     fx:{ neutro:+10, skin:+5, inflam:+5, tcell:+3, dopamine:+5 } },
 
   { k:['dark chocolate','cacao','cocoa'],
     type:'food', emoji:'🍫',
-    msg:'Cacao flavonoids boost BDNF, serotonin and dopamine — but only dark/high-cacao varieties.',
-    sci:'Epicatechin in cacao increases cerebral blood flow to the hippocampus and upregulates BDNF.',
+    msg:'Dark chocolate gives the Builders and Sunshine Squad a big boost — the darker the better!',
+    sci:'Fun fact: The special stuff in dark chocolate sends extra blood to the Memory Keepers so they can write faster!',
     fx:{ bdnf:+8, serotonin:+7, dopamine:+6, hippocampus:+5, inflam:+5 } },
 
   { k:['garlic','ginger','turmeric','honey'],
     type:'food', emoji:'🧄',
-    msg:'Curcumin (turmeric) crosses the blood-brain barrier and boosts BDNF — nature\'s antidepressant.',
-    sci:'Curcumin inhibits NF-κB (inflammation) and upregulates BDNF at doses found in dietary turmeric.',
+    msg:'Garlic and turmeric are like magic potions! They attack bad guys AND call in the Builders!',
+    sci:'Fun fact: The yellow colour in turmeric is so powerful it can travel through your skull to help your brain soldiers!',
     fx:{ inflam:+14, neutro:+5, gut:+4, bdnf:+8, amygdala:+5 } },
 
   { k:['omega','fish oil','salmon','mackerel','sardine','walnut','flaxseed'],
     type:'food', emoji:'🐟',
-    msg:'Omega-3 is the main structural fat of brain cell membranes — critical for every brain region.',
-    sci:'DHA makes up 40% of brain cell membrane fat. EPA reduces neuroinflammation and boosts serotonin.',
+    msg:'Omega-3 is brain armour! It builds stronger walls around every brain soldier so they fight better!',
+    sci:'Fun fact: 40% of the wall around every brain cell is made from the stuff found in oily fish — they literally build your brain!',
     fx:{ inflam:+12, nk:+6, tcell:+4, bdnf:+10, prefrontal:+7, hippocampus:+7, serotonin:+6 } },
 
   { k:['water','hydrate','drank water'],
     type:'food', emoji:'💧',
-    msg:'Even 2% dehydration measurably impairs memory, focus and mood — the brain is 75% water.',
-    sci:'Mild dehydration (-1.4%) in women reduced mood, increased anxiety and impaired concentration (Ganio 2011).',
+    msg:'Water keeps the whole kingdom running! Without it the roads dry up and soldiers can\'t move!',
+    sci:'Fun fact: Your brain is 75% water — even a tiny bit of thirst makes The Commander fuzzy and forgetful!',
     fx:{ skin:+5, lung:+6, liver:+5, inflam:+3, prefrontal:+5, hippocampus:+4, amygdala:+4 } },
 
   { k:['protein','chicken','turkey','eggs','fish','beans','tofu','meat','steak','lentil'],
     type:'food', emoji:'🍳',
-    msg:'Amino acids build antibodies and are raw material for dopamine and serotonin neurotransmitters.',
-    sci:'Tryptophan (eggs, turkey) is converted to serotonin. Tyrosine (chicken, eggs) is converted to dopamine.',
+    msg:'Protein is the army\'s building material! Soldiers use it to make weapons, armour AND happy signals!',
+    sci:'Fun fact: Eggs and turkey make your Sunshine Squad! Your body turns the food into the happy signal itself!',
     fx:{ neutro:+5, tcell:+6, nk:+4, dopamine:+6, serotonin:+6 } },
 
   { k:['zinc','magnesium','supplement','multivitamin','vitamin b','b12'],
     type:'food', emoji:'💊',
-    msg:'Zinc and magnesium are essential for T-cell function, BDNF signalling and serotonin production.',
-    sci:'Zinc deficiency reduces T-cells and impairs BDNF/TrkB signalling. Magnesium regulates NMDA receptors.',
+    msg:'Vitamins and minerals are like weapons upgrades for your soldiers — everyone gets stronger!',
+    sci:'Fun fact: Without zinc, your Hunter Corps can\'t even train properly. It\'s the most important kit in the army!',
     fx:{ tcell:+8, nk:+5, skin:+5, bdnf:+6, serotonin:+5, hippocampus:+5 } },
 
   { k:['green tea','matcha'],
     type:'food', emoji:'🍵',
-    msg:'L-theanine in green tea boosts alpha brain waves — calm focus without the caffeine jitters.',
-    sci:'L-theanine increases GABA, serotonin and dopamine and synergises with caffeine for sustained focus.',
+    msg:'Green tea gives The Commander a superpower — calm and focused at the same time! No jitters!',
+    sci:'Fun fact: Green tea has a special ingredient that makes you alert AND relaxed — like a chill superhero!',
     fx:{ prefrontal:+8, amygdala:+7, serotonin:+6, dopamine:+4, inflam:+5 } },
 
   // ── Lifestyle — positive ──
   { k:['sleep','slept','nap','8 hours','nine hours','ten hours'],
     type:'activity', emoji:'😴',
-    msg:'Sleep is when memory consolidates, T-cells hunt, and the brain\'s glymphatic system flushes toxins.',
-    sci:'During sleep T-cells upregulate LFA-1 to kill viruses. Hippocampus replays memories into cortex for storage.',
+    msg:'The whole army rests, heals and gets stronger overnight! Memory Keepers file away everything you learned!',
+    sci:'Fun fact: While you sleep, Hunter Corps soldiers grow special hooks to grab viruses — they can\'t do this when you\'re awake!',
     fx:{ tcell:+12, nk:+10, neutro:+6, inflam:+8, gut:+4,
          hippocampus:+14, prefrontal:+10, amygdala:+10, bdnf:+8, serotonin:+6 } },
 
   { k:['exercise','run','ran','gym','workout','walk','cycling','swim','jog','hiit','yoga','weights','lifting'],
     type:'activity', emoji:'🏃',
-    msg:'Exercise is the single most powerful trigger of BDNF — the brain\'s own growth hormone. Also mobilises NK cells within minutes.',
-    sci:'A 30-min run increases hippocampal BDNF by 200-300% and NK cell count by ~40% within hours.',
+    msg:'Exercise sends the whole army into action mode! The Builders go crazy constructing new brain roads!',
+    sci:'Fun fact: Just 30 minutes of running makes The Builders work 3× harder — it\'s the best thing you can do for your brain!',
     fx:{ nk:+10, neutro:+7, tcell:+6, lung:+6, inflam:+6,
          bdnf:+14, hippocampus:+10, prefrontal:+8, dopamine:+10, serotonin:+8, amygdala:+7 } },
 
   { k:['sun','sunlight','vitamin d','outside','fresh air','nature'],
     type:'activity', emoji:'☀️',
-    msg:'Sunlight triggers serotonin release in seconds and vitamin D activates T-cells and BDNF.',
-    sci:'Bright light (>10,000 lux) suppresses melatonin and activates serotonin transporter in 20 mins.',
+    msg:'Sunlight wakes up the Sunshine Squad instantly! They spread happiness across the whole kingdom!',
+    sci:'Fun fact: Your skin makes vitamin D from sunlight like a solar panel — and vitamin D is a power-up for Hunter Corps!',
     fx:{ tcell:+9, nk:+6, inflam:+7, serotonin:+12, dopamine:+7, amygdala:+8, bdnf:+6 } },
 
   { k:['meditat','mindful','relax','breathing','calm','breathwork'],
     type:'activity', emoji:'🧘',
-    msg:'Mindfulness thickens the prefrontal cortex and literally shrinks the amygdala over time.',
-    sci:'8-week MBSR increases grey matter in hippocampus and PFC, reduces amygdala volume and cortisol.',
+    msg:'Meditating trains The Commander and the Calm Guard — a quiet mind is a powerful mind!',
+    sci:'Fun fact: Just 8 weeks of breathing practice physically makes The Commander\'s base bigger and stronger!',
     fx:{ tcell:+6, nk:+5, inflam:+8, gut:+3,
          prefrontal:+10, amygdala:+14, hippocampus:+7, serotonin:+8, bdnf:+7 } },
 
   { k:['read','reading','book','studied','study','learn','learning','course','practice'],
     type:'activity', emoji:'📚',
-    msg:'Learning grows new neural connections in the hippocampus and strengthens the prefrontal cortex.',
-    sci:'Neurogenesis in the adult hippocampus is driven by cognitive challenge, novelty and BDNF.',
+    msg:'Reading and learning get the Memory Keepers writing furiously — new pages added to your brain book!',
+    sci:'Fun fact: Every new thing you learn causes The Builders to build a brand new bridge in your brain — reading makes more bridges!',
     fx:{ hippocampus:+10, prefrontal:+9, bdnf:+8, dopamine:+5 } },
 
   { k:['social','friends','family','socialised','conversation','talked','people','laughed','laugh'],
     type:'activity', emoji:'🤝',
-    msg:'Social bonding releases oxytocin which calms the amygdala and boosts serotonin and dopamine.',
-    sci:'Positive social contact reduces cortisol, increases serotonin, and activates the brain\'s reward circuit.',
+    msg:'Spending time with friends sends the Sunshine Squad and Reward Rangers into celebration mode!',
+    sci:'Fun fact: Laughing with friends releases a "hug chemical" that tells the Calm Guard everything is safe — no need to panic!',
     fx:{ serotonin:+10, dopamine:+8, amygdala:+10, prefrontal:+5 } },
 
   { k:['music','listened to music','sang','singing','played instrument'],
     type:'activity', emoji:'🎵',
-    msg:'Music activates the nucleus accumbens (reward), releases dopamine and reduces cortisol.',
-    sci:'Anticipatory music chills increase dopamine by up to 9% in the striatum (Salimpoor 2011).',
+    msg:'Music sends the Reward Rangers dancing! Even just expecting your favourite song fires them up!',
+    sci:'Fun fact: When you hear a song you love, the Reward Rangers literally do a little victory dance in your brain!',
     fx:{ dopamine:+10, serotonin:+7, amygdala:+8, prefrontal:+4 } },
 
   { k:['wash hands','washed','soap','shower','clean','hygiene'], type:'activity',
     emoji:'🧼',
-    msg:'Removes surface pathogens before they breach the skin barrier.',
-    sci:'Handwashing reduces respiratory infections by 21% and GI infections by 31% (CDC data).',
+    msg:'Washing hands defeats invaders before they even reach the castle gates — easy win!',
+    sci:'Fun fact: Washing hands for just 20 seconds wipes out most of the bad guys trying to sneak inside!',
     fx:{ skin:+3 } },
 
   { k:['sunscreen','sun cream','spf'],
     type:'activity', emoji:'🧴',
-    msg:'UV-B radiation degrades skin barrier proteins and suppresses local Langerhans immune cells.',
-    sci:'Langerhans cells — skin\'s resident immune sentinels — are directly damaged by UV exposure.',
+    msg:'Sunscreen gives the Wall Guards a force field! UV rays can\'t break through the castle walls!',
+    sci:'Fun fact: Sun rays without protection wear away the Wall Guards one by one — sunscreen lets them keep their armour on!',
     fx:{ skin:+8 } },
 
   { k:['vaccine','vaccinated','jab','flu shot','booster'],
     type:'activity', emoji:'💉',
-    msg:'T-cells are trained to recognise a specific threat — enabling 1000× faster recall responses.',
-    sci:'Memory T-cells and B-cells can persist for decades following vaccination.',
+    msg:'The Hunter Corps get a wanted poster for one specific enemy — now they can spot it in an instant!',
+    sci:'Fun fact: Once Hunter Corps soldiers learn an enemy\'s face they remember it for your entire life — that\'s a superpower!',
     fx:{ tcell:+18, nk:+5 } },
 
   // ── Harmful ──
   { k:['sugar','candy','sweets','soda','cola','cake','donut','ice cream','biscuit','cookie'],
     type:'food', emoji:'🍬',
-    msg:'Sugar suppresses neutrophils for 5 hours and creates dopamine spikes followed by crashes.',
-    sci:'100g glucose reduces neutrophil phagocytic capacity ~50% (Sanchez 1973). Dopamine spike/crash = craving loop.',
+    msg:'ENEMY ATTACK! 🚨 Sugar puts the Speed Squad to sleep for 5 hours and tricks the Reward Rangers!',
+    sci:'Fun fact: A big sugar hit makes your Speed Squad fight at half strength — bad guys walk straight past them!',
     fx:{ neutro:-8, gut:-10, inflam:-14, tcell:-4, dopamine:-8, serotonin:-5, bdnf:-4 } },
 
   { k:['junk','fast food','pizza','burger','fries','chips','crisps','fried','takeaway','processed'],
     type:'food', emoji:'🍔',
-    msg:'Ultra-processed food disrupts gut flora, inflames the body and reduces BDNF in the brain.',
-    sci:'Emulsifiers (polysorbate-80) degrade gut mucus. High-fat Western diet reduces hippocampal BDNF.',
+    msg:'Junk food brings chaos to the kingdom! The Belly Battalion\'s fortress walls start crumbling!',
+    sci:'Fun fact: Junk food contains chemicals that eat through the Belly Battalion\'s protective walls — it\'s like acid on a castle!',
     fx:{ gut:-8, inflam:-12, liver:-5, neutro:-4, bdnf:-6, hippocampus:-5, serotonin:-4 } },
 
   { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'],
     type:'food', emoji:'🍺',
-    msg:'Alcohol suppresses NK cells, devastates gut flora, overloads the liver, and blocks memory formation.',
-    sci:'Ethanol blocks NMDA receptors in hippocampus (anterograde amnesia) and reduces serotonin within 24 hours.',
+    msg:'MAJOR ATTACK! 🚨 Alcohol puts Shadow Strikers to sleep, floods the Cleanup Crew and jams Memory Keepers!',
+    sci:'Fun fact: Alcohol actually blocks the door to the Memory Keepers\' room — nothing can be written down while it\'s in the way!',
     fx:{ liver:-16, gut:-10, nk:-10, neutro:-6, inflam:-8,
          prefrontal:-10, hippocampus:-12, serotonin:-10, dopamine:-6, amygdala:-8, bdnf:-6 } },
 
   { k:['smok','cigarette','vape','nicotine'],
     type:'activity', emoji:'🚬',
-    msg:'Smoke paralyses lung defences and kills NK cells. Nicotine initially spikes then depletes dopamine.',
-    sci:'A single cigarette impairs mucociliary clearance for ~30 mins. Chronic use depletes dopamine receptors.',
+    msg:'DANGER! 🚨 Smoke freezes the Air Patrol and wipes out Shadow Strikers — the airways are unguarded!',
+    sci:'Fun fact: Just one cigarette paralyses the Air Patrol for 30 minutes — invaders can march straight in!',
     fx:{ lung:-20, nk:-10, inflam:-12, skin:-5, dopamine:-8, bdnf:-7, prefrontal:-5 } },
 
   { k:['weed','cannabis','marijuana','thc'],
     type:'activity', emoji:'🌿',
-    msg:'THC gives short-term dopamine release but impairs hippocampal memory encoding and reduces BDNF long-term.',
-    sci:'CB1 receptors dense in hippocampus — THC disrupts LTP (long-term potentiation), the basis of memory.',
+    msg:'The Reward Rangers get a quick boost but the Memory Keepers\' pens stop working — nothing gets written down!',
+    sci:'Fun fact: Cannabis jams the Memory Keepers\' filing system — they can\'t save new memories properly while it\'s active!',
     fx:{ dopamine:+5, hippocampus:-10, prefrontal:-8, bdnf:-7, amygdala:-6 } },
 
   { k:['antibiotic'],
     type:'food', emoji:'💊',
-    msg:'Antibiotics destroy the infection but wipe out gut flora — and gut bacteria produce 90% of serotonin.',
-    sci:'A single antibiotic course reduces gut microbiome diversity for up to 12 months (Jernberg 2010).',
+    msg:'Antibiotics defeat the enemy but hit the Belly Battalion too — friendly fire! Rebuild with good food!',
+    sci:'Fun fact: One course of antibiotics can reduce the Belly Battalion by half — it takes up to a year to fully rebuild!',
     fx:{ gut:-20, neutro:+5, serotonin:-8 } },
 
   { k:['stress','stressed','anxious','overwhelmed','panic','cortisol','anxiety'],
     type:'activity', emoji:'😣',
-    msg:'Cortisol suppresses T-cells and NK cells, physically shrinks the hippocampus, and overactivates the amygdala.',
-    sci:'Chronic cortisol: downregulates IL-2 (blocks T-cells) + reduces hippocampal volume by ~5% over years.',
+    msg:'Stress floods the kingdom with panic! The Calm Guard is overwhelmed and soldiers stop listening to The Commander!',
+    sci:'Fun fact: Too much stress actually makes the Memory Keepers\' building physically shrink over time — so stay calm!',
     fx:{ tcell:-10, nk:-8, neutro:-5, inflam:-10, gut:-5,
          amygdala:-14, hippocampus:-8, prefrontal:-8, bdnf:-8, serotonin:-7, dopamine:-5 } },
 
   { k:['no sleep','stayed up','late night','insomnia','sleep deprived','4 hours','3 hours','didn\'t sleep'],
     type:'activity', emoji:'🌙',
-    msg:'One bad night crashes NK cells by 70% and impairs hippocampal memory consolidation.',
+    msg:'No sleep = army mutiny! 🚨 70% of Shadow Strikers desert and Memory Keepers can\'t file anything!',
     sci:'4h sleep reduces NK cells by 70% (Irwin 1994). Hippocampus cannot replay memories without deep sleep.',
     fx:{ tcell:-10, nk:-12, neutro:-6, inflam:-8,
          hippocampus:-12, prefrontal:-10, amygdala:-10, bdnf:-8, serotonin:-6 } },
 
   { k:['phone','social media','scrolled','tiktok','instagram','doom','screen'],
     type:'activity', emoji:'📱',
-    msg:'Variable-reward scrolling hijacks the dopamine system — the same circuit as gambling addiction.',
-    sci:'Unpredictable rewards (likes, new posts) trigger dopamine spikes via the nucleus accumbens, causing compulsion.',
+    msg:'Endless scrolling tricks the Reward Rangers into chasing fake gold — they get tired and confused!',
+    sci:'Fun fact: Apps are designed like slot machines — they give random rewards to keep the Reward Rangers hooked and distracted!',
     fx:{ dopamine:-10, prefrontal:-7, amygdala:-6, serotonin:-5 } },
 
   { k:['cut','wound','scrape','graze','bleed'],
     type:'activity', emoji:'🩹',
-    msg:'Skin breached — neutrophils swarm the wound within 30-60 minutes.',
-    sci:'Neutrophils arrive via CXCL8 chemokine gradient within 30-60 minutes of wounding.',
+    msg:'Castle wall breached! 🚨 Speed Squad soldiers sprint to the wound in under an hour to plug the gap!',
+    sci:'Fun fact: Injured skin sends out a chemical distress signal — like a flare gun — and Speed Squad soldiers follow it straight to the cut!',
     fx:{ skin:-14, inflam:-8, neutro:-3 } },
 
   { k:['cold','flu','sick','virus','infection','fever'],
     type:'activity', emoji:'🤧',
-    msg:'Active infection — immune system mobilises, but battle fatigue hits all units.',
-    sci:'Fever at 38.5°C increases lymphocyte proliferation 20-fold, but sustained illness depletes all resources.',
+    msg:'FULL BATTLE! 🚨 The whole army is fighting hard — your fever is actually a weapon that fries the invaders!',
+    sci:'Fun fact: Your body turns UP the heat on purpose when you\'re sick — germs can\'t survive as well when it\'s hot in the kingdom!',
     fx:{ neutro:-6, tcell:-4, nk:-5, inflam:-15, bdnf:-5, serotonin:-5 } },
 
   { k:['coffee','caffeine','energy drink'],
     type:'food', emoji:'☕',
-    msg:'Caffeine blocks adenosine (tiredness) and temporarily boosts dopamine and focus.',
-    sci:'Caffeine is an adenosine receptor antagonist. Increases prefrontal dopamine release for ~3-5 hours.',
+    msg:'Coffee gives The Commander and Reward Rangers a short power boost — but then the castle crashes! ☕ Use wisely, soldier!',
+    sci:'Fun fact: Caffeine tricks your brain by blocking the "sleepy" chemical — your army feels awake... until it wears off!',
     fx:{ inflam:+3, neutro:+2, prefrontal:+6, dopamine:+5, amygdala:-3 } },
 
   { k:['isolated','lonely','alone','isolation'],
     type:'activity', emoji:'🫂',
-    msg:'Loneliness activates the amygdala\'s threat response and significantly reduces serotonin and BDNF.',
-    sci:'Chronic loneliness upregulates inflammatory genes and reduces hippocampal BDNF expression.',
+    msg:'The kingdom feels quiet and sad... Sunshine Squad and Reward Rangers lose energy when no one is around. Find your allies! 🫂',
+    sci:'Fun fact: Your brain actually needs friends like your army needs teammates — loneliness weakens the whole kingdom\'s defences!',
     fx:{ serotonin:-10, dopamine:-7, amygdala:-10, bdnf:-7, inflam:-8 } },
 ];
 
