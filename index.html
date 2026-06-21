@@ -224,6 +224,28 @@
   .fs-leg-count { font-size:10px; font-weight:700; margin-top:1px; }
   .fs-open-btn  { font-size:11px; padding:3px 8px; border-radius:7px; border:1px solid var(--line); background:var(--panel-2); color:var(--muted); cursor:pointer; }
   .fs-open-btn:hover { color:var(--text); border-color:#3a4a66; }
+
+  /* ── Life expectancy block ── */
+  .life-block { margin-top:12px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .life-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+  .life-profile { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+  .life-profile select, .life-profile input {
+    background:var(--bg); border:1px solid var(--line); border-radius:8px;
+    padding:7px 8px; color:var(--text); font-size:12px; width:100%; cursor:pointer;
+  }
+  .life-profile select:focus, .life-profile input:focus { outline:none; border-color:#3a4a66; }
+  .life-profile input::placeholder { color:var(--muted); }
+  .life-main { display:flex; align-items:baseline; gap:6px; margin-bottom:6px; flex-wrap:wrap; }
+  .life-years { font-size:34px; font-weight:800; font-variant-numeric:tabular-nums; transition:color .5s; }
+  .life-yr-label { font-size:13px; color:var(--muted); }
+  .life-remaining { font-size:12px; color:var(--muted); margin-left:auto; align-self:center; }
+  .life-factors { display:flex; flex-direction:column; gap:3px; margin-top:4px; }
+  .life-factor { font-size:11px; display:flex; gap:5px; align-items:center; }
+  .lf-val { font-weight:700; min-width:38px; font-variant-numeric:tabular-nums; }
+  .lf-pos { color:var(--good); }
+  .lf-neg { color:var(--bad); }
+  .lf-name { color:var(--muted); }
+  .life-note { font-size:10px; color:#3a4060; margin-top:8px; line-height:1.4; }
 </style>
 </head>
 <body>
@@ -310,6 +332,37 @@
         <div class="risk-pct" id="riskPct">43%</div>
       </div>
       <div class="risk-status" id="riskStatus">💪 Average protection</div>
+    </div>
+
+    <div class="life-block">
+      <div class="life-label">🕰️ Estimated Lifespan</div>
+      <div class="life-profile">
+        <input type="number" id="profileAge" min="1" max="110" placeholder="Your age" oninput="renderLifespan()" />
+        <select id="profileSex" onchange="renderLifespan()">
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+        </select>
+        <select id="profileSmoke" onchange="renderLifespan()">
+          <option value="no">Non-smoker</option>
+          <option value="ex">Ex-smoker</option>
+          <option value="yes">Smoker</option>
+        </select>
+        <select id="profileSleep" onchange="renderLifespan()">
+          <option value="7">Sleep 7–8 hrs ✓</option>
+          <option value="8">Sleep 8–9 hrs</option>
+          <option value="6">Sleep 6–7 hrs</option>
+          <option value="5">Sleep 5–6 hrs</option>
+          <option value="9">Sleep 9+ hrs</option>
+          <option value="4">Sleep &lt;5 hrs</option>
+        </select>
+      </div>
+      <div class="life-main">
+        <div class="life-years" id="lifeYears">—</div>
+        <div class="life-yr-label">years</div>
+        <div class="life-remaining" id="lifeRemaining"></div>
+      </div>
+      <div class="life-factors" id="lifeFactors"></div>
+      <div class="life-note">Estimate based on your immune &amp; brain health scores, sleep and lifestyle. Not medical advice.</div>
     </div>
   </div>
 
@@ -935,6 +988,85 @@ function renderScores(){
   : risk<50 ? '💪 Average protection'
   : risk<70 ? '⚠️ Defences weakened — take care'
   :           '🚨 High risk — immune system under strain!';
+  renderLifespan();
+}
+
+function calcLifeExpectancy(){
+  const g = id => (unitMap[id]||{val:50}).val;
+
+  // UK average baselines (sex-adjusted)
+  const sex = document.getElementById('profileSex').value;
+  const base = sex === 'f' ? 83 : 79;
+
+  // Linear modifier: val=50→0y, val=100→+posMax, val=0→-negMax
+  function umod(val, posMax, negMax){
+    return val >= 50
+      ? ((val-50)/50) * posMax
+      : ((val-50)/50) * negMax;
+  }
+
+  const factors = [
+    // Immune body units
+    { name:'Inflammation control',  val: umod(g('inflam'), 7, 10) },
+    { name:'Gut microbiome',        val: umod(g('gut'),    5,  7) },
+    { name:'Lung function',         val: umod(g('lung'),   4,  6) },
+    { name:'Liver/metabolic health',val: umod(g('liver'),  3,  5) },
+    { name:'NK cell activity',      val: umod(g('nk'),     3,  4) },
+    { name:'T-cell immunity',       val: umod(g('tcell'),  3,  4) },
+    { name:'Neutrophil response',   val: umod(g('neutro'), 2,  3) },
+    { name:'Skin barrier',          val: umod(g('skin'),   1,  2) },
+    // Brain units
+    { name:'Stress regulation',     val: umod(g('amygdala'),   3, 5) },
+    { name:'Brain plasticity (BDNF)',val: umod(g('bdnf'),      2, 3) },
+    { name:'Serotonin / mood',      val: umod(g('serotonin'),  2, 3) },
+    { name:'Prefrontal function',   val: umod(g('prefrontal'), 2, 3) },
+    { name:'Memory (hippocampus)',  val: umod(g('hippocampus'),1, 2) },
+    { name:'Dopamine system',       val: umod(g('dopamine'),   1, 2) },
+  ];
+
+  // Lifestyle modifiers
+  const smoke = document.getElementById('profileSmoke').value;
+  if(smoke==='yes') factors.push({ name:'Smoking',      val:-10 });
+  if(smoke==='ex')  factors.push({ name:'Ex-smoker',    val:-3  });
+
+  const sleep = document.getElementById('profileSleep').value;
+  const sleepMod = {4:-5, 5:-2, 6:-1, 7:+2, 8:0, 9:-1};
+  const sm = sleepMod[sleep] || 0;
+  if(sm>0)  factors.push({ name:'Healthy sleep (7–8h)', val:sm });
+  if(sm<0)  factors.push({ name:'Poor sleep duration',  val:sm });
+
+  const total = factors.reduce((s,f)=>s+f.val, 0);
+  return { expected: Math.max(40, Math.round(base + total)), factors, base };
+}
+
+function renderLifespan(){
+  const age = parseInt(document.getElementById('profileAge').value)||null;
+  const {expected, factors} = calcLifeExpectancy();
+
+  const yearsEl = document.getElementById('lifeYears');
+  yearsEl.textContent = expected;
+  yearsEl.style.color = expected>=85?'#46d39a':expected>=75?'#fbbf24':'#ff6b6b';
+
+  const remEl = document.getElementById('lifeRemaining');
+  if(age && age < expected)
+    remEl.textContent = '~'+(expected-age)+' years from now';
+  else if(age && age >= expected)
+    remEl.textContent = 'Already above estimate — keep going! 💪';
+  else
+    remEl.textContent = '';
+
+  const sorted = [...factors].sort((a,b)=>b.val-a.val);
+  const pos = sorted.filter(f=>f.val>0.15).slice(0,3);
+  const neg = sorted.filter(f=>f.val<-0.15).slice(0,3).reverse();
+
+  const fEl = document.getElementById('lifeFactors');
+  fEl.innerHTML = '';
+  pos.forEach(f=>{
+    fEl.innerHTML+=`<div class="life-factor"><span class="lf-val lf-pos">+${f.val.toFixed(1)}y</span><span class="lf-name">${f.name}</span></div>`;
+  });
+  neg.forEach(f=>{
+    fEl.innerHTML+=`<div class="life-factor"><span class="lf-val lf-neg">${f.val.toFixed(1)}y</span><span class="lf-name">${f.name}</span></div>`;
+  });
 }
 
 function flashBody(good){
