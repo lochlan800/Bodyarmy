@@ -1908,6 +1908,71 @@ class FsSoldier{
 
 let fsAnimId=null, fsSoldiers=[], fsWallPts=[], fsReinitTimer=null;
 
+// ── Body-shape fat layer ─────────────────────────────────────────────────────
+// Derived from inflammation control + gut + liver → "metabolic health"
+// Healthy = lean silhouette; poor diet / high inflammation = visible belly expansion
+function drawBodyShape(ctx,ox,oy,scale){
+  const m=unitMap;
+  const lean=(m.inflam.val+m.gut.val+m.liver.val)/3; // 0-100
+  const fatPx=(1-lean/100)*28; // extra body-px of adipose padding (0 = lean, 28 = heavy)
+  if(fatPx<0.5) return;
+
+  ctx.save();
+  ctx.beginPath();
+  SKIN_PATH.forEach((pt,i)=>{
+    let px=pt.x, py=pt.y;
+    // Only expand the torso, not head or arms
+    const inTorso=py>=200&&py<=960;
+    const isArm=(pt.x>310&&py<500)||(pt.x<60&&py<500);
+    if(inTorso&&!isArm){
+      const dist=pt.x-193; // left = negative, right = positive
+      // belly (gut centre y:620) gets maximum expansion, tapering towards chest and hips
+      const t=Math.max(0,1-Math.abs(py-620)/430);
+      const expand=fatPx*(0.35+0.65*t);
+      px=dist>=0?pt.x+expand:pt.x-expand;
+    }
+    const sx=ox+px*scale,sy=oy+py*scale;
+    i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
+  });
+  ctx.closePath();
+  const alpha=(0.10+(1-lean/100)*0.22).toFixed(2);
+  ctx.fillStyle=`rgba(210,148,88,${alpha})`;
+  ctx.fill();
+  ctx.restore();
+}
+
+// ── Organ glow layer ─────────────────────────────────────────────────────────
+// Each organ lights up proportionally to its unit's health value
+function drawOrganGlows(ctx,ox,oy,scale){
+  const m=unitMap;
+  const brainAvg=(m.prefrontal.val+m.hippocampus.val+m.amygdala.val+m.dopamine.val+m.serotonin.val+m.bdnf.val)/6;
+  const ORGANS=[
+    {val:brainAvg,    cx:193,cy:82,  rx:68,ry:78,  col:'#818cf8'}, // brain
+    {val:m.lung.val,  cx:127,cy:388, rx:58,ry:88,  col:'#2dd4bf'}, // left lung
+    {val:m.lung.val,  cx:258,cy:388, rx:58,ry:88,  col:'#2dd4bf'}, // right lung
+    {val:m.neutro.val,cx:183,cy:368, rx:36,ry:44,  col:'#f87171'}, // heart (blood health)
+    {val:m.liver.val, cx:258,cy:508, rx:62,ry:52,  col:'#f59e0b'}, // liver
+    {val:m.gut.val,   cx:153,cy:528, rx:48,ry:52,  col:'#86efac'}, // stomach
+    {val:m.gut.val,   cx:193,cy:700, rx:96,ry:108, col:'#4ade80'}, // intestines/gut
+  ];
+  const h2=v=>Math.round(Math.max(0,Math.min(255,v*255))).toString(16).padStart(2,'0');
+  ORGANS.forEach(o=>{
+    const op=0.06+(o.val/100)*0.34; // 0.06 dim → 0.40 bright
+    const sx=ox+o.cx*scale, sy=oy+o.cy*scale;
+    const srx=o.rx*scale,   sry=o.ry*scale;
+    const grd=ctx.createRadialGradient(sx,sy,0,sx,sy,Math.max(srx,sry));
+    grd.addColorStop(0,   o.col+h2(op));
+    grd.addColorStop(0.55,o.col+h2(op*0.5));
+    grd.addColorStop(1,   o.col+'00');
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(sx,sy,srx,sry,0,0,Math.PI*2);
+    ctx.fillStyle=grd;
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
 function triggerFsReinit(){
   if(!document.getElementById('mtab-patrol').classList.contains('active')) return;
   clearTimeout(fsReinitTimer);
@@ -1947,6 +2012,9 @@ function initFsAnim(){
     const ctx=canvas.getContext('2d');
     ctx.clearRect(0,0,canvas.width,canvas.height);
     const{ox,oy,scale}=fsImgBounds();
+
+    drawBodyShape(ctx,ox,oy,scale);   // adipose fat layer (shape changes with health)
+    drawOrganGlows(ctx,ox,oy,scale);  // coloured organ glows (brightness = unit value)
 
     // Skin Barrier — shield wall around the body perimeter
     const wSz=Math.max(12,Math.round(18*scale));
