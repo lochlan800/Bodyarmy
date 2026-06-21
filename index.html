@@ -246,9 +246,120 @@
   .lf-neg { color:var(--bad); }
   .lf-name { color:var(--muted); }
   .life-note { font-size:10px; color:#3a4060; margin-top:8px; line-height:1.4; }
+
+  /* ── Unit Ranks ── */
+  .rank-badge { font-size:10px; padding:2px 6px; border-radius:5px; font-weight:700; white-space:nowrap; }
+
+  /* ── Sleep Logger ── */
+  .sleep-btns { display:flex; gap:5px; flex-wrap:wrap; margin:8px 0 5px; }
+  .sleep-btn { flex:1; min-width:32px; padding:8px 2px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:10px; color:var(--muted);
+    cursor:pointer; font-size:12px; font-weight:700; transition:all .15s; }
+  .sleep-btn:hover, .sleep-btn.active { background:#1e3520; color:#4ade80; border-color:#2a5a30; }
+  .sleep-btn[data-h="7"], .sleep-btn[data-h="8"] { border-color:rgba(74,222,128,.25); color:#4ade80; }
+  .sleep-last { font-size:11px; color:var(--muted); min-height:16px; }
+
+  /* ── Mood Check-in ── */
+  .mood-btns { display:flex; gap:6px; margin:8px 0 5px; }
+  .mood-btn { flex:1; padding:9px 2px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:10px; font-size:22px;
+    cursor:pointer; transition:all .15s; text-align:center; line-height:1; }
+  .mood-btn:hover, .mood-btn.active { background:#1e2d4a; border-color:#2a4a7a; transform:scale(1.12); }
+  .mood-last { font-size:11px; color:var(--muted); min-height:16px; }
+
+  /* ── Missions Panel ── */
+  .mission-list { display:flex; flex-direction:column; gap:8px; }
+  .mission-item { background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px 12px; display:flex; align-items:center; gap:10px; }
+  .mission-item.done { opacity:.65; border-color:rgba(70,211,154,.3); background:rgba(70,211,154,.05); }
+  .mission-icon { font-size:20px; flex-shrink:0; }
+  .mission-info { flex:1; min-width:0; }
+  .mission-task { font-size:13px; font-weight:600; }
+  .mission-item.done .mission-task { text-decoration:line-through; color:var(--muted); }
+  .mission-done-tick { font-size:11px; color:var(--good); text-decoration:none; }
+  .mission-reward { font-size:11px; color:var(--muted); margin-top:2px; }
+  .mission-btn { padding:5px 12px; background:linear-gradient(90deg,#3d7fd6,var(--army)); border:none;
+    color:#fff; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; flex-shrink:0; }
+  .mission-footer { font-size:11px; color:var(--muted); margin-top:10px; }
+
+  /* ── Nutrient Checklist ── */
+  .nutrient-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .nutrient-item { background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all .15s; }
+  .nutrient-item.ticked { background:rgba(70,211,154,.1); border-color:rgba(70,211,154,.4); cursor:default; }
+  .nutrient-item:not(.ticked):hover { border-color:#3a4a66; }
+  .nutrient-emoji { font-size:17px; flex-shrink:0; }
+  .nutrient-name { font-size:12px; font-weight:600; flex:1; }
+  .nutrient-tick { font-size:13px; color:var(--good); font-weight:700; }
+
+  /* ── Plant Diversity ── */
+  .diversity-block { margin-top:10px; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+  .div-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .div-label { font-size:11px; color:var(--muted); }
+  .div-count { font-size:20px; font-weight:800; color:#4ade80; }
+  .div-bar { height:6px; border-radius:5px; background:#11141d; overflow:hidden; border:1px solid var(--line); }
+  .div-bar span { display:block; height:100%; border-radius:5px; transition:width .6s; background:linear-gradient(90deg,#2fa372,#4ade80); }
+  .div-note { font-size:10px; color:var(--muted); margin-top:5px; }
+  .div-plants { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; max-height:58px; overflow:hidden; }
+  .div-plant-tag { font-size:10px; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.2); color:#4ade80; border-radius:999px; padding:2px 7px; }
+
+  /* ── Achievements ── */
+  .badge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+  .badge-item { background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px 6px; text-align:center; transition:border-color .2s; }
+  .badge-item.earned { background:rgba(251,191,36,.07); border-color:rgba(251,191,36,.35); }
+  .badge-item.locked { opacity:.35; filter:grayscale(.8); }
+  .badge-icon { font-size:22px; margin-bottom:4px; }
+  .badge-name { font-size:11px; font-weight:700; }
+  .badge-desc { font-size:10px; color:var(--muted); margin-top:2px; line-height:1.3; }
+
+  /* ── Enemy Intel & Body Clock ── */
+  .intel-tabs { display:flex; gap:6px; margin-bottom:12px; }
+  .intel-tab { flex:1; padding:7px 4px; border-radius:8px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--muted); cursor:pointer; font-size:12px; font-weight:600; transition:all .15s; }
+  .intel-tab.active { background:#1e2d4a; color:var(--army); border-color:#2a4a7a; }
+  .enemy-list { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  @media(max-width:900px){ .enemy-list{ grid-template-columns:1fr 1fr; } }
+  @media(max-width:560px){ .enemy-list{ grid-template-columns:1fr; } }
+  .enemy-card { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  .enemy-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+  .enemy-emoji { font-size:22px; flex-shrink:0; }
+  .enemy-name { font-size:13px; font-weight:700; }
+  .enemy-desc { font-size:11px; color:var(--muted); margin-top:1px; }
+  .enemy-counters { display:flex; flex-wrap:wrap; gap:4px; }
+  .counter-pill { font-size:11px; background:rgba(90,169,255,.1); border:1px solid rgba(90,169,255,.22); color:#5aa9ff; border-radius:999px; padding:2px 8px; }
+  .clock-list { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  @media(max-width:560px){ .clock-list{ grid-template-columns:1fr; } }
+  .clock-item { display:flex; align-items:center; gap:10px; padding:9px 12px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px; }
+  .clock-time { font-size:11px; font-weight:700; color:var(--muted); min-width:60px; font-variant-numeric:tabular-nums; }
+  .clock-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .clock-info { flex:1; }
+  .clock-title { font-size:12px; font-weight:700; }
+  .clock-desc { font-size:11px; color:var(--muted); }
+  .clock-peak { font-size:10px; padding:2px 7px; border-radius:999px; font-weight:600; flex-shrink:0; }
+
+  /* ── Achievement pop-up ── */
+  #achieveToast {
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(120%);
+    z-index:998; min-width:240px; background:#1a2030; border:1px solid rgba(251,191,36,.5);
+    border-radius:16px; padding:14px 18px; box-shadow:0 8px 32px rgba(0,0,0,.6);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .3s; opacity:0; text-align:center;
+  }
+  #achieveToast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .achieve-title { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .achieve-icon  { font-size:28px; margin-bottom:4px; }
+  .achieve-name  { font-size:15px; font-weight:700; }
+  .achieve-desc  { font-size:12px; color:var(--muted); margin-top:3px; }
 </style>
 </head>
 <body>
+
+<div id="achieveToast">
+  <div class="achieve-title">🏆 Achievement Unlocked!</div>
+  <div class="achieve-icon" id="achieveIcon"></div>
+  <div class="achieve-name" id="achieveName"></div>
+  <div class="achieve-desc" id="achieveDesc"></div>
+</div>
 
 <div id="toast">
   <div class="toast-action" id="toastTitle"></div>
@@ -406,9 +517,73 @@
     </div>
     <div class="chips" id="chipsAct"></div>
 
+    <div class="panel-title" style="margin-top:16px">😴 Sleep Logger</div>
+    <div class="sleep-btns">
+      <button class="sleep-btn" data-h="5" onclick="logSleep(5)">5h</button>
+      <button class="sleep-btn" data-h="6" onclick="logSleep(6)">6h</button>
+      <button class="sleep-btn" data-h="7" onclick="logSleep(7)">7h</button>
+      <button class="sleep-btn" data-h="8" onclick="logSleep(8)">8h ✓</button>
+      <button class="sleep-btn" data-h="9" onclick="logSleep(9)">9h</button>
+      <button class="sleep-btn" data-h="10" onclick="logSleep(10)">10h</button>
+    </div>
+    <div class="sleep-last" id="sleepLast"></div>
+
+    <div class="panel-title" style="margin-top:14px">😊 Mood Check-in</div>
+    <div class="mood-btns">
+      <button class="mood-btn" onclick="logMood(0)" title="Terrible">😣</button>
+      <button class="mood-btn" onclick="logMood(1)" title="Low">😔</button>
+      <button class="mood-btn" onclick="logMood(2)" title="Okay">😐</button>
+      <button class="mood-btn" onclick="logMood(3)" title="Good">🙂</button>
+      <button class="mood-btn" onclick="logMood(4)" title="Great">😄</button>
+    </div>
+    <div class="mood-last" id="moodLast"></div>
+
     <div class="panel-title" style="margin-top:18px">📜 Mission Report</div>
     <div class="log" id="log"></div>
     <div class="footer-note">⚔️ Every choice trains your army — make them strong!</div>
+  </div>
+
+  <!-- Daily Army Orders -->
+  <div class="panel">
+    <div class="panel-title" style="display:flex;align-items:center;justify-content:space-between">
+      🎯 Daily Army Orders
+      <span style="font-size:11px;color:var(--muted)" id="missionsDate"></span>
+    </div>
+    <div class="mission-list" id="missionList"></div>
+    <div class="mission-footer" id="missionFooter">New orders every day!</div>
+  </div>
+
+  <!-- Nutrient HQ -->
+  <div class="panel">
+    <div class="panel-title">💊 Nutrient HQ</div>
+    <div class="nutrient-grid" id="nutrientGrid"></div>
+    <div class="diversity-block">
+      <div class="div-header">
+        <div>
+          <div class="div-label">🌿 Plant Diversity This Week</div>
+          <div class="div-count"><span id="plantCount">0</span><span style="font-size:13px;font-weight:400;color:var(--muted)"> / 30</span></div>
+        </div>
+      </div>
+      <div class="div-bar"><span id="plantBar" style="width:0%"></span></div>
+      <div class="div-note" id="plantNote">Log different plant foods to build your diversity score!</div>
+      <div class="div-plants" id="plantList"></div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="panel">
+    <div class="panel-title">🏆 Achievements</div>
+    <div class="badge-grid" id="badgeGrid"></div>
+  </div>
+
+  <!-- Field Intelligence (full-width) -->
+  <div class="panel" style="grid-column:1/-1">
+    <div class="intel-tabs">
+      <button class="intel-tab active" onclick="switchIntelTab('enemy')">🦠 Enemy Intel</button>
+      <button class="intel-tab"        onclick="switchIntelTab('clock')">🕐 Body Clock</button>
+    </div>
+    <div id="intelEnemy" class="enemy-list"></div>
+    <div id="intelClock" class="clock-list" style="display:none"></div>
   </div>
 
 </div>
@@ -921,7 +1096,10 @@ function buildUnits(arr, containerId){
             <span class="unit-emoji">${u.emoji}</span>
             <div><div class="unit-name">${u.name}</div><div class="unit-desc">${u.desc}</div></div>
           </div>
-          <div class="unit-val" id="uv-${u.id}">${Math.round(u.val)}</div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <div class="unit-val" id="uv-${u.id}">${Math.round(u.val)}</div>
+            <span id="ur-${u.id}" class="rank-badge" style="background:${typeof getRank!=='undefined'?getRank(u.val).color:'#6b7280'}22;color:${typeof getRank!=='undefined'?getRank(u.val).color:'#6b7280'}">${typeof getRank!=='undefined'?getRank(u.val).icon:'🪖'}</span>
+          </div>
         </div>
         <div class="unit-bar"><span id="ub-${u.id}" style="width:${u.val}%;background:${u.color}"></span></div>
       </div>`;
@@ -932,6 +1110,13 @@ function updateUnit(id, val){
   const v = clamp(val);
   document.getElementById('uv-'+id).textContent = Math.round(v);
   document.getElementById('ub-'+id).style.width = v+'%';
+  const rEl = document.getElementById('ur-'+id);
+  if(rEl && typeof getRank !== 'undefined'){
+    const rk = getRank(v);
+    rEl.textContent = rk.icon;
+    rEl.style.color = rk.color;
+    rEl.style.background = rk.color+'22';
+  }
 }
 
 function flashUnit(id, good){
@@ -1288,6 +1473,9 @@ function submit(text, type){
   }
   const scale = parseQuantity(text);
   applyRule(text, r, scale);
+  autoCheckMissions(text, type);
+  if(type==='food') updateDiversity(text);
+  checkAchievements();
 }
 
 function buildFoodText(raw){
@@ -1753,9 +1941,384 @@ function renderFsLegend(){
   });
 }
 
+// ─── Unit Ranks ──────────────────────────────────────────────────────────────
+const RANKS = [
+  {max:39,  label:'Recruit',  icon:'🪖', color:'#6b7280'},
+  {max:59,  label:'Soldier',  icon:'⚔️',  color:'#60a5fa'},
+  {max:74,  label:'Sergeant', icon:'🎖️',  color:'#4ade80'},
+  {max:89,  label:'Captain',  icon:'🏅',  color:'#fbbf24'},
+  {max:100, label:'General',  icon:'⭐',  color:'#a78bfa'},
+];
+function getRank(v){ return RANKS.find(r=>v<=r.max)||RANKS[RANKS.length-1]; }
+
+// ─── Sleep Logger ────────────────────────────────────────────────────────────
+const SLEEP_DEF = {
+  5:{ msg:'Extreme sleep deprivation! BDNF production crashes and inflammation surges across the kingdom.',
+      sci:'Fun fact: Sleeping under 5 hours raises your chance of getting sick 4.5× — immune memory cells literally can\'t form without sleep!',
+      fx:{bdnf:-15,inflam:-18,amygdala:-14,serotonin:-12,prefrontal:-10,nk:-6,tcell:-5,hippocampus:-8} },
+  6:{ msg:'Short sleep — the army is struggling. Cortisol spikes and BDNF drops whenever you sleep under 7 hours.',
+      sci:'Fun fact: 2 weeks of 6-hour nights impairs you as much as being awake 24 hours straight — you just don\'t notice the decline!',
+      fx:{bdnf:-9,inflam:-10,amygdala:-9,serotonin:-8,prefrontal:-6,nk:-3} },
+  7:{ msg:'Good sleep! BDNF floods the brain, inflammation clears and immune cells consolidate their battle memories.',
+      sci:'Fun fact: During sleep your brain\'s glymphatic system becomes 10× more active — flushing out toxins linked to Alzheimer\'s!',
+      fx:{bdnf:+10,inflam:+8,amygdala:+8,hippocampus:+8,serotonin:+7,prefrontal:+5,nk:+4} },
+  8:{ msg:'Optimal sleep! Deep NREM sleep cements immune memory and REM builds emotional resilience. Army is battle-ready!',
+      sci:'Fun fact: NK cells become 72% less effective after one 4–5h night — but fully recover after a single 8-hour night!',
+      fx:{bdnf:+12,inflam:+10,amygdala:+10,hippocampus:+10,serotonin:+9,prefrontal:+7,nk:+6,tcell:+4} },
+  9:{ msg:'Great long sleep! Rich REM processes emotions deeply and BDNF production stays elevated.',
+      sci:'Fun fact: REM sleep is when the brain processes emotional memories — like overnight therapy you don\'t pay for!',
+      fx:{bdnf:+6,inflam:+5,amygdala:+6,serotonin:+5,hippocampus:+6} },
+  10:{ msg:'Very long sleep — helpful when recovering, but regularly oversleeping can indicate the body fighting something.',
+       sci:'Fun fact: Chronic long sleep (9+ hrs) is linked to raised inflammation markers — the body can over-repair just as it can under-repair.',
+       fx:{bdnf:+3,inflam:+2,amygdala:+3,serotonin:+2} },
+};
+function logSleep(h){
+  const def = SLEEP_DEF[h]||SLEEP_DEF[8];
+  const r = {emoji:'😴', type:'activity', msg:def.msg, sci:def.sci, fx:def.fx};
+  applyRule(h+'h Sleep', r, 1);
+  const sleepLog = JSON.parse(localStorage.getItem('ba_sleep')||'[]');
+  sleepLog.push({d:new Date().toDateString(), h});
+  localStorage.setItem('ba_sleep', JSON.stringify(sleepLog.slice(-90)));
+  document.querySelectorAll('.sleep-btn').forEach(b=>b.classList.remove('active'));
+  const ab = document.querySelector(`.sleep-btn[data-h="${h}"]`);
+  if(ab) ab.classList.add('active');
+  const el=document.getElementById('sleepLast');
+  if(el) el.textContent='Logged: '+h+'h — '+(h>=8?'Excellent! 💪':h>=7?'Good!':h>=6?'Could be better ⚠️':'Needs improvement 🚨');
+  completeMissionAuto('sleep7', h>=7);
+  checkAchievements();
+}
+
+// ─── Mood Logger ─────────────────────────────────────────────────────────────
+const MOOD_DEF = [
+  {emoji:'😣',label:'Terrible',msg:'The Brain Command is under severe stress — serotonin and dopamine are depleted.',      sci:'Fun fact: Your gut bacteria produce 90% of your serotonin — low mood often starts in the gut, not the brain!',                                     fx:{serotonin:-12,dopamine:-10,amygdala:-12,prefrontal:-8,bdnf:-6}},
+  {emoji:'😔',label:'Low',     msg:'Below average mood — the Calm Guard is overworked and the Reward Rangers are quiet.',   sci:'Fun fact: 10 minutes of walking outside raises serotonin measurably — the cheapest antidepressant there is!',                                    fx:{serotonin:-6,dopamine:-5,amygdala:-6,prefrontal:-4}},
+  {emoji:'😐',label:'Okay',    msg:'Neutral mood — the Brain Command is steady. A calm baseline is healthy and sustainable.',sci:'Fun fact: Constant highs are tiring — a neutral calm state is where the brain does its best long-term repair work!',                           fx:{}},
+  {emoji:'🙂',label:'Good',    msg:'Positive mood! Serotonin Squad and Reward Rangers are firing well — great for learning.',sci:'Fun fact: Positive emotions physically widen your arteries by 22% — happy people genuinely have better blood flow to the brain!',           fx:{serotonin:+5,dopamine:+5,amygdala:+4}},
+  {emoji:'😄',label:'Great',   msg:'Excellent mood! The whole Brain Command thrives — BDNF Builders are at full speed!',    sci:'Fun fact: Genuine laughter raises NK cell activity by 40% — your immune army literally gets stronger when you laugh!',                          fx:{serotonin:+10,dopamine:+9,amygdala:+8,prefrontal:+5,bdnf:+4,nk:+3}},
+];
+function logMood(idx){
+  const mood = MOOD_DEF[idx];
+  const el = document.getElementById('moodLast');
+  if(Object.keys(mood.fx).length){
+    const r = {emoji:mood.emoji, type:'activity', msg:mood.msg, sci:mood.sci, fx:mood.fx};
+    applyRule('Mood: '+mood.label, r, 1);
+  } else {
+    if(el) el.textContent = 'Logged: 😐 Okay — steady as she goes!';
+  }
+  if(el) el.textContent = 'Logged: '+mood.emoji+' '+mood.label;
+  const moodLog = JSON.parse(localStorage.getItem('ba_mood')||'[]');
+  const today = new Date().toDateString();
+  if(!moodLog.includes(today)){moodLog.push(today); localStorage.setItem('ba_mood',JSON.stringify(moodLog.slice(-90)));}
+  completeMissionAuto('mood', true);
+  checkAchievements();
+}
+
+// ─── Micronutrients ──────────────────────────────────────────────────────────
+const NUTRIENT_DEF = [
+  {id:'vitd', emoji:'☀️',name:'Vitamin D',  msg:'Vitamin D activates NK cells and T-cells — the sunshine vitamin is also an immune commander!',      sci:'Fun fact: 1 billion people are Vitamin D deficient — it\'s linked to 17 types of cancer and significantly higher depression risk!', fx:{inflam:+5,nk:+4,tcell:+3,serotonin:+4,bdnf:+3}},
+  {id:'vitc', emoji:'🍊',name:'Vitamin C',  msg:'Vitamin C supercharges neutrophils — they store 100× more of it than blood and use it to kill pathogens!', sci:'Fun fact: Stress depletes Vitamin C rapidly — stressed people need 2–4× more to keep their immune soldiers properly armed!',         fx:{neutro:+8,skin:+5,inflam:+4,tcell:+3}},
+  {id:'zinc', emoji:'⚙️',name:'Zinc',       msg:'Zinc is the army\'s essential training kit — without it T-cells can\'t develop, divide or deploy into battle!', sci:'Fun fact: Zinc deficiency literally shrinks the thymus gland — the T-cell training academy — downsizing your immune army!',       fx:{tcell:+8,nk:+5,skin:+3,neutro:+4}},
+  {id:'mag',  emoji:'🔮',name:'Magnesium',  msg:'Magnesium calms the Amygdala and powers 300+ enzyme reactions — the brain\'s most important mineral!',  sci:'Fun fact: 75% of people don\'t get enough — it converts tryptophan into serotonin, so deficiency directly causes low mood!',      fx:{amygdala:+6,serotonin:+5,inflam:+4,bdnf:+4}},
+  {id:'omega',emoji:'🐟',name:'Omega-3',    msg:'Omega-3 is brain armour — 40% of every brain cell wall is made from DHA found in oily fish!',           sci:'Fun fact: Omega-3 reduces anxiety by 20% on average in clinical trials — one of the most studied supplements in medicine!',         fx:{inflam:+8,bdnf:+7,serotonin:+5,nk:+4}},
+  {id:'b12',  emoji:'💊',name:'Vitamin B12',msg:'B12 powers the brain\'s electrical signals — it maintains the myelin sheath protecting every nerve!',    sci:'Fun fact: Vegans get almost zero B12 from food — deficiency causes irreversible nerve damage if left untreated!',                   fx:{dopamine:+5,serotonin:+4,prefrontal:+4,hippocampus:+3}},
+  {id:'iron', emoji:'🩸',name:'Iron',       msg:'Iron carries oxygen to every soldier in the body — without it neutrophils can\'t kill pathogens effectively!',sci:'Fun fact: Iron deficiency is the world\'s most common nutritional deficiency — 25% of people globally are affected!',             fx:{neutro:+4,prefrontal:+3,dopamine:+3,skin:+2}},
+];
+function getNutrientState(){
+  const today=new Date().toDateString();
+  const saved=JSON.parse(localStorage.getItem('ba_nutrients')||'{}');
+  if(saved.date!==today) return {date:today,ticked:[]};
+  return saved;
+}
+function tickNutrient(id){
+  const state=getNutrientState();
+  if(state.ticked.includes(id)) return;
+  state.ticked.push(id);
+  localStorage.setItem('ba_nutrients',JSON.stringify(state));
+  const def=NUTRIENT_DEF.find(n=>n.id===id); if(!def) return;
+  const r={emoji:def.emoji,type:'food',msg:def.msg,sci:def.sci,fx:def.fx};
+  applyRule(def.name,r,1);
+  renderNutrients();
+  checkAchievements();
+}
+function renderNutrients(){
+  const state=getNutrientState();
+  const el=document.getElementById('nutrientGrid'); if(!el) return;
+  el.innerHTML='';
+  NUTRIENT_DEF.forEach(n=>{
+    const done=state.ticked.includes(n.id);
+    el.innerHTML+=`<div class="nutrient-item${done?' ticked':''}" ${done?'':'onclick="tickNutrient(\''+n.id+'\')"'} title="${done?'✓ Logged today':n.msg.split('!')[0]}">
+      <span class="nutrient-emoji">${n.emoji}</span>
+      <span class="nutrient-name">${n.name}</span>
+      ${done?'<span class="nutrient-tick">✓</span>':''}
+    </div>`;
+  });
+}
+
+// ─── Plant Diversity ─────────────────────────────────────────────────────────
+const PLANT_WORDS=['apple','banana','berr','blueberr','strawberr','raspberry','blackberr','cherry',
+'kiwi','orange','lemon','lime','mango','grape','peach','plum','pear','pineapple','watermelon',
+'avocado','tomato','pepper','cucumber','courgette','zucchini','broccoli','cauliflower','cabbage',
+'kale','spinach','lettuce','celery','carrot','onion','garlic','ginger','turmeric','beetroot',
+'sweet potato','potato','mushroom','corn','pea','bean','lentil','chickpea','soy','tofu','oat',
+'quinoa','barley','rye','buckwheat','almond','walnut','cashew','pecan','pistachio','brazil nut',
+'chia','flax','pumpkin seed','sunflower seed','hemp seed','sesame','olive','coconut','dates','fig',
+'raisin','prune','parsley','basil','coriander','mint','rosemary','thyme','dark chocolate',
+'green tea','matcha','kimchi','sauerkraut','miso','tempeh','edamame','artichoke','asparagus',
+'aubergine','eggplant','fennel','leek','radish','watercress','rocket','kefir','yogurt','yoghurt'];
+function getWeekData(){
+  const wk=Math.floor(Date.now()/(1000*60*60*24*7));
+  const saved=JSON.parse(localStorage.getItem('ba_plants')||'{}');
+  if(saved.wk!==wk) return {wk,plants:[]};
+  return saved;
+}
+function updateDiversity(text){
+  const t=text.toLowerCase(), data=getWeekData(); let added=false;
+  PLANT_WORDS.forEach(p=>{if(t.includes(p)&&!data.plants.includes(p)){data.plants.push(p);added=true;}});
+  if(added){localStorage.setItem('ba_plants',JSON.stringify(data));renderDiversity();checkAchievements();}
+}
+function renderDiversity(){
+  const data=getWeekData(), count=data.plants.length;
+  const el=document.getElementById('plantCount'); if(el) el.textContent=count;
+  const bar=document.getElementById('plantBar'); if(bar) bar.style.width=Math.min(100,count/30*100)+'%';
+  const note=document.getElementById('plantNote');
+  if(note) note.textContent=count===0?'Log plant foods to start your diversity score!'
+    :count<10?'Great start! Aim for 15 different plants this week.'
+    :count<20?'Good variety! Can you reach 30 different plants?'
+    :count<30?'Excellent! Almost at the 30-plant goal!'
+    :'🏆 30-plant challenge complete! Your microbiome is thriving!';
+  const list=document.getElementById('plantList');
+  if(list) list.innerHTML=data.plants.map(p=>`<span class="div-plant-tag">${p}</span>`).join('');
+}
+
+// ─── Daily Missions ──────────────────────────────────────────────────────────
+const MISSION_POOL=[
+  {id:'water',   icon:'💧',task:'Drink 2L of water today',        reward:{lung:+5,skin:+5,liver:+5,prefrontal:+4}, trigger:{type:'food',   k:['water','hydrat']}},
+  {id:'greens',  icon:'🥦',task:'Eat a green vegetable',          reward:{gut:+8,inflam:+6,tcell:+4},             trigger:{type:'food',   k:['broccoli','spinach','kale','celery','cucumber','courgette','asparagus','pea','greens','vegetable']}},
+  {id:'run',     icon:'🏃',task:'Exercise for 30+ minutes',       reward:{bdnf:+8,serotonin:+6,neutro:+5,nk:+4},  trigger:{type:'activity',k:['run','jog','gym','swim','cycl','hiit','sport','walk','hike','football','tennis','basketball']}},
+  {id:'ferment', icon:'🫙',task:'Eat a fermented food',           reward:{gut:+12,serotonin:+5,inflam:+6},        trigger:{type:'food',   k:['kefir','yogurt','yoghurt','kimchi','kombucha','miso','sauerkraut','tempeh']}},
+  {id:'sleep7',  icon:'😴',task:'Log 7+ hours of sleep',          reward:{bdnf:+8,inflam:+6,amygdala:+7},        trigger:null},
+  {id:'omega3',  icon:'🐟',task:'Eat an omega-3 rich food',       reward:{inflam:+8,bdnf:+7,tcell:+4},           trigger:{type:'food',   k:['salmon','mackerel','sardine','tuna','walnut','flaxseed','flax','chia','omega','fish']}},
+  {id:'mood',    icon:'😊',task:'Log your mood today',             reward:{prefrontal:+4,amygdala:+4},            trigger:null},
+  {id:'berry',   icon:'🫐',task:'Eat a berry or citrus fruit',    reward:{bdnf:+8,hippocampus:+6,inflam:+6},     trigger:{type:'food',   k:['berr','blueberr','strawberr','raspberry','orange','kiwi','lemon','citrus','grape','cherry']}},
+  {id:'breath',  icon:'🧘',task:'10 min breathing or meditation', reward:{amygdala:+10,inflam:+6,serotonin:+6},  trigger:{type:'activity',k:['meditat','breath','yoga','mindful','calm','relax','pranayam']}},
+  {id:'nuts',    icon:'🥜',task:'Eat nuts or seeds',              reward:{bdnf:+6,inflam:+5,gut:+5},             trigger:{type:'food',   k:['almond','walnut','cashew','pecan','pistachio','nut','pumpkin seed','chia','flax','hemp','sunflower']}},
+  {id:'protein', icon:'🍳',task:'Eat a quality protein source',   reward:{neutro:+5,tcell:+5,nk:+4},            trigger:{type:'food',   k:['chicken','turkey','egg','fish','tofu','lentil','bean','tempeh','meat','salmon']}},
+  {id:'outdoor', icon:'🌿',task:'Spend 20+ min outdoors',         reward:{inflam:+5,serotonin:+6,nk:+4},         trigger:{type:'activity',k:['walk','hike','outdoor','park','garden','nature','bike','cycl','playground','outside']}},
+  {id:'greentea',icon:'🍵',task:'Drink green tea or matcha',      reward:{prefrontal:+7,amygdala:+6,serotonin:+5},trigger:{type:'food',  k:['green tea','matcha']}},
+  {id:'rainbow', icon:'🌈',task:'Eat 3 different coloured plants',reward:{gut:+8,inflam:+6,tcell:+5},            trigger:{type:'food',   k:['salad','mixed veg','stir fry','soup','smoothie','rainbow']}},
+  {id:'purple',  icon:'🔮',task:'Eat a purple or blue food',      reward:{bdnf:+10,hippocampus:+7,inflam:+7},    trigger:{type:'food',   k:['blueberr','purple','beetroot','red cabbage','grape','aubergine','eggplant','fig','blackberr']}},
+];
+function simpleHash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))&0xffffffff;return h;}
+function getMissionData(){
+  const today=new Date().toDateString();
+  const saved=JSON.parse(localStorage.getItem('ba_missions')||'{}');
+  if(saved.date!==today){
+    const dk=new Date(today).getTime();
+    const sorted=[...MISSION_POOL].sort((a,b)=>simpleHash(a.id+dk)-simpleHash(b.id+dk));
+    const nd={date:today,done:[],ids:sorted.slice(0,4).map(m=>m.id)};
+    localStorage.setItem('ba_missions',JSON.stringify(nd)); return nd;
+  }
+  return saved;
+}
+function completeMissionAuto(missionId, condition){
+  if(!condition) return;
+  const data=getMissionData();
+  if(!data.ids.includes(missionId)||data.done.includes(missionId)) return;
+  data.done.push(missionId);
+  const total=parseInt(localStorage.getItem('ba_missions_total')||'0')+1;
+  localStorage.setItem('ba_missions_total',String(total));
+  localStorage.setItem('ba_missions',JSON.stringify(data));
+  const def=MISSION_POOL.find(m=>m.id===missionId); if(!def) return;
+  const r={emoji:'🎯',type:'activity',msg:'Mission complete: '+def.task+' — bonus rewards unlocked!',sci:'Daily missions build habits — consistency is the #1 predictor of long-term health outcomes!',fx:def.reward};
+  applyRule('🎯 Mission: '+def.task,r,1);
+  renderMissions();
+}
+function completeMissionManual(id){ completeMissionAuto(id,true); }
+function autoCheckMissions(text,type){
+  const data=getMissionData(), t=text.toLowerCase();
+  data.ids.forEach(id=>{
+    if(data.done.includes(id)) return;
+    const def=MISSION_POOL.find(m=>m.id===id);
+    if(!def||!def.trigger||def.trigger.type!==type) return;
+    if(def.trigger.k.some(kw=>t.includes(kw))) completeMissionAuto(id,true);
+  });
+}
+function renderMissions(){
+  const data=getMissionData(), el=document.getElementById('missionList'); if(!el) return;
+  const dateEl=document.getElementById('missionsDate');
+  if(dateEl) dateEl.textContent=new Date().toLocaleDateString([],{weekday:'short',day:'numeric',month:'short'});
+  el.innerHTML='';
+  data.ids.forEach(id=>{
+    const def=MISSION_POOL.find(m=>m.id===id); if(!def) return;
+    const done=data.done.includes(id);
+    const rwdStr=Object.entries(def.reward).slice(0,2).map(([k,v])=>(v>0?'+':'')+v+' '+(unitMap[k]?.emoji||'')).join(' ');
+    el.innerHTML+=`<div class="mission-item${done?' done':''}">
+      <span class="mission-icon">${def.icon}</span>
+      <div class="mission-info">
+        <div class="mission-task">${def.task}${done?' <span class="mission-done-tick">✓</span>':''}</div>
+        <div class="mission-reward">Reward: ${rwdStr}</div>
+      </div>
+      ${done?'':`<button class="mission-btn" onclick="completeMissionManual('${id}')">Done</button>`}
+    </div>`;
+  });
+  const footer=document.getElementById('missionFooter');
+  if(footer) footer.textContent=data.done.length===data.ids.length
+    ?'🎖️ All missions complete! New orders tomorrow!'
+    :'Complete missions for bonus army boosts! Resets tomorrow.';
+}
+
+// ─── Achievements ────────────────────────────────────────────────────────────
+const ACHIEVEMENT_DEFS=[
+  {id:'first_food', icon:'🥾',name:'First Steps',     desc:'Log your first food'},
+  {id:'first_act',  icon:'🏃',name:'Into Battle',     desc:'Log your first activity'},
+  {id:'iron_gut',   icon:'💪',name:'Iron Gut',        desc:'Log a probiotic 7 times'},
+  {id:'sleep_champ',icon:'😴',name:'Sleep Champion',  desc:'Log 7+ hours sleep 5 times'},
+  {id:'plant_15',   icon:'🌿',name:'Plant Power',     desc:'15 unique plants this week'},
+  {id:'plant_30',   icon:'👑',name:'Diversity King',  desc:'30 unique plants this week'},
+  {id:'century',    icon:'💯',name:'Century Club',    desc:'Get any unit to 100'},
+  {id:'brain_70',   icon:'🧠',name:'Brain Commander', desc:'All brain units above 70'},
+  {id:'immune_80',  icon:'⚔️', name:'Immune Elite',   desc:'All body units above 80'},
+  {id:'orders_done',icon:'🎖️',name:'Orders Followed', desc:'Complete all daily missions'},
+  {id:'veteran',    icon:'🏅',name:'Veteran',         desc:'Complete 10+ missions total'},
+  {id:'mood_streak',icon:'😊',name:'Mood Tracker',    desc:'Log mood 7 days in a row'},
+  {id:'fortress',   icon:'🛡️',name:'Fortress',        desc:'Virus risk below 15%'},
+  {id:'life_85',    icon:'🕰️',name:'Centenarian Path',desc:'Estimated lifespan above 85'},
+];
+function getEarned(){ return JSON.parse(localStorage.getItem('ba_achievements')||'[]'); }
+function getMoodStreak(){
+  const log=JSON.parse(localStorage.getItem('ba_mood')||'[]');
+  if(!log.length) return 0;
+  const s=[...log].sort(); let str=1,max=1;
+  for(let i=1;i<s.length;i++){
+    const d=(new Date(s[i])-new Date(s[i-1]))/(86400000);
+    if(Math.round(d)===1){str++;max=Math.max(max,str);}else str=1;
+  }
+  return max;
+}
+let achieveTimer=null;
+function showAchievement(a){
+  clearTimeout(achieveTimer);
+  const t=document.getElementById('achieveToast');
+  document.getElementById('achieveIcon').textContent=a.icon;
+  document.getElementById('achieveName').textContent=a.name;
+  document.getElementById('achieveDesc').textContent=a.desc;
+  t.classList.add('show');
+  achieveTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+function checkAchievements(){
+  const earned=getEarned();
+  const sleepLog=JSON.parse(localStorage.getItem('ba_sleep')||'[]');
+  const mData=getMissionData();
+  const pData=getWeekData();
+  const total=parseInt(localStorage.getItem('ba_missions_total')||'0');
+  const checks={
+    first_food: ()=>history.some(h=>h.r.type==='food'),
+    first_act:  ()=>history.some(h=>h.r.type==='activity'),
+    iron_gut:   ()=>history.filter(h=>['kefir','yogurt','yoghurt','kimchi','kombucha','miso','sauerkraut','tempeh'].some(k=>h.label.toLowerCase().includes(k))).length>=7,
+    sleep_champ:()=>sleepLog.filter(s=>s.h>=7).length>=5,
+    plant_15:   ()=>pData.plants.length>=15,
+    plant_30:   ()=>pData.plants.length>=30,
+    century:    ()=>ALL_UNITS.some(u=>u.val>=100),
+    brain_70:   ()=>BRAIN_UNITS.every(u=>u.val>=70),
+    immune_80:  ()=>BODY_UNITS.every(u=>u.val>=80),
+    orders_done:()=>mData.done.length>=mData.ids.length&&mData.ids.length>0,
+    veteran:    ()=>total>=10,
+    mood_streak:()=>getMoodStreak()>=7,
+    fortress:   ()=>calcVirusRisk()<15,
+    life_85:    ()=>calcLifeExpectancy().expected>=85,
+  };
+  let anyNew=false;
+  ACHIEVEMENT_DEFS.forEach(a=>{
+    if(earned.includes(a.id)) return;
+    if(checks[a.id]&&checks[a.id]()){
+      earned.push(a.id); anyNew=true;
+      setTimeout(()=>showAchievement(a), 2200);
+    }
+  });
+  if(anyNew){ localStorage.setItem('ba_achievements',JSON.stringify(earned)); renderAchievements(); }
+}
+function renderAchievements(){
+  const earned=getEarned(), el=document.getElementById('badgeGrid'); if(!el) return;
+  el.innerHTML='';
+  ACHIEVEMENT_DEFS.forEach(a=>{
+    const e=earned.includes(a.id);
+    el.innerHTML+=`<div class="badge-item ${e?'earned':'locked'}" title="${a.desc}">
+      <div class="badge-icon">${a.icon}</div>
+      <div class="badge-name">${a.name}</div>
+      <div class="badge-desc">${a.desc}</div>
+    </div>`;
+  });
+}
+
+// ─── Enemy Intel & Body Clock ─────────────────────────────────────────────────
+const ENEMIES=[
+  {emoji:'🤧',name:'Common Cold (Rhinovirus)',  desc:'200+ strains — your most frequent attacker. Infiltrates via nose and throat.',                              counters:['Neutrophils ⚡','Skin Barrier 🛡️','Vitamin C 🍊','Lung Defence 🌬️']},
+  {emoji:'🦠',name:'Influenza (Flu)',            desc:'Fast-mutating respiratory virus — seasonal and dangerous in high-risk groups.',                            counters:['NK Cells 🗡️','T-Cells 🎯','Lung Defence 🌬️','Gut Microbiome 🦠']},
+  {emoji:'🧫',name:'Bacteria (e.g. Strep)',     desc:'Invades through wounds, food and air — gut bacteria are your first line of defence.',                     counters:['Neutrophils ⚡','Gut Microbiome 🦠','Skin Barrier 🛡️','Liver 🔧']},
+  {emoji:'🎯',name:'Cancer Cells',               desc:'Mutated cells your body produces daily — NK cells and T-cells hunt them 24/7.',                           counters:['NK Cells 🗡️','T-Cells 🎯','Inflammation Control 🌡️','BDNF 🌱']},
+  {emoji:'🔥',name:'Oxidative Stress',           desc:'Free radicals that damage DNA and accelerate ageing — antioxidants neutralise the attack.',               counters:['Inflammation Control 🌡️','Gut Microbiome 🦠','Liver 🔧','Vitamin C 🍊']},
+  {emoji:'😰',name:'Chronic Stress (Cortisol)', desc:'Long-term stress suppresses T-cells and NK cells by up to 50% and shrinks the hippocampus.',              counters:['Stress Regulation 😌','Serotonin 🌤️','BDNF 🌱','Gut Microbiome 🦠']},
+];
+const CLOCK_EVENTS=[
+  {time:'6–8am',    color:'#fbbf24',title:'Cortisol Peak',            desc:'Natural wake-up hormone at its highest — best time for complex decisions and planning',   peak:'Alert 🧠'},
+  {time:'8–10am',   color:'#fb923c',title:'Testosterone Peak',        desc:'Strength and drive are highest — optimal for resistance training',                        peak:'Power 💪'},
+  {time:'10am–1pm', color:'#4ade80',title:'Peak Alertness Window',    desc:'Cognitive performance is highest — ideal for learning, exams or creative work',           peak:'Focus 🎯'},
+  {time:'1–3pm',    color:'#60a5fa',title:'Post-Lunch Dip',           desc:'Melatonin briefly rises — a 20-min nap can double afternoon performance',                 peak:'Rest 😴'},
+  {time:'3–5pm',    color:'#a78bfa',title:'Physical Peak',            desc:'Core temperature peaks — reaction time, coordination and strength are all optimal',       peak:'Sport 🏃'},
+  {time:'5–7pm',    color:'#f472b6',title:'Serotonin Wind-Down',      desc:'Start winding down — blue screens delay melatonin and disrupt the whole sleep cycle',     peak:'Calm 🌅'},
+  {time:'9–10pm',   color:'#818cf8',title:'Melatonin Rises',          desc:'Darkness triggers melatonin — dim lights and no screens for faster sleep onset',          peak:'Prepare 🌙'},
+  {time:'11pm–3am', color:'#34d399',title:'Deep Sleep & BDNF',        desc:'Brain produces BDNF and flushes waste via the glymphatic system — the critical repair window', peak:'Repair 💾'},
+];
+function renderEnemyIntel(){
+  const el=document.getElementById('intelEnemy'); if(!el) return;
+  el.innerHTML='';
+  ENEMIES.forEach(e=>{
+    el.innerHTML+=`<div class="enemy-card">
+      <div class="enemy-head"><span class="enemy-emoji">${e.emoji}</span>
+        <div><div class="enemy-name">${e.name}</div><div class="enemy-desc">${e.desc}</div></div>
+      </div>
+      <div class="enemy-counters">${e.counters.map(c=>`<span class="counter-pill">${c}</span>`).join('')}</div>
+    </div>`;
+  });
+}
+function renderBodyClock(){
+  const el=document.getElementById('intelClock'); if(!el) return;
+  el.innerHTML='';
+  CLOCK_EVENTS.forEach(ev=>{
+    el.innerHTML+=`<div class="clock-item">
+      <div class="clock-time">${ev.time}</div>
+      <div class="clock-dot" style="background:${ev.color}"></div>
+      <div class="clock-info"><div class="clock-title">${ev.title}</div><div class="clock-desc">${ev.desc}</div></div>
+      <span class="clock-peak" style="background:${ev.color}22;color:${ev.color}">${ev.peak}</span>
+    </div>`;
+  });
+}
+function switchIntelTab(tab){
+  document.getElementById('intelEnemy').style.display=tab==='enemy'?'':'none';
+  document.getElementById('intelClock').style.display=tab==='clock'?'':'none';
+  document.querySelectorAll('.intel-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='enemy')||(i===1&&tab==='clock')));
+}
+
+// ─── Init all new features ────────────────────────────────────────────────────
+function initNewFeatures(){
+  renderNutrients();
+  renderDiversity();
+  renderMissions();
+  renderAchievements();
+  renderEnemyIntel();
+  renderBodyClock();
+  const sleepLog=JSON.parse(localStorage.getItem('ba_sleep')||'[]');
+  if(sleepLog.length){
+    const last=sleepLog[sleepLog.length-1];
+    const el=document.getElementById('sleepLast');
+    if(el) el.textContent='Last logged: '+last.h+'h ('+last.d+')';
+  }
+}
+
 buildUnits(BODY_UNITS, 'bodyUnits');
 buildUnits(BRAIN_UNITS, 'brainUnits');
 renderScores();
+initNewFeatures();
 </script>
 </body>
 </html>
