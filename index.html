@@ -80,9 +80,36 @@
   .up { color:var(--good); } .dn { color:var(--bad); }
   .sci { font-size:11px; color:#5a6480; margin-top:3px; }
   .footer-note { text-align:center; color:#3a4060; font-size:11px; margin-top:14px; }
+
+  /* ── Toast notification ── */
+  #toast {
+    position:fixed; top:18px; left:50%; transform:translateX(-50%) translateY(-120%);
+    z-index:999; min-width:260px; max-width:380px; width:90%;
+    background:#1a2236; border:1px solid #2a3a5a;
+    border-radius:16px; padding:14px 16px;
+    box-shadow:0 8px 32px rgba(0,0,0,.55);
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+    opacity:0; pointer-events:none;
+  }
+  #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .toast-action { font-size:14px; font-weight:700; margin-bottom:10px; color:var(--text); }
+  .toast-action span { margin-right:6px; }
+  .toast-rows { display:flex; flex-direction:column; gap:6px; }
+  .toast-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .toast-row-left { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text); }
+  .toast-delta { font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .toast-mini-bar { flex:1; height:5px; border-radius:3px; background:#11141d; overflow:hidden; min-width:40px; }
+  .toast-mini-fill { height:100%; border-radius:3px; transition:width .4s ease; }
+  .toast-up   { color:var(--good); }
+  .toast-dn   { color:var(--bad); }
 </style>
 </head>
 <body>
+
+<div id="toast">
+  <div class="toast-action" id="toastTitle"></div>
+  <div class="toast-rows" id="toastRows"></div>
+</div>
 
 <header>
   <h1>🛡️ Body Army</h1>
@@ -454,6 +481,34 @@ function showTab(tab){
   document.getElementById('tab-brain-btn').classList.toggle('active', tab==='brain');
 }
 
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(label, r, changedUnits){
+  const toast = document.getElementById('toast');
+  document.getElementById('toastTitle').innerHTML = `${r.emoji} <span>${label}</span>`;
+
+  const rows = document.getElementById('toastRows');
+  rows.innerHTML = changedUnits.map(({u, delta}) => {
+    const good = delta > 0;
+    const sign = good ? '+' : '';
+    return `
+      <div class="toast-row">
+        <div class="toast-row-left">
+          <span>${u.emoji}</span>
+          <span>${u.name}</span>
+        </div>
+        <div class="toast-mini-bar">
+          <div class="toast-mini-fill" style="width:${clamp(u.val)}%;background:${u.color}"></div>
+        </div>
+        <div class="toast-delta ${good?'toast-up':'toast-dn'}">${sign}${delta}</div>
+      </div>`;
+  }).join('');
+
+  clearTimeout(toastTimer);
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
 // ─── Classify + apply ─────────────────────────────────────────────────────────
 function classify(text){
   const t = text.toLowerCase();
@@ -465,8 +520,8 @@ function classify(text){
 
 function applyRule(label, r){
   const changes = [];
+  const changedUnits = [];
   let netGood = 0;
-  // Which tab gets affected? Auto-switch if only brain or only body is affected
   const hasBrain = Object.keys(r.fx).some(id => BRAIN_UNITS.find(u=>u.id===id));
   const hasBody  = Object.keys(r.fx).some(id => BODY_UNITS.find(u=>u.id===id));
 
@@ -478,15 +533,14 @@ function applyRule(label, r){
     netGood += delta;
     const sign = delta>0?'▲':'▼';
     changes.push(`<span class="${delta>0?'up':'dn'}">${sign} ${u.emoji} ${u.name}</span>`);
+    changedUnits.push({ u, delta });
   });
 
   renderScores();
   flashBody(netGood >= 0);
-
-  // Auto-switch tab to show the most-affected system
   if(hasBrain && !hasBody) showTab('brain');
   else showTab('body');
-
+  showToast(label, r, changedUnits);
   logLine(label, r, changes);
 }
 
