@@ -30,16 +30,6 @@
   #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:14px;
     transition:opacity .1s ease; z-index:3; }
 
-  .cell { position:absolute; border-radius:50%; transition:opacity .5s ease; z-index:4; pointer-events:none; }
-  /* white blood cells = your army */
-  .army { width:18px; height:18px;
-    background:radial-gradient(circle at 32% 30%, #eaf4ff, #9fc6ff 60%, #5aa9ff);
-    box-shadow:0 0 14px rgba(90,169,255,1), inset -2px -2px 4px rgba(60,110,180,.5);
-    animation:pulse 2.6s ease-in-out infinite; }
-  /* pathogens = invaders */
-  .enemy { width:14px; height:14px; background:radial-gradient(circle at 30% 30%, #ffd27a, #ff7a3c 60%, #b23b1e);
-    box-shadow:0 0 12px rgba(255,120,60,1);
-    clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
   @keyframes pulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.18);} }
 
   .stat { margin-bottom:14px; }
@@ -183,21 +173,7 @@ function setBar(id,val){ document.getElementById(id+'Bar').style.width=clamp(val
   document.getElementById(id+'Val').textContent=Math.round(val); }
 function render(){ setBar('army',state.army); setBar('enemy',state.enemy); setBar('health',state.health); renderCells(); }
 
-function renderCells(){
-  const body=document.getElementById('body');
-  body.querySelectorAll('.army,.enemy').forEach(c=>c.remove());
-  for(let i=0;i<Math.round(state.army/10);i++) spawnCell(body,'army');
-  for(let i=0;i<Math.round(state.enemy/10);i++) spawnCell(body,'enemy');
-}
-// Cells scatter across the torso+organ region of the photo.
-// The image is cropped top so organs span roughly 20-70% height, 30-70% width.
-function spawnCell(body,kind){
-  const el=document.createElement('div'); el.className='cell '+kind;
-  el.style.left=(32+Math.random()*36)+'%';
-  el.style.top=(18+Math.random()*52)+'%';
-  el.style.opacity=0;
-  body.appendChild(el); requestAnimationFrame(()=>el.style.opacity=1);
-}
+function renderCells(){}
 function flashBody(good){
   const f=document.getElementById('bodyFlash');
   f.style.background = good ? 'rgba(70,211,154,.30)' : 'rgba(255,107,107,.30)';
