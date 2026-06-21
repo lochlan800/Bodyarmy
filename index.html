@@ -296,15 +296,21 @@
     color:#fff; font-size:12px; font-weight:600; border-radius:8px; cursor:pointer; flex-shrink:0; }
   .mission-footer { font-size:11px; color:var(--muted); margin-top:10px; }
 
+  /* ── Supplies intro text ── */
+  .supply-intro { font-size:13px; color:var(--muted); line-height:1.55; margin-bottom:12px; }
+
   /* ── Nutrient Checklist ── */
-  .nutrient-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-  .nutrient-item { background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
-    padding:8px 10px; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all .15s; }
-  .nutrient-item.ticked { background:rgba(70,211,154,.1); border-color:rgba(70,211,154,.4); cursor:default; }
-  .nutrient-item:not(.ticked):hover { border-color:#3a4a66; }
-  .nutrient-emoji { font-size:17px; flex-shrink:0; }
-  .nutrient-name { font-size:12px; font-weight:600; flex:1; }
-  .nutrient-tick { font-size:13px; color:var(--good); font-weight:700; }
+  .nutrient-grid { display:flex; flex-direction:column; gap:8px; }
+  .nutrient-item { background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:all .15s; }
+  .nutrient-item.ticked { background:rgba(70,211,154,.08); border-color:rgba(70,211,154,.35); cursor:default; }
+  .nutrient-item:not(.ticked):hover { border-color:#3a4a66; background:var(--panel); }
+  .nutrient-emoji { font-size:24px; flex-shrink:0; line-height:1; }
+  .nutrient-info { flex:1; min-width:0; }
+  .nutrient-name { font-size:14px; font-weight:700; }
+  .nutrient-tip  { font-size:11px; color:var(--muted); margin-top:2px; }
+  .nutrient-action { font-size:11px; color:var(--army); white-space:nowrap; flex-shrink:0; }
+  .nutrient-tick { font-size:12px; color:var(--good); font-weight:700; white-space:nowrap; flex-shrink:0; }
 
   /* ── Plant Diversity ── */
   .diversity-block { margin-top:10px; background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
@@ -628,17 +634,21 @@
   <!-- TAB: Supplies -->
   <div class="mtab" id="mtab-supplies">
     <div class="panel">
-      <div class="panel-title">💊 Nutrient HQ</div>
+      <div class="panel-title">💊 Daily Supplies</div>
+      <div class="supply-intro">Tick each one off when you've had it today — as food OR a supplement. Your army gets a boost each time. Resets tomorrow.</div>
       <div class="nutrient-grid" id="nutrientGrid"></div>
+
+      <div class="panel-title" style="margin-top:20px">🌿 Plant Diversity</div>
+      <div class="supply-intro">Every different plant food you log counts here. Gut scientists say 30 different plants a week is the magic number for a healthy gut army!</div>
       <div class="diversity-block">
         <div class="div-header">
           <div>
-            <div class="div-label">🌿 Plant Diversity This Week</div>
+            <div class="div-label">Different plants this week</div>
             <div class="div-count"><span id="plantCount">0</span><span style="font-size:13px;font-weight:400;color:var(--muted)"> / 30</span></div>
           </div>
         </div>
         <div class="div-bar"><span id="plantBar" style="width:0%"></span></div>
-        <div class="div-note" id="plantNote">Log different plant foods to build your diversity score!</div>
+        <div class="div-note" id="plantNote">Log different plant foods in the 📋 Log tab to build your score!</div>
         <div class="div-plants" id="plantList"></div>
       </div>
     </div>
@@ -2286,13 +2296,13 @@ function logMood(idx){
 
 // ─── Micronutrients ──────────────────────────────────────────────────────────
 const NUTRIENT_DEF = [
-  {id:'vitd', emoji:'☀️',name:'Vitamin D',  msg:'Vitamin D activates NK cells and T-cells — the sunshine vitamin is also an immune commander!',      sci:'Fun fact: 1 billion people are Vitamin D deficient — it\'s linked to 17 types of cancer and significantly higher depression risk!', fx:{inflam:+5,nk:+4,tcell:+3,serotonin:+4,bdnf:+3}},
-  {id:'vitc', emoji:'🍊',name:'Vitamin C',  msg:'Vitamin C supercharges neutrophils — they store 100× more of it than blood and use it to kill pathogens!', sci:'Fun fact: Stress depletes Vitamin C rapidly — stressed people need 2–4× more to keep their immune soldiers properly armed!',         fx:{neutro:+8,skin:+5,inflam:+4,tcell:+3}},
-  {id:'zinc', emoji:'⚙️',name:'Zinc',       msg:'Zinc is the army\'s essential training kit — without it T-cells can\'t develop, divide or deploy into battle!', sci:'Fun fact: Zinc deficiency literally shrinks the thymus gland — the T-cell training academy — downsizing your immune army!',       fx:{tcell:+8,nk:+5,skin:+3,neutro:+4}},
-  {id:'mag',  emoji:'🔮',name:'Magnesium',  msg:'Magnesium calms the Amygdala and powers 300+ enzyme reactions — the brain\'s most important mineral!',  sci:'Fun fact: 75% of people don\'t get enough — it converts tryptophan into serotonin, so deficiency directly causes low mood!',      fx:{amygdala:+6,serotonin:+5,inflam:+4,bdnf:+4}},
-  {id:'omega',emoji:'🐟',name:'Omega-3',    msg:'Omega-3 is brain armour — 40% of every brain cell wall is made from DHA found in oily fish!',           sci:'Fun fact: Omega-3 reduces anxiety by 20% on average in clinical trials — one of the most studied supplements in medicine!',         fx:{inflam:+8,bdnf:+7,serotonin:+5,nk:+4}},
-  {id:'b12',  emoji:'💊',name:'Vitamin B12',msg:'B12 powers the brain\'s electrical signals — it maintains the myelin sheath protecting every nerve!',    sci:'Fun fact: Vegans get almost zero B12 from food — deficiency causes irreversible nerve damage if left untreated!',                   fx:{dopamine:+5,serotonin:+4,prefrontal:+4,hippocampus:+3}},
-  {id:'iron', emoji:'🩸',name:'Iron',       msg:'Iron carries oxygen to every soldier in the body — without it neutrophils can\'t kill pathogens effectively!',sci:'Fun fact: Iron deficiency is the world\'s most common nutritional deficiency — 25% of people globally are affected!',             fx:{neutro:+4,prefrontal:+3,dopamine:+3,skin:+2}},
+  {id:'vitd', emoji:'☀️',name:'Vitamin D',  tip:'Powers your NK cells & T-cells',             msg:'Vitamin D activates NK cells and T-cells — the sunshine vitamin is also an immune commander!',      sci:'Fun fact: 1 billion people are Vitamin D deficient — it\'s linked to 17 types of cancer and significantly higher depression risk!', fx:{inflam:+5,nk:+4,tcell:+3,serotonin:+4,bdnf:+3}},
+  {id:'vitc', emoji:'🍊',name:'Vitamin C',  tip:'Supercharges your white blood cells',         msg:'Vitamin C supercharges neutrophils — they store 100× more of it than blood and use it to kill pathogens!', sci:'Fun fact: Stress depletes Vitamin C rapidly — stressed people need 2–4× more to keep their immune soldiers properly armed!',         fx:{neutro:+8,skin:+5,inflam:+4,tcell:+3}},
+  {id:'zinc', emoji:'⚙️',name:'Zinc',       tip:'Trains T-cells — the immune special forces',  msg:'Zinc is the army\'s essential training kit — without it T-cells can\'t develop, divide or deploy into battle!', sci:'Fun fact: Zinc deficiency literally shrinks the thymus gland — the T-cell training academy — downsizing your immune army!',       fx:{tcell:+8,nk:+5,skin:+3,neutro:+4}},
+  {id:'mag',  emoji:'🔮',name:'Magnesium',  tip:'Calms your brain & boosts serotonin',         msg:'Magnesium calms the Amygdala and powers 300+ enzyme reactions — the brain\'s most important mineral!',  sci:'Fun fact: 75% of people don\'t get enough — it converts tryptophan into serotonin, so deficiency directly causes low mood!',      fx:{amygdala:+6,serotonin:+5,inflam:+4,bdnf:+4}},
+  {id:'omega',emoji:'🐟',name:'Omega-3',    tip:'Builds brain cells & fights inflammation',    msg:'Omega-3 is brain armour — 40% of every brain cell wall is made from DHA found in oily fish!',           sci:'Fun fact: Omega-3 reduces anxiety by 20% on average in clinical trials — one of the most studied supplements in medicine!',         fx:{inflam:+8,bdnf:+7,serotonin:+5,nk:+4}},
+  {id:'b12',  emoji:'💊',name:'Vitamin B12',tip:'Keeps brain signals sharp & nerves healthy',  msg:'B12 powers the brain\'s electrical signals — it maintains the myelin sheath protecting every nerve!',    sci:'Fun fact: Vegans get almost zero B12 from food — deficiency causes irreversible nerve damage if left untreated!',                   fx:{dopamine:+5,serotonin:+4,prefrontal:+4,hippocampus:+3}},
+  {id:'iron', emoji:'🩸',name:'Iron',       tip:'Carries oxygen to every immune soldier',      msg:'Iron carries oxygen to every soldier in the body — without it neutrophils can\'t kill pathogens effectively!',sci:'Fun fact: Iron deficiency is the world\'s most common nutritional deficiency — 25% of people globally are affected!',             fx:{neutro:+4,prefrontal:+3,dopamine:+3,skin:+2}},
 ];
 function getNutrientState(){
   const today=new Date().toDateString();
@@ -2314,13 +2324,19 @@ function tickNutrient(id){
 function renderNutrients(){
   const state=getNutrientState();
   const el=document.getElementById('nutrientGrid'); if(!el) return;
-  el.innerHTML='';
+  const done=state.ticked.length, total=NUTRIENT_DEF.length;
+  el.innerHTML=`<div style="font-size:12px;color:var(--muted);margin-bottom:6px">${done}/${total} ticked off today</div>`;
   NUTRIENT_DEF.forEach(n=>{
-    const done=state.ticked.includes(n.id);
-    el.innerHTML+=`<div class="nutrient-item${done?' ticked':''}" ${done?'':'onclick="tickNutrient(\''+n.id+'\')"'} title="${done?'✓ Logged today':n.msg.split('!')[0]}">
+    const ticked=state.ticked.includes(n.id);
+    el.innerHTML+=`<div class="nutrient-item${ticked?' ticked':''}" ${ticked?'':'onclick="tickNutrient(\''+n.id+'\')"'}>
       <span class="nutrient-emoji">${n.emoji}</span>
-      <span class="nutrient-name">${n.name}</span>
-      ${done?'<span class="nutrient-tick">✓</span>':''}
+      <div class="nutrient-info">
+        <div class="nutrient-name">${n.name}</div>
+        <div class="nutrient-tip">${n.tip}</div>
+      </div>
+      ${ticked
+        ? '<span class="nutrient-tick">✓ Done!</span>'
+        : '<span class="nutrient-action">Tap to log ›</span>'}
     </div>`;
   });
 }
