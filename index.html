@@ -1480,6 +1480,7 @@ function applyRule(label, r, scale=1){
   else showTab('body');
   showToast(label, r, changedUnits);
   logLine(label, r, changes, scale);
+  triggerFsReinit();
   // Save to history
   const now = new Date();
   const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
@@ -1586,65 +1587,66 @@ const BLOOD_VESSELS = [
   [{x:182,y:368},{x:158,y:377},{x:138,y:384},{x:127,y:388}],           // left pulmonary
 ];
 
-// Unit behaviour definitions — zones map to body.png pixel space
+// Unit behaviour definitions — zones map to body.png pixel space (387×1536)
+// Organ reference from SVG: brain cy:82 r:68/78 | lungs cy:388 | liver cx:258 cy:508 | gut cx:193 cy:700 r:96/108
 const FS_DEF = {
-  // coil: spiral orbits inside gut zone
-  gut:        { emoji:'🦠', color:'#4ade80', speed:0.6,  behavior:'coil',
+  // coil: spiral orbits tightly inside gut ellipse (matches SVG: cx:193 cy:700 rx:96 ry:108)
+  gut:        { emoji:'🦠', color:'#4ade80', speed:0.55, behavior:'coil',
                 zone:{x:97,y:592,w:192,h:216},
                 role:'Colonising the gut — your largest immune fortress (70% of immunity)' },
-  // vascular: race along blood vessel paths
+  // vascular: race along blood vessel paths through the whole body
   neutro:     { emoji:'⚡', color:'#60a5fa', speed:2.8,  behavior:'vascular',
-                zone:{x:60,y:82,w:267,h:900},
+                zone:{x:60,y:82,w:267,h:1440},
                 role:'Racing through blood vessels — first responder to every threat' },
-  // patrol: methodical back-and-forth sweep through lymph zone
-  tcell:      { emoji:'🎯', color:'#a78bfa', speed:1.0,  behavior:'patrol',
-                zone:{x:80,y:350,w:225,h:420},
-                role:'Patrolling lymph nodes — memorising and targeting every enemy' },
-  // inspect: move to target, show targeting ring, move on
-  nk:         { emoji:'🗡️', color:'#fbbf24', speed:1.2,  behavior:'inspect',
-                zone:{x:90,y:400,w:205,h:400},
-                role:'Hunting infected cells — inspects tissue, eliminates threats' },
+  // patrol: T-cells mature in thymus (sternum y:260-380) then circulate via lymph nodes
+  tcell:      { emoji:'🎯', color:'#a78bfa', speed:0.9,  behavior:'patrol',
+                zone:{x:138,y:250,w:112,h:230},
+                role:'Patrolling the thymus & lymph nodes — memorising and targeting every enemy' },
+  // inspect: NK cells hunt in liver, spleen and lymph nodes (liver cx:258 cy:508)
+  nk:         { emoji:'🗡️', color:'#fbbf24', speed:1.1,  behavior:'inspect',
+                zone:{x:96,y:456,w:205,h:200},
+                role:'Hunting infected cells — inspects liver, spleen and tissues' },
   // wall: static shield icons around body perimeter
   skin:       { emoji:'🛡️', color:'#fb923c',
                 behavior:'wall',
                 role:'Physical barrier — guarding every inch of the body perimeter' },
-  // sweep: cilia-like oscillation in lung zones
+  // sweep: cilia-like oscillation exactly inside left and right lung zones (SVG cy:388 rx:58 ry:88)
   lung:       { emoji:'🌬️', color:'#2dd4bf', speed:0.8,  behavior:'sweep',
                 zone:{x:69,y:300,w:249,h:176},
                 role:'Cilia sweeping pathogens from the airway mucosa' },
-  // filter: barely moves, slow pulsing glow
-  liver:      { emoji:'🔧', color:'#f59e0b', speed:0.12, behavior:'filter',
+  // filter: barely moves, slow pulsing glow inside liver zone (SVG cx:258 cy:508 rx:62 ry:52)
+  liver:      { emoji:'🔧', color:'#f59e0b', speed:0.1,  behavior:'filter',
                 zone:{x:196,y:456,w:124,h:104},
                 role:'Filtering toxins — Kupffer cells processing blood continuously' },
-  // diffuse: random walk + expanding broadcast rings
-  inflam:     { emoji:'🧯', color:'#f87171', speed:0.6,  behavior:'diffuse',
-                zone:{x:80,y:280,w:225,h:750},
+  // diffuse: random walk + expanding rings — inflammation can affect the whole torso
+  inflam:     { emoji:'🧯', color:'#f87171', speed:0.55, behavior:'diffuse',
+                zone:{x:78,y:240,w:232,h:820},
                 role:'Broadcasting anti-inflammatory signals across all tissues' },
-  // pulse: stationary glow in brain sub-region
+  // pulse: stationary glows at specific brain sub-region coordinates
   prefrontal: { emoji:'🧠', color:'#818cf8', speed:0.2,  behavior:'pulse',
-                zone:{x:125,y:4,w:136,h:156}, cx:178, cy:52, r:28,
+                zone:{x:125,y:4,w:136,h:156}, cx:170, cy:48, r:30,
                 role:'Command post — executive control, focus and decision-making' },
   hippocampus:{ emoji:'💾', color:'#34d399', speed:0.2,  behavior:'pulse',
-                zone:{x:125,y:4,w:136,h:156}, cx:205, cy:90, r:22,
+                zone:{x:125,y:4,w:136,h:156}, cx:213, cy:85, r:22,
                 role:'Memory centre — encoding and consolidating every experience' },
   amygdala:   { emoji:'😌', color:'#f472b6', speed:0.2,  behavior:'pulse',
-                zone:{x:125,y:4,w:136,h:156}, cx:180, cy:115, r:20,
+                zone:{x:125,y:4,w:136,h:156}, cx:178, cy:118, r:18,
                 role:'Stress regulator — keeping emotional responses calibrated' },
-  // spark: dart to target, flash ring on arrival
+  // spark: dart between neurons inside brain zone
   dopamine:   { emoji:'✨', color:'#fde68a', speed:3.2,  behavior:'spark',
-                zone:{x:130,y:10,w:126,h:140},
+                zone:{x:128,y:10,w:126,h:140},
                 role:'Reward signal — sparks of motivation firing between neurons' },
   // wave: sine-wave drift across brain zone
-  serotonin:  { emoji:'☀️', color:'#fdba74', speed:0.5,  behavior:'wave',
+  serotonin:  { emoji:'☀️', color:'#fdba74', speed:0.45, behavior:'wave',
                 zone:{x:128,y:8,w:130,h:148},
                 role:'Mood signal — gentle waves of wellbeing across the brain' },
-  // grow: appear, scale up, fade out, respawn
+  // grow: appear, scale up, fade out, respawn inside brain zone
   bdnf:       { emoji:'🌱', color:'#6ee7b7', speed:0.3,  behavior:'grow',
                 zone:{x:128,y:8,w:130,h:148},
                 role:'Brain growth factor — sprouting new neural connections' },
 };
 
-function fsSoldierCount(val){ return Math.max(0, Math.ceil(val / 100 * 8)); }
+function fsSoldierCount(val){ return Math.max(0, Math.round(val / 100 * 15)); }
 
 // Closed-loop path helpers (used for SKIN_PATH)
 function pathLen(pts){
@@ -1711,11 +1713,12 @@ class FsSoldier{
       this.dir=Math.random()<0.5?1:-1;
     } else if(b==='coil'){
       this.cx=193; this.cy=700;
-      this.radius=18+Math.random()*78;
+      this.rx=12+Math.random()*82; // elliptical — matches gut's rx:96
+      this.ry=this.rx*(108/96);    // stretch to match gut's ry:108
       this.angle=Math.random()*Math.PI*2;
       this.angSpeed=(0.012+Math.random()*0.022)*(Math.random()<0.5?1:-1);
-      this.x=this.cx+Math.cos(this.angle)*this.radius;
-      this.y=this.cy+Math.sin(this.angle)*this.radius;
+      this.x=this.cx+Math.cos(this.angle)*this.rx;
+      this.y=this.cy+Math.sin(this.angle)*this.ry;
     } else if(b==='sweep'){
       this.side=this.index%2===0?'left':'right';
       this.bx=this.side==='left'?127:258; this.by=388;
@@ -1764,8 +1767,8 @@ class FsSoldier{
       const p=ptOnOpen(this.vessel,this.t); this.x=p.x; this.y=p.y;
     } else if(b==='coil'){
       this.angle+=this.angSpeed;
-      this.x=this.cx+Math.cos(this.angle)*this.radius;
-      this.y=this.cy+Math.sin(this.angle)*this.radius;
+      this.x=this.cx+Math.cos(this.angle)*this.rx;
+      this.y=this.cy+Math.sin(this.angle)*this.ry;
     } else if(b==='sweep'){
       this.phase+=0.045;
       this.x=this.baseX+Math.sin(this.phase)*this.ampX;
@@ -1841,14 +1844,14 @@ class FsSoldier{
   draw(ctx,ox,oy,scale){
     const def=this.def, b=def.behavior;
     const sx=ox+this.x*scale, sy=oy+this.y*scale;
-    const sz=Math.max(10,Math.round(16*scale));
+    const sz=Math.max(16,Math.round(26*scale));
     ctx.save();
     if(b==='pulse'){
       const pulse=0.7+0.3*Math.sin(this.phase);
       ctx.globalAlpha=this.alpha*0.9;
       ctx.font=(sz*pulse)+'px serif';
       ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.shadowColor=def.color; ctx.shadowBlur=22*scale*pulse;
+      ctx.shadowColor=def.color; ctx.shadowBlur=Math.max(14,30*scale*pulse);
       ctx.fillText(def.emoji,sx,sy);
     } else if(b==='grow'){
       ctx.globalAlpha=this.growAlpha2*this.alpha;
@@ -1903,7 +1906,13 @@ class FsSoldier{
   }
 }
 
-let fsAnimId=null, fsSoldiers=[], fsWallPts=[];
+let fsAnimId=null, fsSoldiers=[], fsWallPts=[], fsReinitTimer=null;
+
+function triggerFsReinit(){
+  if(!document.getElementById('mtab-patrol').classList.contains('active')) return;
+  clearTimeout(fsReinitTimer);
+  fsReinitTimer=setTimeout(()=>requestAnimationFrame(initFsAnim), 600);
+}
 
 function fsImgBounds(){
   const wrap=document.getElementById('fsBodWrap');
@@ -1940,7 +1949,7 @@ function initFsAnim(){
     const{ox,oy,scale}=fsImgBounds();
 
     // Skin Barrier — shield wall around the body perimeter
-    const wSz=Math.max(8,Math.round(13*scale));
+    const wSz=Math.max(12,Math.round(18*scale));
     ctx.save();
     ctx.font=wSz+'px serif';
     ctx.textAlign='center'; ctx.textBaseline='middle';
