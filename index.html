@@ -21,24 +21,26 @@
   .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; }
   .panel h2 { margin:0 0 14px; font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 
-  /* Translucent body frame with organs inside */
-  .body { position:relative; height:380px; border-radius:14px; overflow:hidden;
-    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
-    background:radial-gradient(circle at 50% 38%, #232b3d, #11141d); }
-  .body svg { height:100%; display:block; }
-  .organ { transition:opacity .4s; }
+  /* Real anatomy image body */
+  .body { position:relative; height:480px; border-radius:14px; overflow:hidden;
+    border:1px solid var(--line);
+    background:#f5ede0; }
+  .body img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+  /* flash overlay */
+  #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:14px;
+    transition:opacity .1s ease; z-index:3; }
 
-  .cell { position:absolute; border-radius:50%; transition:opacity .5s ease; z-index:4; }
+  .cell { position:absolute; border-radius:50%; transition:opacity .5s ease; z-index:4; pointer-events:none; }
   /* white blood cells = your army */
-  .army { width:16px; height:16px;
+  .army { width:18px; height:18px;
     background:radial-gradient(circle at 32% 30%, #eaf4ff, #9fc6ff 60%, #5aa9ff);
-    box-shadow:0 0 12px rgba(90,169,255,.9), inset -2px -2px 4px rgba(60,110,180,.5);
+    box-shadow:0 0 14px rgba(90,169,255,1), inset -2px -2px 4px rgba(60,110,180,.5);
     animation:pulse 2.6s ease-in-out infinite; }
   /* pathogens = invaders */
-  .enemy { width:12px; height:12px; background:radial-gradient(circle at 30% 30%, #ffd27a, #ff7a3c 60%, #b23b1e);
-    box-shadow:0 0 10px rgba(255,120,60,.9);
+  .enemy { width:14px; height:14px; background:radial-gradient(circle at 30% 30%, #ffd27a, #ff7a3c 60%, #b23b1e);
+    box-shadow:0 0 12px rgba(255,120,60,1);
     clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
-  @keyframes pulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.15);} }
+  @keyframes pulse { 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.18);} }
 
   .stat { margin-bottom:14px; }
   .stat .row { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; }
@@ -78,32 +80,8 @@
     <div class="panel">
       <h2>Inside the body</h2>
       <div class="body" id="body">
-        <svg viewBox="0 0 200 360" xmlns="http://www.w3.org/2000/svg" aria-label="inside of a human body">
-          <!-- translucent body frame -->
-          <g stroke="#d7ac86" stroke-width="2" fill="rgba(240,205,175,0.14)">
-            <rect x="84" y="188" width="15" height="158" rx="7"/>   <!-- left leg -->
-            <rect x="101" y="188" width="15" height="158" rx="7"/>  <!-- right leg -->
-            <rect x="55" y="76" width="13" height="100" rx="6" transform="rotate(8 61 76)"/>   <!-- left arm -->
-            <rect x="132" y="76" width="13" height="100" rx="6" transform="rotate(-8 138 76)"/> <!-- right arm -->
-            <rect x="79" y="170" width="42" height="28" rx="13"/>   <!-- hips -->
-            <path d="M73,76 Q100,64 127,76 L122,172 Q100,180 78,172 Z"/> <!-- torso -->
-            <rect x="92" y="56" width="16" height="13" rx="5"/>     <!-- neck -->
-            <ellipse cx="100" cy="38" rx="18" ry="20"/>            <!-- head -->
-          </g>
-          <!-- organs inside the torso -->
-          <g>
-            <ellipse class="organ" cx="89"  cy="104" rx="11" ry="20" fill="#df9a9a"/> <!-- left lung -->
-            <ellipse class="organ" cx="111" cy="104" rx="11" ry="20" fill="#df9a9a"/> <!-- right lung -->
-            <path class="organ" d="M100,98 c-5,-9 -17,-2 -11,8 l11,13 l11,-13 c6,-10 -6,-17 -11,-8 z" fill="#c0392b"/> <!-- heart -->
-            <path class="organ" d="M85,126 q-7,9 2,16 q11,7 16,-4 q2,-11 -7,-13 q-7,-2 -11,1 z" fill="#cf8a52"/> <!-- stomach -->
-            <path class="organ" d="M105,124 q17,-4 19,9 q1,9 -11,10 q-11,1 -13,-8 q-1,-9 5,-11 z" fill="#9a5a3a"/> <!-- liver -->
-            <g class="organ" stroke="#d3a06a" stroke-width="6" fill="none" stroke-linecap="round">
-              <path d="M84,142 q7,-7 14,0 q7,7 14,0"/>
-              <path d="M84,152 q7,-7 14,0 q7,7 14,0"/>
-              <path d="M86,162 q7,-7 14,0 q6,6 12,0"/>
-            </g>
-          </g>
-        </svg>
+        <img src="body.jpeg" alt="human body with organs" />
+        <div id="bodyFlash"></div>
       </div>
       <div style="margin-top:18px">
         <div class="stat"><div class="row"><span>🛡️ Army strength</span><b id="armyVal">50</b></div>
@@ -211,18 +189,20 @@ function renderCells(){
   for(let i=0;i<Math.round(state.army/10);i++) spawnCell(body,'army');
   for(let i=0;i<Math.round(state.enemy/10);i++) spawnCell(body,'enemy');
 }
-// Cells live inside the torso area of the body frame (percentages of the panel).
+// Cells scatter across the torso+organ region of the photo.
+// The image is cropped top so organs span roughly 20-70% height, 30-70% width.
 function spawnCell(body,kind){
   const el=document.createElement('div'); el.className='cell '+kind;
-  el.style.left=(40+Math.random()*20)+'%'; el.style.top=(22+Math.random()*26)+'%'; el.style.opacity=0;
+  el.style.left=(32+Math.random()*36)+'%';
+  el.style.top=(18+Math.random()*52)+'%';
+  el.style.opacity=0;
   body.appendChild(el); requestAnimationFrame(()=>el.style.opacity=1);
 }
 function flashBody(good){
-  const body=document.getElementById('body');
-  body.style.background = good
-    ? 'radial-gradient(120px 160px at 50% 35%, rgba(70,211,154,.18), transparent), #1f2330'
-    : 'radial-gradient(120px 160px at 50% 35%, rgba(255,107,107,.18), transparent), #1f2330';
-  setTimeout(()=>body.style.background='',350);
+  const f=document.getElementById('bodyFlash');
+  f.style.background = good ? 'rgba(70,211,154,.30)' : 'rgba(255,107,107,.30)';
+  f.style.opacity=1;
+  setTimeout(()=>f.style.opacity=0, 400);
 }
 function logLine(label,r){
   const log=document.getElementById('log'); const d=document.createElement('div');
