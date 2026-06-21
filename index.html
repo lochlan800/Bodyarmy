@@ -258,12 +258,19 @@
 
   <!-- COL 3: input + log -->
   <div class="panel">
-    <div class="panel-title">🗡️ What did you do today?</div>
+    <div class="panel-title">🍎 Food &amp; Drink</div>
     <div class="inputRow">
-      <input id="inp" placeholder="e.g. drank kefir, went for a run, read a book…" autocomplete="off" />
-      <button id="go">Send!</button>
+      <input id="inpFood" placeholder="e.g. drank kefir, ate broccoli, coffee…" autocomplete="off" />
+      <button id="goFood">Add!</button>
     </div>
-    <div class="chips" id="chips"></div>
+    <div class="chips" id="chipsFood"></div>
+
+    <div class="panel-title" style="margin-top:16px">🏃 Activity</div>
+    <div class="inputRow">
+      <input id="inpAct" placeholder="e.g. went for a run, slept 8 hours, read…" autocomplete="off" />
+      <button id="goAct">Add!</button>
+    </div>
+    <div class="chips" id="chipsAct"></div>
 
     <div class="panel-title" style="margin-top:18px">📜 Mission Report</div>
     <div class="log" id="log"></div>
@@ -712,10 +719,10 @@ function showToast(label, r, changedUnits){
 }
 
 // ─── Classify + apply ─────────────────────────────────────────────────────────
-function classify(text){
+function classify(text, type){
   const t = text.toLowerCase();
   for(const r of RULES){
-    if(r.k.some(w => t.includes(w))) return r;
+    if(r.type === type && r.k.some(w => t.includes(w))) return r;
   }
   return null;
 }
@@ -763,31 +770,44 @@ function logLine(label, r, changes){
   log.prepend(d);
 }
 
-function submit(text){
+function submit(text, type){
   text = text.trim(); if(!text) return;
-  const r = classify(text);
+  const r = classify(text, type);
   if(!r){
     const log = document.getElementById('log');
     const d = document.createElement('div'); d.className='log-entry';
-    d.innerHTML=`🤔 <b>${text}</b><div class="sci">Not recognised — try food, drink, exercise, sleep, substances, social activity, or an injury.</div>`;
+    const hint = type==='food'
+      ? 'Try kefir, vegetables, water, protein, sugar, alcohol…'
+      : 'Try running, sleep, meditation, reading, stress, smoking…';
+    d.innerHTML=`🤔 <b>${text}</b><div class="sci">Not recognised — ${hint}</div>`;
     log.prepend(d); return;
   }
   applyRule(text, r);
 }
 
-document.getElementById('go').onclick = ()=>{
-  const i=document.getElementById('inp'); submit(i.value); i.value=''; i.focus();
+document.getElementById('goFood').onclick = ()=>{
+  const i=document.getElementById('inpFood'); submit(i.value,'food'); i.value=''; i.focus();
 };
-document.getElementById('inp').addEventListener('keydown', e=>{
-  if(e.key==='Enter'){ submit(e.target.value); e.target.value=''; }
+document.getElementById('inpFood').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ submit(e.target.value,'food'); e.target.value=''; }
 });
 
-['drank kefir','went for a run','slept 8 hours','read a book','listened to music',
- 'ate junk food','drank alcohol','scrolled social media','stressed out','smoked']
-  .forEach(ex=>{
-    const b=document.createElement('button'); b.textContent=ex;
-    b.onclick=()=>submit(ex);
-    document.getElementById('chips').appendChild(b);
+document.getElementById('goAct').onclick = ()=>{
+  const i=document.getElementById('inpAct'); submit(i.value,'activity'); i.value=''; i.focus();
+};
+document.getElementById('inpAct').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ submit(e.target.value,'activity'); e.target.value=''; }
+});
+
+[[['drank kefir','ate vegetables','dark chocolate','drank water','ate junk food','drank alcohol'],'food'],
+ [['went for a run','slept 8 hours','read a book','listened to music','stressed out','smoked'],'activity']]
+  .forEach(([examples, type])=>{
+    const container = document.getElementById(type==='food'?'chipsFood':'chipsAct');
+    examples.forEach(ex=>{
+      const b=document.createElement('button'); b.textContent=ex;
+      b.onclick=()=>submit(ex,type);
+      container.appendChild(b);
+    });
   });
 
 buildUnits(BODY_UNITS, 'bodyUnits');
