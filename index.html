@@ -277,24 +277,24 @@ const clamp = v => Math.max(0, Math.min(100, v));
 
 // ─── Body defence units ────────────────────────────────────────────────────────
 const BODY_UNITS = [
-  { id:'gut',    emoji:'🏰', name:'Belly Battalion',   desc:'Tiny soldiers who guard your tummy fortress!',       val:60, color:'#4ade80' },
-  { id:'neutro', emoji:'⚡', name:'Speed Squad',       desc:'Super-fast fighters who rush to battle germs!',      val:55, color:'#60a5fa' },
-  { id:'tcell',  emoji:'🎯', name:'Hunter Corps',      desc:'Smart warriors who remember every enemy they\'ve seen!', val:50, color:'#a78bfa' },
-  { id:'nk',     emoji:'🗡️', name:'Shadow Strikers',  desc:'Secret agents who sneak up on viruses and destroy them!', val:50, color:'#fbbf24' },
-  { id:'skin',   emoji:'🛡️', name:'Wall Guards',      desc:'Brave soldiers who protect the castle walls — your skin!', val:72, color:'#fb923c' },
-  { id:'lung',   emoji:'🌬️', name:'Air Patrol',       desc:'Airborne troops who keep invaders out of your airways!', val:65, color:'#2dd4bf' },
-  { id:'liver',  emoji:'🔧', name:'Cleanup Crew',     desc:'Engineers who remove poison from the kingdom!',       val:68, color:'#f59e0b' },
-  { id:'inflam', emoji:'🧯', name:'Fire Brigade',     desc:'Stop too much fire in the kingdom — calm wins battles!', val:65, color:'#f87171' },
+  { id:'gut',    emoji:'🦠', name:'Gut Microbiome',      desc:'Good bacteria — 70% of immunity lives here', val:60, color:'#4ade80' },
+  { id:'neutro', emoji:'⚡', name:'Neutrophils',          desc:'First-responder white blood cells',           val:55, color:'#60a5fa' },
+  { id:'tcell',  emoji:'🎯', name:'T-Cells',              desc:'Adaptive immunity — learn & destroy',         val:50, color:'#a78bfa' },
+  { id:'nk',     emoji:'🗡️', name:'NK Cells',             desc:'Natural killers — hunt viruses & cancer',     val:50, color:'#fbbf24' },
+  { id:'skin',   emoji:'🛡️', name:'Skin Barrier',         desc:'Physical perimeter defence',                  val:72, color:'#fb923c' },
+  { id:'lung',   emoji:'🫁', name:'Lung Defence',         desc:'Mucociliary airway patrol',                   val:65, color:'#2dd4bf' },
+  { id:'liver',  emoji:'🔧', name:'Liver',                desc:'Detox & toxin filtration',                    val:68, color:'#f59e0b' },
+  { id:'inflam', emoji:'🌡️', name:'Inflammation Control', desc:'Low chronic inflammation = healthier',        val:65, color:'#f87171' },
 ];
 
 // ─── Brain units ───────────────────────────────────────────────────────────────
 const BRAIN_UNITS = [
-  { id:'prefrontal',  emoji:'👑', name:'The Commander',    desc:'The general of your brain — keeps you focused and in charge!', val:55, color:'#818cf8' },
-  { id:'hippocampus', emoji:'📜', name:'Memory Keepers',  desc:'Scribes who write down everything you learn so you never forget!', val:55, color:'#34d399' },
-  { id:'amygdala',    emoji:'🏯', name:'Calm Guard',      desc:'Soldiers who stop the kingdom from panicking — cool heads win!', val:60, color:'#f472b6' },
-  { id:'dopamine',    emoji:'✨', name:'Reward Rangers',  desc:'Cheerleaders who give the whole army energy and motivation!',    val:55, color:'#fde68a' },
-  { id:'serotonin',   emoji:'☀️', name:'Sunshine Squad',  desc:'Happy soldiers who boost everyone\'s mood and spirit!',         val:55, color:'#fdba74' },
-  { id:'bdnf',        emoji:'🌱', name:'The Builders',    desc:'Construction crew who build new bridges so soldiers work better!', val:50, color:'#6ee7b7' },
+  { id:'prefrontal',  emoji:'🧠', name:'Prefrontal Cortex', desc:'Focus, planning & self-control',             val:55, color:'#818cf8' },
+  { id:'hippocampus', emoji:'💾', name:'Hippocampus',       desc:'Memory formation & learning',                val:55, color:'#34d399' },
+  { id:'amygdala',    emoji:'😌', name:'Stress Regulation', desc:'Amygdala calm (higher = better regulated)',  val:60, color:'#f472b6' },
+  { id:'dopamine',    emoji:'✨', name:'Dopamine System',   desc:'Motivation, drive & reward',                 val:55, color:'#fde68a' },
+  { id:'serotonin',   emoji:'🌤️', name:'Serotonin',         desc:'Mood, wellbeing & emotional balance',        val:55, color:'#fdba74' },
+  { id:'bdnf',        emoji:'🌱', name:'BDNF',              desc:'Brain growth factor — builds new connections',val:50, color:'#6ee7b7' },
 ];
 
 const ALL_UNITS = [...BODY_UNITS, ...BRAIN_UNITS];
