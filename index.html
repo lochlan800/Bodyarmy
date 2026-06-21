@@ -24,8 +24,8 @@
   /* Real anatomy image body */
   .body { position:relative; height:480px; border-radius:14px; overflow:hidden;
     border:1px solid var(--line);
-    background:#f5ede0; }
-  .body img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center top; display:block; }
+    background:var(--bg); }
+  .body img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:center top; display:block; }
   /* flash overlay */
   #bodyFlash { position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:14px;
     transition:opacity .1s ease; z-index:3; }
@@ -80,7 +80,7 @@
     <div class="panel">
       <h2>Inside the body</h2>
       <div class="body" id="body">
-        <img src="body.jpeg" alt="human body with organs" />
+        <img src="body.png" alt="human body with organs" />
         <div id="bodyFlash"></div>
       </div>
       <div style="margin-top:18px">
