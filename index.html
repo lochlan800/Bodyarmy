@@ -514,17 +514,17 @@
       <div class="life-block">
         <div class="life-label">🕰️ Estimated Lifespan</div>
         <div class="life-profile">
-          <input type="number" id="profileAge" min="1" max="110" placeholder="Your age" oninput="renderLifespan()" />
-          <select id="profileSex" onchange="renderLifespan()">
+          <input type="number" id="profileAge" min="1" max="110" placeholder="Your age" oninput="saveProfile()" />
+          <select id="profileSex" onchange="saveProfile()">
             <option value="m">Male</option>
             <option value="f">Female</option>
           </select>
-          <select id="profileSmoke" onchange="renderLifespan()">
+          <select id="profileSmoke" onchange="saveProfile()">
             <option value="no">Non-smoker</option>
             <option value="ex">Ex-smoker</option>
             <option value="yes">Smoker</option>
           </select>
-          <select id="profileSleep" onchange="renderLifespan()">
+          <select id="profileSleep" onchange="saveProfile()">
             <option value="7">Sleep 7–8 hrs ✓</option>
             <option value="8">Sleep 8–9 hrs</option>
             <option value="6">Sleep 6–7 hrs</option>
@@ -1549,7 +1549,8 @@ function applyRule(label, r, scale=1){
   const now = new Date();
   const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
                ' · ' + now.toLocaleDateString([], {day:'numeric',month:'short'});
-  history.push({ label, r, changedUnits, time });
+  history.push({ label, r, changedUnits, time, scale });
+  saveState();
 }
 
 function logLine(label, r, changes, scale){
@@ -2572,6 +2573,61 @@ function switchIntelTab(tab){
   document.querySelectorAll('.intel-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='enemy')||(i===1&&tab==='clock')));
 }
 
+// ─── State persistence ────────────────────────────────────────────────────────
+function saveState(){
+  const units={};
+  ALL_UNITS.forEach(u=>units[u.id]=u.val);
+  localStorage.setItem('ba_units',JSON.stringify(units));
+
+  const hist=history.map(e=>({
+    label:e.label, scale:e.scale||1,
+    rType:e.r.type, rEmoji:e.r.emoji, rMsg:e.r.msg, rSci:e.r.sci,
+    changedUnits:e.changedUnits.map(({u,delta})=>({id:u.id,delta})),
+    time:e.time,
+  }));
+  localStorage.setItem('ba_history',JSON.stringify(hist.slice(-200)));
+}
+
+function saveProfile(){
+  localStorage.setItem('ba_profile',JSON.stringify({
+    age:  document.getElementById('profileAge').value,
+    sex:  document.getElementById('profileSex').value,
+    smoke:document.getElementById('profileSmoke').value,
+    sleep:document.getElementById('profileSleep').value,
+  }));
+  renderLifespan();
+}
+
+function loadState(){
+  // Restore unit values
+  const units=JSON.parse(localStorage.getItem('ba_units')||'{}');
+  ALL_UNITS.forEach(u=>{ if(units[u.id]!==undefined) u.val=clamp(units[u.id]); });
+
+  // Restore history + log entries
+  const saved=JSON.parse(localStorage.getItem('ba_history')||'[]');
+  saved.forEach(e=>{
+    const changedUnits=e.changedUnits
+      .map(({id,delta})=>({u:unitMap[id],delta}))
+      .filter(x=>x.u);
+    history.push({
+      label:e.label, scale:e.scale||1,
+      r:{type:e.rType,emoji:e.rEmoji,msg:e.rMsg,sci:e.rSci,fx:{}},
+      changedUnits, time:e.time,
+    });
+    const changes=changedUnits.map(({u,delta})=>
+      `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'} ${u.emoji} ${u.name} ${delta>0?'+':''}${delta}</span>`
+    );
+    logLine(e.label,{emoji:e.rEmoji,msg:e.rMsg,sci:e.rSci},changes,e.scale||1);
+  });
+
+  // Restore profile inputs
+  const prof=JSON.parse(localStorage.getItem('ba_profile')||'{}');
+  if(prof.age)   document.getElementById('profileAge').value=prof.age;
+  if(prof.sex)   document.getElementById('profileSex').value=prof.sex;
+  if(prof.smoke) document.getElementById('profileSmoke').value=prof.smoke;
+  if(prof.sleep) document.getElementById('profileSleep').value=prof.sleep;
+}
+
 // ─── Init all new features ────────────────────────────────────────────────────
 function initNewFeatures(){
   renderNutrients();
@@ -2588,6 +2644,7 @@ function initNewFeatures(){
   }
 }
 
+loadState();
 buildUnits(BODY_UNITS, 'bodyUnits');
 buildUnits(BRAIN_UNITS, 'brainUnits');
 renderScores();
