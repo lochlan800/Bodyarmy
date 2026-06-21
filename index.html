@@ -378,6 +378,32 @@
   .achieve-icon  { font-size:28px; margin-bottom:4px; }
   .achieve-name  { font-size:15px; font-weight:700; }
   .achieve-desc  { font-size:12px; color:var(--muted); margin-top:3px; }
+
+  /* ── Organ info panel (body tab) ── */
+  #organClickLayer { position:absolute; inset:0; z-index:4; cursor:pointer; }
+  #organInfoOverlay { position:fixed; inset:0; z-index:190; background:rgba(0,0,0,.45);
+    opacity:0; pointer-events:none; transition:opacity .25s; }
+  #organInfoOverlay.open { opacity:1; pointer-events:auto; }
+  #organInfoPanel {
+    position:fixed; bottom:-320px; left:50%; transform:translateX(-50%);
+    width:100%; max-width:720px; z-index:191;
+    background:#1a2236; border-top:1px solid #2a4a6a;
+    border-radius:22px 22px 0 0; padding:0 20px 44px;
+    box-shadow:0 -8px 40px rgba(0,0,0,.65);
+    transition:bottom .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  #organInfoPanel.open { bottom:0; }
+  #organInfoHandle { width:40px; height:4px; border-radius:4px; margin:12px auto 16px;
+    background:#3a4a6a; transition:background .3s; }
+  #organInfoHead { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  #organInfoEmoji { font-size:28px; line-height:1; }
+  #organInfoName  { font-size:18px; font-weight:800; flex:1; }
+  #organInfoClose { background:none; border:1px solid var(--line); color:var(--muted);
+    border-radius:8px; padding:5px 9px; cursor:pointer; font-size:16px; line-height:1;
+    transition:all .15s; flex-shrink:0; }
+  #organInfoClose:hover { color:var(--text); border-color:#3a4a66; }
+  #organInfoDesc  { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  #organInfoHealth { margin-top:4px; }
 </style>
 </head>
 <body>
@@ -385,6 +411,18 @@
 <div id="organTooltip">
   <div id="organTooltipHead"><span id="organTooltipEmoji"></span><span id="organTooltipName"></span></div>
   <div id="organTooltipDesc"></div>
+</div>
+
+<div id="organInfoOverlay" onclick="hideOrganInfoPanel()"></div>
+<div id="organInfoPanel">
+  <div id="organInfoHandle"></div>
+  <div id="organInfoHead">
+    <span id="organInfoEmoji"></span>
+    <span id="organInfoName"></span>
+    <button id="organInfoClose" onclick="hideOrganInfoPanel()">✕</button>
+  </div>
+  <div id="organInfoDesc"></div>
+  <div id="organInfoHealth"></div>
 </div>
 
 <div id="achieveToast">
@@ -448,6 +486,7 @@
           <ellipse id="org-stomach" class="org" cx="153" cy="528" rx="48"  ry="52"/>
           <ellipse id="org-gut"     class="org" cx="193" cy="700" rx="96"  ry="108"/>
         </svg>
+        <div id="organClickLayer" onclick="handleBodyOrganClick(event)"></div>
       </div>
       <div class="score-row" style="margin-top:14px">
         <div class="score-block">
@@ -1979,6 +2018,65 @@ function handlePatrolClick(e){
 function hideOrganTooltip(){
   const t=document.getElementById('organTooltip');
   if(t) t.style.display='none';
+}
+
+// ── Organ info panel — My Body tab ───────────────────────────────────────────
+const BODY_ORGAN_INFO=[
+  {cx:183,cy:368,rx:36,ry:44,  emoji:'❤️',name:'Heart',          unitIds:['neutro'],                                         color:'#f87171',desc:'A muscular pump that beats 100,000 times a day, pushing oxygen-rich blood to every cell in your body.'},
+  {cx:153,cy:528,rx:48,ry:52,  emoji:'🫀',name:'Stomach',        unitIds:['gut'],                                            color:'#86efac',desc:'A muscular bag that churns food with strong acid, breaking it into a liquid paste ready for the intestines.'},
+  {cx:258,cy:508,rx:62,ry:52,  emoji:'🔧',name:'Liver',          unitIds:['liver'],                                          color:'#f59e0b',desc:'Your largest internal organ — filters toxins from the blood, stores energy, and produces bile for digestion.'},
+  {cx:127,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Left Lung',      unitIds:['lung'],                                           color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  {cx:258,cy:388,rx:58,ry:88,  emoji:'🫁',name:'Right Lung',     unitIds:['lung'],                                           color:'#2dd4bf',desc:'Inflates with each breath to pull oxygen into the bloodstream and push waste carbon dioxide back out.'},
+  {cx:193,cy:82, rx:68,ry:78,  emoji:'🧠',name:'Brain',          unitIds:['prefrontal','hippocampus','amygdala','dopamine','serotonin','bdnf'], color:'#818cf8',desc:'Your body\'s command centre — 86 billion neurons control every thought, memory, movement and emotion you have.'},
+  {cx:193,cy:700,rx:96,ry:108, emoji:'🦠',name:'Gut/Intestines', unitIds:['gut'],                                            color:'#4ade80',desc:'A 9-metre tube that absorbs nutrients and houses trillions of bacteria that control 70% of your immune system.'},
+];
+
+function handleBodyOrganClick(e){
+  const wrap=document.getElementById('body');
+  const rect=wrap.getBoundingClientRect();
+  const mx=e.clientX-rect.left;
+  const my=e.clientY-rect.top;
+  // body.png is 387×1536, rendered with object-fit:contain object-position:center top
+  const wW=rect.width, wH=rect.height;
+  const scale=Math.min(wW/387, wH/1536);
+  const ox=(wW-387*scale)/2;
+  const oy=0; // top-aligned
+  const bx=(mx-ox)/scale;
+  const by=(my-oy)/scale;
+  let hit=null;
+  for(const o of BODY_ORGAN_INFO){
+    const dx=(bx-o.cx)/o.rx, dy=(by-o.cy)/o.ry;
+    if(dx*dx+dy*dy<=1){hit=o;break;}
+  }
+  if(!hit){hideOrganInfoPanel();return;}
+  showOrganInfoPanel(hit);
+}
+
+function showOrganInfoPanel(organ){
+  document.getElementById('organInfoEmoji').textContent=organ.emoji;
+  document.getElementById('organInfoName').textContent=organ.name;
+  document.getElementById('organInfoDesc').textContent=organ.desc;
+  document.getElementById('organInfoHandle').style.background=organ.color;
+  const vals=organ.unitIds.map(id=>unitMap[id]?.val||0);
+  const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  const barColor=avg>=65?'#46d39a':avg>=40?'#fbbf24':'#ff6b6b';
+  const label=avg>=65?'Healthy 💪':avg>=40?'Moderate ⚠️':'Low 🔴';
+  document.getElementById('organInfoHealth').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:12px;color:var(--muted)">Army strength here:</span>
+      <span style="font-size:15px;font-weight:800;color:${barColor}">${avg}%</span>
+      <span style="font-size:12px;color:var(--muted)">${label}</span>
+    </div>
+    <div style="height:7px;border-radius:5px;background:#11141d;overflow:hidden;border:1px solid var(--line)">
+      <div style="height:100%;width:${avg}%;border-radius:5px;background:${barColor};transition:width .5s"></div>
+    </div>`;
+  document.getElementById('organInfoPanel').classList.add('open');
+  document.getElementById('organInfoOverlay').classList.add('open');
+}
+
+function hideOrganInfoPanel(){
+  document.getElementById('organInfoPanel').classList.remove('open');
+  document.getElementById('organInfoOverlay').classList.remove('open');
 }
 
 // ── Body-shape fat layer ─────────────────────────────────────────────────────
