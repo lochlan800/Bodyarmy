@@ -281,6 +281,28 @@
 
 <script>
 const clamp = v => Math.max(0, Math.min(100, v));
+const clampScale = v => Math.min(Math.max(v, 0.25), 4);
+
+function parseQuantity(text) {
+  const t = text.toLowerCase();
+  const m = t.match(/(\d+\.?\d*)\s*(cups?|glasses?|litres?|liters?|ml|oz|hours?|hrs?|mins?|minutes?|kms?|miles?|pieces?|slices?|cans?|bottles?|bowls?|plates?|servings?|shots?)/);
+  if (m) {
+    const n = parseFloat(m[1]), u = m[2].replace(/s$/, '');
+    if (u==='min'||u==='minute') return clampScale(n / 30);
+    if (u==='hour'||u==='hr') return clampScale(n);
+    if (u==='km') return clampScale(n / 3);
+    if (u==='mile') return clampScale(n / 2);
+    if (u==='litre'||u==='liter') return clampScale(n * 2);
+    if (u==='ml') return clampScale(n / 250);
+    return clampScale(n);
+  }
+  const bare = t.match(/^(\d+)\s+/);
+  if (bare) return clampScale(parseFloat(bare[1]));
+  if (/\ba lot\b|loads|tons|heaps|massive|huge|large|big/.test(t)) return 2;
+  if (/\btiny\b|\blittle\b|\bsmall\b|\bhalf\b|\bquick\b|\bshort\b/.test(t)) return 0.5;
+  if (/\bdouble\b|\btwice\b/.test(t)) return 2;
+  return 1;
+}
 
 // ─── Body defence units ────────────────────────────────────────────────────────
 const BODY_UNITS = [
@@ -522,6 +544,152 @@ const RULES = [
     msg:'The kingdom feels quiet and sad... Sunshine Squad and Reward Rangers lose energy when no one is around. Find your allies! 🫂',
     sci:'Fun fact: Your brain actually needs friends like your army needs teammates — loneliness weakens the whole kingdom\'s defences!',
     fx:{ serotonin:-10, dopamine:-7, amygdala:-10, bdnf:-7, inflam:-8 } },
+
+  // ── Extra food ──
+  { k:['nuts','almonds','walnuts','cashews','peanuts','pecans','pistachios'],
+    type:'food', emoji:'🥜',
+    msg:'Nuts are tiny power packs! Walnut omega-3 builds Brain Builders, and vitamin E armours the whole team!',
+    sci:'Fun fact: Walnuts look like tiny brains — and they actually contain the exact fats your brain is made of!',
+    fx:{ gut:+5, inflam:+6, bdnf:+6, hippocampus:+4, skin:+3 } },
+
+  { k:['avocado'],
+    type:'food', emoji:'🥑',
+    msg:'Avocado gives The Commander healthy fuel! Healthy fats help brain soldiers think sharper and faster!',
+    sci:'Fun fact: Avocados are packed with folate — a vitamin that helps build the chemical messengers brain soldiers use to talk to each other!',
+    fx:{ bdnf:+7, prefrontal:+5, inflam:+6, gut:+4 } },
+
+  { k:['oat','oatmeal','porridge','granola'],
+    type:'food', emoji:'🥣',
+    msg:'Oats are slow-burning fuel for the whole army! Steady energy all morning — no crash, no chaos!',
+    sci:'Fun fact: The fibre in oats feeds gut soldiers a special food called beta-glucan that trains them to fight harder!',
+    fx:{ gut:+7, inflam:+5, neutro:+3, serotonin:+4 } },
+
+  { k:['milk','dairy','cheese'],
+    type:'food', emoji:'🧀',
+    msg:'Dairy brings calcium to keep the kingdom\'s scaffolding strong, and gives the Builders raw materials!',
+    sci:'Fun fact: Calcium doesn\'t just build bones — it also helps brain soldiers fire signals to each other faster!',
+    fx:{ gut:+3, skin:+4, bdnf:+4, serotonin:+3 } },
+
+  { k:['mushroom','shiitake','reishi','portobello'],
+    type:'food', emoji:'🍄',
+    msg:'Mushrooms are magic! They send special signals to the Hunter Corps and Natural Killers to train harder!',
+    sci:'Fun fact: Shiitake mushrooms contain beta-glucan — the same secret weapon that makes NK Cells 3× more active!',
+    fx:{ gut:+6, neutro:+8, tcell:+6, nk:+5, inflam:+5 } },
+
+  { k:['olive oil','olives'],
+    type:'food', emoji:'🫒',
+    msg:'Olive oil douses the fires of inflammation — the whole army fights cleaner with less chaos in the kingdom!',
+    sci:'Fun fact: The main ingredient in olive oil acts like a natural version of ibuprofen — it calms the Fire Brigade naturally!',
+    fx:{ inflam:+8, tcell:+5, gut:+4, bdnf:+4 } },
+
+  { k:['sweet potato','pumpkin','squash','carrot','beetroot','beet'],
+    type:'food', emoji:'🍠',
+    msg:'Orange and red foods give Wall Guards a mega upgrade! Beta-carotene turns into a skin shield!',
+    sci:'Fun fact: Your body converts the orange colour in sweet potatoes into vitamin A — the main repair kit for your skin fortress!',
+    fx:{ skin:+7, neutro:+5, inflam:+5, gut:+4 } },
+
+  { k:['soup','broth','bone broth','stew'],
+    type:'food', emoji:'🍲',
+    msg:'Hot soup is the army\'s field hospital! Broth soothes the airways, hydrates soldiers and calms the gut garrison!',
+    sci:'Fun fact: Bone broth contains collagen — the same stuff your Wall Guards use to patch up the skin fortress after battle!',
+    fx:{ gut:+6, neutro:+4, inflam:+5, skin:+3, lung:+4 } },
+
+  { k:['spicy','chilli','chili','hot sauce','jalapeño','jalapeno'],
+    type:'food', emoji:'🌶️',
+    msg:'Spicy food is like a fire drill for the army! Capsaicin gives the Reward Rangers a quick victory lap!',
+    sci:'Fun fact: The burning feeling from chilli tricks pain sensors — your brain releases natural painkillers in response!',
+    fx:{ neutro:+4, inflam:+3, dopamine:+5, gut:-2 } },
+
+  { k:['smoothie','fruit juice','juice'],
+    type:'food', emoji:'🥤',
+    msg:'Smoothies rush vitamins to the front line fast! Whole-fruit versions also feed the Gut Microbiome troops!',
+    sci:'Fun fact: Blending fruit keeps all the fibre that feeds gut soldiers — but pure juice loses most of it!',
+    fx:{ gut:+5, neutro:+4, inflam:+4, skin:+3 } },
+
+  { k:['white bread','white rice','pasta','noodles'],
+    type:'food', emoji:'🍞',
+    msg:'Fast carbs give a quick energy burst but the Gut Microbiome is left hungry — not much for them to work with!',
+    sci:'Fun fact: White bread breaks down so fast it\'s almost like eating sugar — gut soldiers prefer the wholegrain version!',
+    fx:{ dopamine:+3, inflam:-3, gut:-3 } },
+
+  // ── Extra activities ──
+  { k:['cold shower','cold bath','ice bath','cold plunge','cold water'],
+    type:'activity', emoji:'🚿',
+    msg:'COLD WATER DRILL! ⚡ The whole army snaps to attention — Neutrophils surge, mood rockets, and the kingdom tingles!',
+    sci:'Fun fact: Cold water causes a 300% spike in norepinephrine — a battle signal that wakes every soldier at once!',
+    fx:{ neutro:+6, dopamine:+8, serotonin:+6, inflam:+5, nk:+5 } },
+
+  { k:['sauna','steam room','steam bath'],
+    type:'activity', emoji:'🧖',
+    msg:'The sauna is the kingdom\'s repair spa! Heat shock signals send repair crews to fix damaged soldiers everywhere!',
+    sci:'Fun fact: Regular sauna use reduces your chance of catching a cold by 50% — it literally trains the army to be tougher!',
+    fx:{ inflam:+7, nk:+5, skin:+4, serotonin:+5, bdnf:+4 } },
+
+  { k:['danc','dancing','dance'],
+    type:'activity', emoji:'💃',
+    msg:'Dancing is exercise + music + coordination all at once — The Builders go into overdrive laying new brain roads!',
+    sci:'Fun fact: Dancing is one of the only activities that lights up ALL parts of the brain simultaneously — it\'s a full brain workout!',
+    fx:{ dopamine:+10, serotonin:+7, bdnf:+7, neutro:+4, inflam:+5, hippocampus:+5 } },
+
+  { k:['football','soccer','basketball','tennis','badminton','cricket','rugby','volleyball','hockey','netball'],
+    type:'activity', emoji:'⚽',
+    msg:'Team sport is a double win — your body army trains AND the brain army bonds with teammates!',
+    sci:'Fun fact: Team sports boost oxytocin (the trust chemical) AND BDNF at the same time — almost nothing else does both!',
+    fx:{ neutro:+5, dopamine:+9, serotonin:+7, bdnf:+6, inflam:+5, amygdala:+5 } },
+
+  { k:['hike','hiking','trail','nature walk','forest','park'],
+    type:'activity', emoji:'🥾',
+    msg:'Nature walks quiet the Amygdala\'s alarm system — green spaces literally calm the panic centre of the brain!',
+    sci:'Fun fact: 90 minutes walking in nature reduces activity in the worry part of the brain — proven by brain scans!',
+    fx:{ serotonin:+8, amygdala:+7, bdnf:+6, inflam:+5, neutro:+4 } },
+
+  { k:['stretch','stretching','flexibility','pilates'],
+    type:'activity', emoji:'🤸',
+    msg:'Stretching releases tension trapped in the muscles and lets the Calm Guard do its job properly!',
+    sci:'Fun fact: Slow stretching activates your parasympathetic nervous system — the signal that tells the whole army to stand down from red alert!',
+    fx:{ inflam:+5, amygdala:+5, serotonin:+4, prefrontal:+3 } },
+
+  { k:['journal','journaling','gratitude','grateful','diary','wrote in'],
+    type:'activity', emoji:'📓',
+    msg:'Writing feelings down hands them to The Commander to sort — the Calm Guard relaxes once the kingdom has a plan!',
+    sci:'Fun fact: Writing about worries for just 8 minutes reduces anxiety brain signals measurably — it\'s like defragging your hard drive!',
+    fx:{ amygdala:+8, serotonin:+6, prefrontal:+5, hippocampus:+4 } },
+
+  { k:['draw','drawing','paint','painting','art','sketch','colouring','coloring'],
+    type:'activity', emoji:'🎨',
+    msg:'Art puts The Commander in charge of the whole kingdom — creative flow calms stress and lets The Builders work freely!',
+    sci:'Fun fact: Making art drops the stress hormone cortisol after just 45 minutes — even if you think you\'re bad at it!',
+    fx:{ amygdala:+7, dopamine:+6, serotonin:+5, prefrontal:+5 } },
+
+  { k:['video game','gaming','gamed','played games'],
+    type:'activity', emoji:'🎮',
+    msg:'Games fire up Reward Rangers and can train The Commander — but too much keeps the army up past bedtime!',
+    sci:'Fun fact: Action games improve reaction time and hand-eye coordination — some surgeons play games to warm up before surgery!',
+    fx:{ dopamine:+6, prefrontal:+3, amygdala:-3 } },
+
+  { k:['sat all day','sedentary','didn\'t move','sitting all day','desk all day'],
+    type:'activity', emoji:'🪑',
+    msg:'The whole army fell asleep on the job! Sitting too long lets inflammation creep through the kingdom unchecked!',
+    sci:'Fun fact: Sitting for more than 3 hours continuously has the same bad effect on inflammation as smoking a cigarette!',
+    fx:{ inflam:-8, neutro:-4, bdnf:-5, serotonin:-5, dopamine:-4 } },
+
+  { k:['played outside','outdoor play','playground','cycling','biking','bike ride','scooter','skateboard'],
+    type:'activity', emoji:'🌳',
+    msg:'Outside play is the secret cheat code — sunlight, movement AND fresh air all level up the army at once!',
+    sci:'Fun fact: Kids who play outside have 50% more Vitamin D and score higher on memory tests than kids who stay indoors!',
+    fx:{ serotonin:+6, dopamine:+7, neutro:+4, inflam:+4, bdnf:+5, skin:+3 } },
+
+  { k:['cook','cooking','baked','baking','made food','meal prep'],
+    type:'activity', emoji:'👨‍🍳',
+    msg:'Cooking trains The Commander — planning, sequencing and creativity all in one! Plus you know what goes in your kingdom!',
+    sci:'Fun fact: People who cook at home have lower inflammation markers on average — they eat more nutrients and fewer additives!',
+    fx:{ prefrontal:+5, dopamine:+5, amygdala:+3, inflam:+3 } },
+
+  { k:['fasting','intermittent fast','skipped breakfast','16:8'],
+    type:'activity', emoji:'⏰',
+    msg:'Short fasting activates the kingdom\'s autophagy clean-up crew — they clear out broken soldiers and build stronger ones!',
+    sci:'Fun fact: Going 16 hours without eating triggers a cellular recycling process — your body literally eats its own damaged cells to rebuild better ones!',
+    fx:{ inflam:+6, gut:+5, bdnf:+5, nk:+4 } },
 ];
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
@@ -727,7 +895,7 @@ function classify(text, type){
   return null;
 }
 
-function applyRule(label, r){
+function applyRule(label, r, scale=1){
   const changes = [];
   const changedUnits = [];
   let netGood = 0;
@@ -736,14 +904,15 @@ function applyRule(label, r){
 
   Object.entries(r.fx).forEach(([id, delta]) => {
     const u = unitMap[id]; if(!u) return;
-    u.val = clamp(u.val + delta);
+    const scaledDelta = Math.round(delta * scale) || (delta > 0 ? 1 : -1);
+    u.val = clamp(u.val + scaledDelta);
     updateUnit(id, u.val);
-    flashUnit(id, delta > 0);
+    flashUnit(id, scaledDelta > 0);
     flashOrgans(id, u.val);
-    netGood += delta;
-    const sign = delta>0?'▲':'▼';
-    changes.push(`<span class="${delta>0?'up':'dn'}">${sign} ${u.emoji} ${u.name}</span>`);
-    changedUnits.push({ u, delta });
+    netGood += scaledDelta;
+    const sign = scaledDelta>0?'▲':'▼';
+    changes.push(`<span class="${scaledDelta>0?'up':'dn'}">${sign} ${u.emoji} ${u.name} ${scaledDelta>0?'+':''}${scaledDelta}</span>`);
+    changedUnits.push({ u, delta: scaledDelta });
   });
 
   renderScores();
@@ -751,7 +920,7 @@ function applyRule(label, r){
   if(hasBrain && !hasBody) showTab('brain');
   else showTab('body');
   showToast(label, r, changedUnits);
-  logLine(label, r, changes);
+  logLine(label, r, changes, scale);
   // Save to history
   const now = new Date();
   const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
@@ -759,12 +928,14 @@ function applyRule(label, r){
   history.push({ label, r, changedUnits, time });
 }
 
-function logLine(label, r, changes){
+function logLine(label, r, changes, scale){
   const log = document.getElementById('log');
   const d = document.createElement('div'); d.className='log-entry';
+  const scaleBadge = scale !== 1
+    ? ` <span style="color:var(--muted);font-size:10px">(×${scale % 1 === 0 ? scale : scale.toFixed(1)})</span>` : '';
   d.innerHTML =
     `<div class="changes">${changes.join('<br>')}</div>`+
-    `${r.emoji} <b>${label}</b>`+
+    `${r.emoji} <b>${label}</b>${scaleBadge}`+
     `<div class="sci">${r.msg}</div>`+
     `<div class="sci" style="color:#3a4878;margin-top:2px">${r.sci}</div>`;
   log.prepend(d);
@@ -782,7 +953,8 @@ function submit(text, type){
     d.innerHTML=`🤔 <b>${text}</b><div class="sci">Not recognised — ${hint}</div>`;
     log.prepend(d); return;
   }
-  applyRule(text, r);
+  const scale = parseQuantity(text);
+  applyRule(text, r, scale);
 }
 
 document.getElementById('goFood').onclick = ()=>{
@@ -799,8 +971,8 @@ document.getElementById('inpAct').addEventListener('keydown', e=>{
   if(e.key==='Enter'){ submit(e.target.value,'activity'); e.target.value=''; }
 });
 
-[[['drank kefir','ate vegetables','dark chocolate','drank water','ate junk food','drank alcohol'],'food'],
- [['went for a run','slept 8 hours','read a book','listened to music','stressed out','smoked'],'activity']]
+[[['drank kefir','2 glasses of water','ate avocado','mushrooms','blueberries','dark chocolate','3 cups green tea','ate junk food','2 beers'],'food'],
+ [['30 minutes running','slept 8 hours','cold shower','danced','read a book','meditated','stressed out','sat all day'],'activity']]
   .forEach(([examples, type])=>{
     const container = document.getElementById(type==='food'?'chipsFood':'chipsAct');
     examples.forEach(ex=>{
