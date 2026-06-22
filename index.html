@@ -157,6 +157,31 @@
   .hist-list { padding:14px 20px 40px; display:flex; flex-direction:column; gap:10px; max-width:700px; }
   .hist-empty { color:var(--muted); font-size:14px; padding:30px 0; text-align:center; }
 
+  /* ── History Calendar ── */
+  .hist-cal { padding:14px 20px 40px; max-width:480px; }
+  .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cal-nav-btn { background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:8px; padding:6px 14px; cursor:pointer; font-size:16px; }
+  .cal-month-label { font-size:17px; font-weight:700; }
+  .cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:4px; }
+  .cal-wd { text-align:center; font-size:10px; color:var(--muted); font-weight:700; padding:4px 0; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+  .cal-cell {
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; border-radius:8px; cursor:pointer;
+    background:var(--panel-2); border:1px solid transparent;
+    font-size:13px; font-weight:600; transition:all .15s;
+  }
+  .cal-cell.empty { background:transparent; pointer-events:none; }
+  .cal-cell:not(.empty):hover { border-color:#3a4a66; }
+  .cal-cell.has-entries { color:#5aa9ff; }
+  .cal-cell.today { border-color:#2a4a7a; }
+  .cal-cell.selected { background:#1e2d4a; border-color:#5aa9ff; color:#5aa9ff; }
+  .cal-dot { width:4px; height:4px; border-radius:50%; background:currentColor; margin-top:2px; opacity:.7; }
+  .cal-day-panel { margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+  .cal-day-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px; }
+  .cal-day-empty { color:var(--muted); font-size:13px; padding:20px 0; text-align:center; }
+
   /* history card */
   .hcard {
     background:var(--panel); border:1px solid var(--line); border-radius:14px;
@@ -484,10 +509,12 @@
     <h2>📋 History</h2>
   </div>
   <div class="hist-tabs">
-    <button class="hist-tab active" id="htab-food-btn"     onclick="showHistTab('food')">🍎 Food &amp; Drink</button>
-    <button class="hist-tab"        id="htab-activity-btn" onclick="showHistTab('activity')">🏃 Activities</button>
+    <button class="hist-tab active" id="htab-food-btn"     onclick="showHistTab('food')">🍎 Food</button>
+    <button class="hist-tab"        id="htab-activity-btn" onclick="showHistTab('activity')">🏃 Activity</button>
+    <button class="hist-tab"        id="htab-cal-btn"      onclick="showHistTab('calendar')">📅 Calendar</button>
   </div>
   <div class="hist-list" id="histList"></div>
+  <div id="histCalendar" style="display:none"></div>
 </div>
 
 
@@ -1568,7 +1595,100 @@ function showHistTab(tab){
   currentHistTab = tab;
   document.getElementById('htab-food-btn').classList.toggle('active', tab==='food');
   document.getElementById('htab-activity-btn').classList.toggle('active', tab==='activity');
-  renderHistList();
+  document.getElementById('htab-cal-btn').classList.toggle('active', tab==='calendar');
+  const isCal = tab==='calendar';
+  document.getElementById('histList').style.display = isCal ? 'none' : '';
+  document.getElementById('histCalendar').style.display = isCal ? '' : 'none';
+  if(isCal) renderCalendar();
+  else renderHistList();
+}
+
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let calSelectedDate=new Date().toISOString().slice(0,10);
+
+function calShiftMonth(dir){
+  calMonth+=dir;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+}
+
+function selectCalDay(dateStr){
+  calSelectedDate=dateStr;
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const el=document.getElementById('histCalendar'); if(!el) return;
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const today=new Date().toISOString().slice(0,10);
+
+  const datesWithEntries=new Set(history.filter(e=>e.date).map(e=>e.date));
+
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay=new Date(calYear,calMonth+1,0);
+  let startDow=(firstDay.getDay()+6)%7; // Mon-based
+
+  let cells='';
+  for(let i=0;i<startDow;i++) cells+=`<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=lastDay.getDate();d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const has=datesWithEntries.has(ds);
+    let cls='cal-cell'+(has?' has-entries':'')+(ds===today?' today':'')+(ds===calSelectedDate?' selected':'');
+    cells+=`<div class="${cls}" onclick="selectCalDay('${ds}')">${d}${has?'<div class="cal-dot"></div>':''}</div>`;
+  }
+
+  el.innerHTML=`<div class="hist-cal">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calShiftMonth(-1)">‹</button>
+      <div class="cal-month-label">${MONTHS[calMonth]} ${calYear}</div>
+      <button class="cal-nav-btn" onclick="calShiftMonth(1)">›</button>
+    </div>
+    <div class="cal-weekdays">${WD.map(w=>`<div class="cal-wd">${w}</div>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-day-panel" id="calDayPanel"></div>
+  </div>`;
+
+  renderDayEntries(calSelectedDate);
+}
+
+function renderDayEntries(dateStr){
+  const panel=document.getElementById('calDayPanel'); if(!panel) return;
+  const entries=history.filter(e=>e.date===dateStr);
+  const d=new Date(dateStr+'T12:00:00');
+  const label=d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(!entries.length){
+    panel.innerHTML=`<div class="cal-day-title">📅 ${label}</div><div class="cal-day-empty">Nothing logged on this day.</div>`;
+    return;
+  }
+  const cards=entries.map((e,i)=>{
+    const pills=e.changedUnits.map(({u,delta})=>
+      `<span class="hpill ${delta>0?'up':'dn'}">${delta>0?'▲':'▼'} ${u.emoji} ${u.name}</span>`
+    ).join('');
+    const detail=e.changedUnits.map(({u,delta})=>`
+      <div class="hd-row">
+        <div class="hd-name">${u.emoji} ${u.name}</div>
+        <div class="hd-bar"><span style="width:${clamp(u.val)}%;background:${u.color}"></span></div>
+        <div class="hd-delta ${delta>0?'up':'dn'}">${delta>0?'+':''}${delta}</div>
+      </div>`).join('');
+    return `<div class="hcard" id="cal-hcard-${i}" onclick="this.classList.toggle('open')">
+      <div class="hcard-top">
+        <div class="hcard-emoji">${e.r.emoji}</div>
+        <div class="hcard-info">
+          <div class="hcard-name">${e.label}</div>
+          <div class="hcard-time">${e.time}</div>
+          <div class="hcard-pills">${pills}</div>
+        </div>
+        <div class="hcard-chevron">›</div>
+      </div>
+      <div class="hcard-detail">${detail}
+        <div class="hd-sci"><b>What happened:</b> ${e.r.msg}</div>
+        <div class="hd-sci"><b>The science:</b> ${e.r.sci}</div>
+      </div>
+    </div>`;
+  }).join('');
+  panel.innerHTML=`<div class="cal-day-title">📅 ${label}</div>${cards}`;
 }
 
 function deleteHistory(origIdx){
@@ -1688,9 +1808,10 @@ function applyRule(label, r, scale=1){
   triggerFsReinit();
   // Save to history
   const now = new Date();
+  const date = now.toISOString().slice(0,10);
   const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) +
                ' · ' + now.toLocaleDateString([], {day:'numeric',month:'short'});
-  history.push({ label, r, changedUnits, time, scale });
+  history.push({ label, r, changedUnits, time, date, scale });
   saveState();
   logToday();
 }
@@ -2872,7 +2993,7 @@ function saveState(){
     label:e.label, scale:e.scale||1,
     rType:e.r.type, rEmoji:e.r.emoji, rMsg:e.r.msg, rSci:e.r.sci,
     changedUnits:e.changedUnits.map(({u,delta})=>({id:u.id,delta})),
-    time:e.time,
+    time:e.time, date:e.date||'',
   }));
   localStorage.setItem('ba_history',JSON.stringify(hist.slice(-200)));
 }
@@ -2901,7 +3022,7 @@ function loadState(){
     history.push({
       label:e.label, scale:e.scale||1,
       r:{type:e.rType,emoji:e.rEmoji,msg:e.rMsg,sci:e.rSci,fx:{}},
-      changedUnits, time:e.time,
+      changedUnits, time:e.time, date:e.date||'',
     });
     const changes=changedUnits.map(({u,delta})=>
       `<span class="${delta>0?'up':'dn'}">${delta>0?'▲':'▼'} ${u.emoji} ${u.name} ${delta>0?'+':''}${delta}</span>`
