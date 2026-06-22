@@ -415,6 +415,9 @@
   .achieve-icon  { font-size:28px; margin-bottom:4px; }
   .achieve-name  { font-size:15px; font-weight:700; }
   .achieve-desc  { font-size:12px; color:var(--muted); margin-top:3px; }
+  .log-tip { font-size:10px; color:#2a7a4a; margin-top:3px; line-height:1.4; }
+  .toast-tip { font-size:10px; color:var(--muted); margin-top:7px; padding-top:7px;
+    border-top:1px solid var(--line); line-height:1.4; text-align:left; }
 
   /* ── Organ info panel (body tab) ── */
   #organInfoOverlay { position:fixed; inset:0; z-index:190; background:rgba(0,0,0,.45);
@@ -471,6 +474,7 @@
 <div id="toast">
   <div class="toast-action" id="toastTitle"></div>
   <div class="toast-rows" id="toastRows"></div>
+  <div class="toast-tip" id="toastTip" style="display:none"></div>
 </div>
 
 <!-- History page (full-screen overlay) -->
@@ -784,66 +788,77 @@ const RULES = [
     type:'food', emoji:'🥛',
     msg:'New recruits join the Belly Battalion! Good bacteria soldiers pour into the tummy fortress!',
     sci:'Fun fact: 70% of your entire immune army lives in your gut — it\'s the biggest battlefield in your body!',
+    tip:'Eat with fibre (oats, veg, banana) — bacteria survive better when they have something to feed on.',
     fx:{ gut:+15, neutro:+4, inflam:+6, serotonin:+8, amygdala:+4 } },
 
   { k:['vegetable','veg','salad','broccoli','spinach','kale','greens','fruit','apple','berries','banana'],
     type:'food', emoji:'🥦',
     msg:'The Belly Battalion gets a feast! Fibre is like a power-up meal for your tummy soldiers.',
     sci:'Fun fact: When gut soldiers eat fibre they produce acids that help the Hunter Corps get stronger too!',
+    tip:'Add olive oil or butter — fat unlocks vitamins A, D, E and K that your body can\'t absorb without it.',
     fx:{ gut:+8, tcell:+5, inflam:+8, neutro:+3, bdnf:+5, hippocampus:+4 } },
 
   { k:['blueberr','berry','berries'],
     type:'food', emoji:'🫐',
     msg:'The Builders in your brain get new materials! Blueberries help them construct new paths!',
     sci:'Fun fact: The special blue colour in blueberries travels all the way to your brain to help Memory Keepers work better!',
+    tip:'Frozen blueberries work just as well — cheaper and in season all year round.',
     fx:{ bdnf:+12, hippocampus:+9, inflam:+7, gut:+4 } },
 
   { k:['orange','vitamin c','lemon','citrus','kiwi'],
     type:'food', emoji:'🍊',
     msg:'Vitamin C gives the Speed Squad armour! They charge into battle with 50× more power!',
     sci:'Fun fact: Speed Squad soldiers store up to 100 times more vitamin C than the blood around them — they love it!',
+    tip:'Eat within 30 min of cutting — vitamin C breaks down fast once exposed to air.',
     fx:{ neutro:+10, skin:+5, inflam:+5, tcell:+3, dopamine:+5 } },
 
   { k:['dark chocolate','cacao','cocoa'],
     type:'food', emoji:'🍫',
     msg:'Dark chocolate gives the Builders and Sunshine Squad a big boost — the darker the better!',
     sci:'Fun fact: The special stuff in dark chocolate sends extra blood to the Memory Keepers so they can write faster!',
+    tip:'Go 70%+ cacao for real benefit — milk chocolate has too much sugar to count.',
     fx:{ bdnf:+8, serotonin:+7, dopamine:+6, hippocampus:+5, inflam:+5 } },
 
   { k:['garlic','ginger','turmeric','honey'],
     type:'food', emoji:'🧄',
     msg:'Garlic and turmeric are like magic potions! They attack bad guys AND call in the Builders!',
     sci:'Fun fact: The yellow colour in turmeric is so powerful it can travel through your skull to help your brain soldiers!',
+    tip:'Add black pepper with turmeric — it makes the active compound 2000× more absorbable.',
     fx:{ inflam:+14, neutro:+5, gut:+4, bdnf:+8, amygdala:+5 } },
 
   { k:['omega','fish oil','salmon','mackerel','sardine','walnut','flaxseed'],
     type:'food', emoji:'🐟',
     msg:'Omega-3 is brain armour! It builds stronger walls around every brain soldier so they fight better!',
     sci:'Fun fact: 40% of the wall around every brain cell is made from the stuff found in oily fish — they literally build your brain!',
+    tip:'Aim for oily fish twice a week — or add ground flaxseed or chia daily if you don\'t eat fish.',
     fx:{ inflam:+12, nk:+6, tcell:+4, bdnf:+10, prefrontal:+7, hippocampus:+7, serotonin:+6 } },
 
   { k:['water','hydrate','drank water'],
     type:'food', emoji:'💧',
     msg:'Water keeps the whole kingdom running! Without it the roads dry up and soldiers can\'t move!',
     sci:'Fun fact: Your brain is 75% water — even a tiny bit of thirst makes The Commander fuzzy and forgetful!',
+    tip:'Drink a glass before each meal — easiest way to hit your daily target without thinking about it.',
     fx:{ skin:+5, lung:+6, liver:+5, inflam:+3, prefrontal:+5, hippocampus:+4, amygdala:+4 } },
 
   { k:['protein','chicken','turkey','eggs','fish','beans','tofu','meat','steak','lentil'],
     type:'food', emoji:'🍳',
     msg:'Protein is the army\'s building material! Soldiers use it to make weapons, armour AND happy signals!',
     sci:'Fun fact: Eggs and turkey make your Sunshine Squad! Your body turns the food into the happy signal itself!',
+    tip:'Spread protein across all meals — your body can only use about 30g at one time for repair.',
     fx:{ neutro:+5, tcell:+6, nk:+4, dopamine:+6, serotonin:+6 } },
 
   { k:['zinc','magnesium','supplement','multivitamin','vitamin b','b12'],
     type:'food', emoji:'💊',
     msg:'Vitamins and minerals are like weapons upgrades for your soldiers — everyone gets stronger!',
     sci:'Fun fact: Without zinc, your Hunter Corps can\'t even train properly. It\'s the most important kit in the army!',
+    tip:'Take with food, not on an empty stomach — absorbs better and avoids nausea.',
     fx:{ tcell:+8, nk:+5, skin:+5, bdnf:+6, serotonin:+5, hippocampus:+5 } },
 
   { k:['green tea','matcha'],
     type:'food', emoji:'🍵',
     msg:'Green tea gives The Commander a superpower — calm and focused at the same time! No jitters!',
     sci:'Fun fact: Green tea has a special ingredient that makes you alert AND relaxed — like a chill superhero!',
+    tip:'Keep it to 1–3 cups before 2pm — caffeine too late pushes your sleep back by hours.',
     fx:{ prefrontal:+8, amygdala:+7, serotonin:+6, dopamine:+4, inflam:+5 } },
 
   // ── Seeds ──
@@ -851,78 +866,91 @@ const RULES = [
     type:'food', emoji:'🫧',
     msg:'Chia seeds are tiny armour pellets for the Gut Microbiome! They expand into a gel that feeds good bacteria all day long!',
     sci:'Fun fact: Just 2 tablespoons of chia seeds contains more omega-3 than most fish — and they turn into a gel in your gut that feeds your immune soldiers for hours!',
+    tip:'Soak for 10–15 min first — the gel feeds gut bacteria even more effectively than dry seeds.',
     fx:{ gut:+9, inflam:+8, bdnf:+5, neutro:+4, skin:+3 } },
 
   { k:['flax seed','flaxseed','linseed','flax'],
     type:'food', emoji:'🌿',
     msg:'Flax seeds are the plant kingdom\'s top omega-3 weapon! They arm the T-Cells and calm the Fire Brigade!',
     sci:'Fun fact: Flaxseeds are the richest plant source of omega-3 on Earth — one tablespoon gives your T-Cells major firepower against inflammation!',
+    tip:'Grind them first — whole seeds pass through undigested and you get zero benefit.',
     fx:{ inflam:+9, tcell:+6, gut:+7, bdnf:+5, skin:+3 } },
 
   { k:['hemp seed','hemp'],
     type:'food', emoji:'💚',
     msg:'Hemp seeds are complete protein packets — every one of the 9 essential amino acids your soldiers need to rebuild after battle!',
     sci:'Fun fact: Hemp seeds have the perfect 3:1 ratio of omega-6 to omega-3 — the exact balance that keeps the Fire Brigade from going out of control!',
+    tip:'Sprinkle on anything — they have almost no taste and work with both sweet and savoury.',
     fx:{ gut:+6, inflam:+8, neutro:+5, skin:+6, tcell:+4 } },
 
   { k:['pumpkin seed','pepita'],
     type:'food', emoji:'🎃',
     msg:'Pumpkin seeds are the zinc bomb — Hunter Corps and Speed Squad both get a massive upgrade from just a handful!',
     sci:'Fun fact: A 30g serving of pumpkin seeds delivers almost half your daily zinc — the mineral your T-Cells absolutely cannot train without!',
+    tip:'30g (small handful) is enough — lightly roast to preserve the zinc and improve flavour.',
     fx:{ tcell:+10, neutro:+7, nk:+6, inflam:+6, bdnf:+4 } },
 
   { k:['sunflower seed'],
     type:'food', emoji:'🌻',
     msg:'Sunflower seeds coat NK Cells in vitamin E armour — they become nearly unstoppable virus hunters!',
     sci:'Fun fact: NK Cells store vitamin E inside their walls — sunflower seeds give them the biggest vitamin E top-up of any common food!',
+    tip:'Store in a cool dark place — vitamin E breaks down quickly when exposed to heat and light.',
     fx:{ nk:+8, skin:+7, inflam:+6, neutro:+4 } },
 
   { k:['sesame seed','sesame','tahini'],
     type:'food', emoji:'⚪',
     msg:'Sesame seeds have secret anti-inflammatory chemicals called lignans — they tell the Fire Brigade to calm right down and stop burning the kingdom!',
     sci:'Fun fact: Sesamin from sesame seeds is so anti-inflammatory that researchers study it as a natural painkiller — and it helps T-Cells communicate better!',
+    tip:'Pair with lemon juice — it doubles the calcium your body absorbs from sesame.',
     fx:{ inflam:+8, tcell:+5, skin:+5, bdnf:+4 } },
 
   { k:['black seed','nigella','kalonji','black cumin','nigella sativa'],
     type:'food', emoji:'🖤',
     msg:'Black seeds are legendary warrior seeds — the compound thymoquinone is one of nature\'s most powerful anti-infection weapons!',
     sci:'Fun fact: Nigella sativa has been studied in over 600 scientific papers — thymoquinone boosts NK Cells, calms inflammation AND acts as a natural antibiotic!',
+    tip:'Half a teaspoon in honey is the traditional dose — start small and build up gradually.',
     fx:{ nk:+9, neutro:+8, inflam:+10, tcell:+6, gut:+5 } },
 
   { k:['poppy seed'],
     type:'food', emoji:'🔵',
     msg:'Poppy seeds bring calcium and magnesium to strengthen the Wall Guards and keep the kingdom\'s structure solid!',
     sci:'Fun fact: Poppy seeds are surprisingly rich in calcium and magnesium — both minerals help immune cells send signals to each other faster!',
+    tip:'Great baked into bread or on salads — the minerals survive cooking very well.',
     fx:{ skin:+4, neutro:+3, inflam:+3, serotonin:+3 } },
 
   { k:['fenugreek seed','fenugreek'],
     type:'food', emoji:'🟡',
     msg:'Fenugreek seeds steady the kingdom\'s sugar supply so Neutrophils don\'t get weakened by sugar spikes!',
     sci:'Fun fact: Fenugreek seeds contain a special fibre that slows sugar entering the blood — keeping your Neutrophils at full fighting strength all day!',
+    tip:'Half a teaspoon in warm water each morning keeps blood sugar steady all day.',
     fx:{ inflam:+6, gut:+6, neutro:+4, tcell:+3 } },
 
   { k:['fennel seed','fennel'],
     type:'food', emoji:'🌱',
     msg:'Fennel seeds are the Gut Microbiome\'s peace-makers — they calm cramps and help good bacteria thrive in the gut fortress!',
     sci:'Fun fact: Anethole in fennel is anti-inflammatory AND antibacterial — it helps your gut soldiers by clearing out the bad guys while keeping good bacteria safe!',
+    tip:'Chew a pinch after eating — it aids digestion and freshens breath at the same time.',
     fx:{ gut:+6, inflam:+5, lung:+3, serotonin:+3 } },
 
   { k:['cumin seed','cumin'],
     type:'food', emoji:'🟤',
     msg:'Cumin seeds are antioxidant warriors that help Cleanup Crew filter the blood faster — ancient kingdoms knew this secret for thousands of years!',
     sci:'Fun fact: Cumin contains thymol — a natural antifungal that helps your Liver soldiers neutralise harmful compounds before they reach the bloodstream!',
+    tip:'Toast in a dry pan first — heat releases up to 3× more of the active antioxidants.',
     fx:{ liver:+6, inflam:+5, gut:+5, neutro:+3 } },
 
   { k:['coriander seed','coriander'],
     type:'food', emoji:'🌿',
     msg:'Coriander seeds help the Cleanup Crew flush heavy metals and toxins — they\'re the detox specialists of the spice world!',
     sci:'Fun fact: Coriander seeds bind to heavy metal molecules in the blood and help the Liver soldiers carry them safely out of the kingdom!',
+    tip:'Add at the end of cooking — boiling destroys a lot of the beneficial compounds.',
     fx:{ liver:+7, inflam:+5, gut:+4 } },
 
   { k:['seed mix','mixed seeds','seed'],
     type:'food', emoji:'🌱',
     msg:'A seed mix is like sending a full squad of reinforcements! Every type of seed brings its own special power to the kingdom!',
     sci:'Fun fact: Mixing different seeds gives you zinc, omega-3, vitamin E, and fibre all in one — the ultimate immune starter pack!',
+    tip:'Rotate varieties — don\'t eat the same seeds every day, variety is what makes it powerful.',
     fx:{ gut:+7, inflam:+7, tcell:+5, nk:+4, skin:+4, bdnf:+4 } },
 
   // ── Lifestyle — positive ──
@@ -930,6 +958,7 @@ const RULES = [
     type:'activity', emoji:'😴',
     msg:'The whole army rests, heals and gets stronger overnight! Memory Keepers file away everything you learned!',
     sci:'Fun fact: While you sleep, Hunter Corps soldiers grow special hooks to grab viruses — they can\'t do this when you\'re awake!',
+    tip:'Same bedtime every night matters more than total hours — consistency is what sets your body clock.',
     fx:{ tcell:+12, nk:+10, neutro:+6, inflam:+8, gut:+4,
          hippocampus:+14, prefrontal:+10, amygdala:+10, bdnf:+8, serotonin:+6 } },
 
@@ -937,6 +966,7 @@ const RULES = [
     type:'activity', emoji:'🏃',
     msg:'Exercise sends the whole army into action mode! The Builders go crazy constructing new brain roads!',
     sci:'Fun fact: Just 30 minutes of running makes The Builders work 3× harder — it\'s the best thing you can do for your brain!',
+    tip:'Consistency beats intensity — 20 min every day does more than a 2-hour session once a week.',
     fx:{ nk:+10, neutro:+7, tcell:+6, lung:+6, inflam:+6,
          bdnf:+14, hippocampus:+10, prefrontal:+8, dopamine:+10, serotonin:+8, amygdala:+7 } },
 
@@ -944,12 +974,14 @@ const RULES = [
     type:'activity', emoji:'☀️',
     msg:'Sunlight wakes up the Sunshine Squad instantly! They spread happiness across the whole kingdom!',
     sci:'Fun fact: Your skin makes vitamin D from sunlight like a solar panel — and vitamin D is a power-up for Hunter Corps!',
+    tip:'10–30 min before 11am is ideal — enough for vitamin D without the skin damage risk.',
     fx:{ tcell:+9, nk:+6, inflam:+7, serotonin:+12, dopamine:+7, amygdala:+8, bdnf:+6 } },
 
   { k:['meditat','mindful','relax','breathing','calm','breathwork'],
     type:'activity', emoji:'🧘',
     msg:'Meditating trains The Commander and the Calm Guard — a quiet mind is a powerful mind!',
     sci:'Fun fact: Just 8 weeks of breathing practice physically makes The Commander\'s base bigger and stronger!',
+    tip:'Try 4-7-8 breathing: inhale 4 sec, hold 7, exhale 8 — lowers cortisol in under 90 seconds.',
     fx:{ tcell:+6, nk:+5, inflam:+8, gut:+3,
          prefrontal:+10, amygdala:+14, hippocampus:+7, serotonin:+8, bdnf:+7 } },
 
@@ -957,48 +989,56 @@ const RULES = [
     type:'activity', emoji:'📚',
     msg:'Reading and learning get the Memory Keepers writing furiously — new pages added to your brain book!',
     sci:'Fun fact: Every new thing you learn causes The Builders to build a brand new bridge in your brain — reading makes more bridges!',
+    tip:'Paper books build more memory pathways than screens — try 20 min with your phone in another room.',
     fx:{ hippocampus:+10, prefrontal:+9, bdnf:+8, dopamine:+5 } },
 
   { k:['school','class','lesson','college','university','homework','revision','exam','test','lecture'],
     type:'activity', emoji:'🏫',
     msg:'School sends Brain Command into full training mode! The Commander sharpens up and Memory Keepers get busy writing new knowledge into your brain book!',
     sci:'Fun fact: Learning new things at school triggers BDNF — the brain\'s own fertiliser — which grows brand new connections between your neurons!',
+    tip:'Take a 5 min walk after each study session — the BDNF spike locks in what you just learned.',
     fx:{ prefrontal:+8, hippocampus:+9, bdnf:+9, dopamine:+6, serotonin:+4 } },
 
   { k:['social','friends','family','socialised','conversation','talked','people','laughed','laugh'],
     type:'activity', emoji:'🤝',
     msg:'Spending time with friends sends the Sunshine Squad and Reward Rangers into celebration mode!',
     sci:'Fun fact: Laughing with friends releases a "hug chemical" that tells the Calm Guard everything is safe — no need to panic!',
+    tip:'Even a 10 min voice call gives most of the same mood benefits as being in person.',
     fx:{ serotonin:+10, dopamine:+8, amygdala:+10, prefrontal:+5 } },
 
   { k:['music','listened to music','sang','singing','played instrument'],
     type:'activity', emoji:'🎵',
     msg:'Music sends the Reward Rangers dancing! Even just expecting your favourite song fires them up!',
     sci:'Fun fact: When you hear a song you love, the Reward Rangers literally do a little victory dance in your brain!',
+    tip:'Try playing an instrument — active music-making builds even more brain connections than just listening.',
     fx:{ dopamine:+10, serotonin:+7, amygdala:+8, prefrontal:+4 } },
 
   { k:['wash hands','washed','soap','shower','clean','hygiene'], type:'activity',
     emoji:'🧼',
     msg:'Washing hands defeats invaders before they even reach the castle gates — easy win!',
     sci:'Fun fact: Washing hands for just 20 seconds wipes out most of the bad guys trying to sneak inside!',
+    tip:'Scrub between fingers for a full 20 sec — the friction does the work, not the soap itself.',
     fx:{ skin:+3 } },
 
   { k:['skincare','moisturis','moisturiz','face wash','cleanser','toner','serum','skin routine','skin care'],
     type:'activity', emoji:'✨',
     msg:'Skincare strengthens the Wall Guards and keeps the castle\'s outer defences shining and strong!',
     sci:'Fun fact: A healthy skin barrier is your body\'s number one physical defence — moisturising helps skin cells lock together like armoured bricks!',
+    tip:'Apply moisturiser to slightly damp skin — it seals in water and works twice as effectively.',
     fx:{ skin:+10, inflam:+5, serotonin:+4, amygdala:+4 } },
 
   { k:['sunscreen','sun cream','spf'],
     type:'activity', emoji:'🧴',
     msg:'Sunscreen gives the Wall Guards a force field! UV rays can\'t break through the castle walls!',
     sci:'Fun fact: Sun rays without protection wear away the Wall Guards one by one — sunscreen lets them keep their armour on!',
+    tip:'Reapply every 2 hours in direct sun — SPF 30+ is the minimum for real protection.',
     fx:{ skin:+8 } },
 
   { k:['vaccine','vaccinated','jab','flu shot','booster'],
     type:'activity', emoji:'💉',
     msg:'The Hunter Corps get a wanted poster for one specific enemy — now they can spot it in an instant!',
     sci:'Fun fact: Once Hunter Corps soldiers learn an enemy\'s face they remember it for your entire life — that\'s a superpower!',
+    tip:'Keep up with boosters — immunity to some vaccines fades over time and needs a top-up.',
     fx:{ tcell:+18, nk:+5 } },
 
   // ── Harmful ──
@@ -1006,18 +1046,21 @@ const RULES = [
     type:'food', emoji:'🍬',
     msg:'ENEMY ATTACK! 🚨 Sugar puts the Speed Squad to sleep for 5 hours and tricks the Reward Rangers!',
     sci:'Fun fact: A big sugar hit makes your Speed Squad fight at half strength — bad guys walk straight past them!',
+    tip:'Try fresh fruit — natural sugars come packaged with fibre that slows the blood sugar spike.',
     fx:{ neutro:-8, gut:-10, inflam:-14, tcell:-4, dopamine:-8, serotonin:-5, bdnf:-4 } },
 
   { k:['junk','fast food','pizza','burger','fries','chips','crisps','fried','takeaway','processed'],
     type:'food', emoji:'🍔',
     msg:'Junk food brings chaos to the kingdom! The Belly Battalion\'s fortress walls start crumbling!',
     sci:'Fun fact: Junk food contains chemicals that eat through the Belly Battalion\'s protective walls — it\'s like acid on a castle!',
+    tip:'Batch cook one healthy meal a week — it\'s the easiest way to crowd out the junk food habit.',
     fx:{ gut:-8, inflam:-12, liver:-5, neutro:-4, bdnf:-6, hippocampus:-5, serotonin:-4 } },
 
   { k:['alcohol','beer','wine','vodka','whiskey','drunk','drinking'],
     type:'food', emoji:'🍺',
     msg:'MAJOR ATTACK! 🚨 Alcohol puts Shadow Strikers to sleep, floods the Cleanup Crew and jams Memory Keepers!',
     sci:'Fun fact: Alcohol actually blocks the door to the Memory Keepers\' room — nothing can be written down while it\'s in the way!',
+    tip:'Alternate every alcoholic drink with water — roughly halves the damage and keeps you hydrated.',
     fx:{ liver:-16, gut:-10, nk:-10, neutro:-6, inflam:-8,
          prefrontal:-10, hippocampus:-12, serotonin:-10, dopamine:-6, amygdala:-8, bdnf:-6 } },
 
@@ -1025,24 +1068,28 @@ const RULES = [
     type:'activity', emoji:'🚬',
     msg:'DANGER! 🚨 Smoke freezes the Air Patrol and wipes out Shadow Strikers — the airways are unguarded!',
     sci:'Fun fact: Just one cigarette paralyses the Air Patrol for 30 minutes — invaders can march straight in!',
+    tip:'The body starts repairing within 20 min of stopping — every hour without one counts.',
     fx:{ lung:-20, nk:-10, inflam:-12, skin:-5, dopamine:-8, bdnf:-7, prefrontal:-5 } },
 
   { k:['weed','cannabis','marijuana','thc'],
     type:'activity', emoji:'🌿',
     msg:'The Reward Rangers get a quick boost but the Memory Keepers\' pens stop working — nothing gets written down!',
     sci:'Fun fact: Cannabis jams the Memory Keepers\' filing system — they can\'t save new memories properly while it\'s active!',
+    tip:'Memory effects are much stronger in developing brains (under 25) — impact lasts far longer.',
     fx:{ dopamine:+5, hippocampus:-10, prefrontal:-8, bdnf:-7, amygdala:-6 } },
 
   { k:['antibiotic'],
     type:'food', emoji:'💊',
     msg:'Antibiotics defeat the enemy but hit the Belly Battalion too — friendly fire! Rebuild with good food!',
     sci:'Fun fact: One course of antibiotics can reduce the Belly Battalion by half — it takes up to a year to fully rebuild!',
+    tip:'Take probiotics 2 hours after each dose — rebuilds the gut army while antibiotics do their job.',
     fx:{ gut:-20, neutro:+5, serotonin:-8 } },
 
   { k:['stress','stressed','anxious','overwhelmed','panic','cortisol','anxiety'],
     type:'activity', emoji:'😣',
     msg:'Stress floods the kingdom with panic! The Calm Guard is overwhelmed and soldiers stop listening to The Commander!',
     sci:'Fun fact: Too much stress actually makes the Memory Keepers\' building physically shrink over time — so stay calm!',
+    tip:'Name the emotion out loud — labelling feelings reduces amygdala activity measurably within seconds.',
     fx:{ tcell:-10, nk:-8, neutro:-5, inflam:-10, gut:-5,
          amygdala:-14, hippocampus:-8, prefrontal:-8, bdnf:-8, serotonin:-7, dopamine:-5 } },
 
@@ -1050,6 +1097,7 @@ const RULES = [
     type:'activity', emoji:'🌙',
     msg:'No sleep = army mutiny! 🚨 70% of Shadow Strikers desert and Memory Keepers can\'t file anything!',
     sci:'4h sleep reduces NK cells by 70% (Irwin 1994). Hippocampus cannot replay memories without deep sleep.',
+    tip:'Even a 20 min nap before 3pm recovers some NK cell activity lost from a bad night.',
     fx:{ tcell:-10, nk:-12, neutro:-6, inflam:-8,
          hippocampus:-12, prefrontal:-10, amygdala:-10, bdnf:-8, serotonin:-6 } },
 
@@ -1057,30 +1105,35 @@ const RULES = [
     type:'activity', emoji:'📱',
     msg:'Endless scrolling tricks the Reward Rangers into chasing fake gold — they get tired and confused!',
     sci:'Fun fact: Apps are designed like slot machines — they give random rewards to keep the Reward Rangers hooked and distracted!',
+    tip:'Put your phone in another room at bedtime — out of sight reduces urges by about 40%.',
     fx:{ dopamine:-10, prefrontal:-7, amygdala:-6, serotonin:-5 } },
 
   { k:['cut','wound','scrape','graze','bleed'],
     type:'activity', emoji:'🩹',
     msg:'Castle wall breached! 🚨 Speed Squad soldiers sprint to the wound in under an hour to plug the gap!',
     sci:'Fun fact: Injured skin sends out a chemical distress signal — like a flare gun — and Speed Squad soldiers follow it straight to the cut!',
+    tip:'Clean with water and keep it covered — a moist wound heals up to 50% faster than a dry one.',
     fx:{ skin:-14, inflam:-8, neutro:-3 } },
 
   { k:['cold','flu','sick','virus','infection','fever'],
     type:'activity', emoji:'🤧',
     msg:'FULL BATTLE! 🚨 The whole army is fighting hard — your fever is actually a weapon that fries the invaders!',
     sci:'Fun fact: Your body turns UP the heat on purpose when you\'re sick — germs can\'t survive as well when it\'s hot in the kingdom!',
+    tip:'Rest is the #1 treatment — all available energy needs to go to the fight, not everyday tasks.',
     fx:{ neutro:-6, tcell:-4, nk:-5, inflam:-15, bdnf:-5, serotonin:-5 } },
 
   { k:['coffee','caffeine','energy drink'],
     type:'food', emoji:'☕',
     msg:'Coffee gives The Commander and Reward Rangers a short power boost — but then the castle crashes! ☕ Use wisely, soldier!',
     sci:'Fun fact: Caffeine tricks your brain by blocking the "sleepy" chemical — your army feels awake... until it wears off!',
+    tip:'Cut off at 1–2pm — caffeine has a 5-hour half-life and disrupts deep sleep even if you fall asleep fine.',
     fx:{ inflam:+3, neutro:+2, prefrontal:+6, dopamine:+5, amygdala:-3 } },
 
   { k:['isolated','lonely','alone','isolation'],
     type:'activity', emoji:'🫂',
     msg:'The kingdom feels quiet and sad... Sunshine Squad and Reward Rangers lose energy when no one is around. Find your allies! 🫂',
     sci:'Fun fact: Your brain actually needs friends like your army needs teammates — loneliness weakens the whole kingdom\'s defences!',
+    tip:'Start small — even a daily text to someone begins to reverse the effects of loneliness.',
     fx:{ serotonin:-10, dopamine:-7, amygdala:-10, bdnf:-7, inflam:-8 } },
 
   // ── Extra food ──
@@ -1088,66 +1141,77 @@ const RULES = [
     type:'food', emoji:'🥜',
     msg:'Nuts are tiny power packs! Walnut omega-3 builds Brain Builders, and vitamin E armours the whole team!',
     sci:'Fun fact: Walnuts look like tiny brains — and they actually contain the exact fats your brain is made of!',
+    tip:'Choose raw or dry-roasted — oils used in regular roasting can contain inflammatory fats.',
     fx:{ gut:+5, inflam:+6, bdnf:+6, hippocampus:+4, skin:+3 } },
 
   { k:['avocado'],
     type:'food', emoji:'🥑',
     msg:'Avocado gives The Commander healthy fuel! Healthy fats help brain soldiers think sharper and faster!',
     sci:'Fun fact: Avocados are packed with folate — a vitamin that helps build the chemical messengers brain soldiers use to talk to each other!',
+    tip:'Eat with tomatoes — the fat in avocado unlocks lycopene in tomatoes your body can\'t absorb without it.',
     fx:{ bdnf:+7, prefrontal:+5, inflam:+6, gut:+4 } },
 
   { k:['oat','oatmeal','porridge','granola'],
     type:'food', emoji:'🥣',
     msg:'Oats are slow-burning fuel for the whole army! Steady energy all morning — no crash, no chaos!',
     sci:'Fun fact: The fibre in oats feeds gut soldiers a special food called beta-glucan that trains them to fight harder!',
+    tip:'Overnight oats take 2 min to prep the night before — soak in milk or water and it\'s ready by morning.',
     fx:{ gut:+7, inflam:+5, neutro:+3, serotonin:+4 } },
 
   { k:['milk','dairy','cheese'],
     type:'food', emoji:'🧀',
     msg:'Dairy brings calcium to keep the kingdom\'s scaffolding strong, and gives the Builders raw materials!',
     sci:'Fun fact: Calcium doesn\'t just build bones — it also helps brain soldiers fire signals to each other faster!',
+    tip:'Full-fat versions keep vitamins A and D that are stripped out of skimmed — worth the extra calories.',
     fx:{ gut:+3, skin:+4, bdnf:+4, serotonin:+3 } },
 
   { k:['mushroom','shiitake','reishi','portobello'],
     type:'food', emoji:'🍄',
     msg:'Mushrooms are magic! They send special signals to the Hunter Corps and Natural Killers to train harder!',
     sci:'Fun fact: Shiitake mushrooms contain beta-glucan — the same secret weapon that makes NK Cells 3× more active!',
+    tip:'Leave mushrooms gill-side up in sunlight for 30 min — they generate their own vitamin D just like skin does.',
     fx:{ gut:+6, neutro:+8, tcell:+6, nk:+5, inflam:+5 } },
 
   { k:['olive oil','olives'],
     type:'food', emoji:'🫒',
     msg:'Olive oil douses the fires of inflammation — the whole army fights cleaner with less chaos in the kingdom!',
     sci:'Fun fact: The main ingredient in olive oil acts like a natural version of ibuprofen — it calms the Fire Brigade naturally!',
+    tip:'Drizzle cold after cooking — sustained high heat destroys the active anti-inflammatory compounds.',
     fx:{ inflam:+8, tcell:+5, gut:+4, bdnf:+4 } },
 
   { k:['sweet potato','pumpkin','squash','carrot','beetroot','beet'],
     type:'food', emoji:'🍠',
     msg:'Orange and red foods give Wall Guards a mega upgrade! Beta-carotene turns into a skin shield!',
     sci:'Fun fact: Your body converts the orange colour in sweet potatoes into vitamin A — the main repair kit for your skin fortress!',
+    tip:'Eat the skin too — half the fibre and many nutrients sit right underneath it.',
     fx:{ skin:+7, neutro:+5, inflam:+5, gut:+4 } },
 
   { k:['soup','broth','bone broth','stew'],
     type:'food', emoji:'🍲',
     msg:'Hot soup is the army\'s field hospital! Broth soothes the airways, hydrates soldiers and calms the gut garrison!',
     sci:'Fun fact: Bone broth contains collagen — the same stuff your Wall Guards use to patch up the skin fortress after battle!',
+    tip:'Homemade broth beats shop-bought — store versions have far less collagen and far more sodium.',
     fx:{ gut:+6, neutro:+4, inflam:+5, skin:+3, lung:+4 } },
 
   { k:['spicy','chilli','chili','hot sauce','jalapeño','jalapeno'],
     type:'food', emoji:'🌶️',
     msg:'Spicy food is like a fire drill for the army! Capsaicin gives the Reward Rangers a quick victory lap!',
     sci:'Fun fact: The burning feeling from chilli tricks pain sensors — your brain releases natural painkillers in response!',
+    tip:'If your gut is sensitive, eat with dairy — casein in milk actively neutralises capsaicin.',
     fx:{ neutro:+4, inflam:+3, dopamine:+5, gut:-2 } },
 
   { k:['smoothie','fruit juice','juice'],
     type:'food', emoji:'🥤',
     msg:'Smoothies rush vitamins to the front line fast! Whole-fruit versions also feed the Gut Microbiome troops!',
     sci:'Fun fact: Blending fruit keeps all the fibre that feeds gut soldiers — but pure juice loses most of it!',
+    tip:'Blend whole fruit rather than juice — keeps the fibre and prevents the blood sugar spike.',
     fx:{ gut:+5, neutro:+4, inflam:+4, skin:+3 } },
 
   { k:['white bread','white rice','pasta','noodles'],
     type:'food', emoji:'🍞',
     msg:'Fast carbs give a quick energy burst but the Gut Microbiome is left hungry — not much for them to work with!',
     sci:'Fun fact: White bread breaks down so fast it\'s almost like eating sugar — gut soldiers prefer the wholegrain version!',
+    tip:'Swap for wholegrain — same food, same taste, but your gut soldiers actually get fed too.',
     fx:{ dopamine:+3, inflam:-3, gut:-3 } },
 
   // ── Extra activities ──
@@ -1155,78 +1219,91 @@ const RULES = [
     type:'activity', emoji:'🚿',
     msg:'COLD WATER DRILL! ⚡ The whole army snaps to attention — Neutrophils surge, mood rockets, and the kingdom tingles!',
     sci:'Fun fact: Cold water causes a 300% spike in norepinephrine — a battle signal that wakes every soldier at once!',
+    tip:'Start warm and end with 30–90 sec cold — you\'ll adapt within a week and benefits come quickly.',
     fx:{ neutro:+6, dopamine:+8, serotonin:+6, inflam:+5, nk:+5 } },
 
   { k:['sauna','steam room','steam bath'],
     type:'activity', emoji:'🧖',
     msg:'The sauna is the kingdom\'s repair spa! Heat shock signals send repair crews to fix damaged soldiers everywhere!',
     sci:'Fun fact: Regular sauna use reduces your chance of catching a cold by 50% — it literally trains the army to be tougher!',
+    tip:'15–20 min at 80–100°C is the sweet spot — longer sessions don\'t add much more benefit.',
     fx:{ inflam:+7, nk:+5, skin:+4, serotonin:+5, bdnf:+4 } },
 
   { k:['danc','dancing','dance'],
     type:'activity', emoji:'💃',
     msg:'Dancing is exercise + music + coordination all at once — The Builders go into overdrive laying new brain roads!',
     sci:'Fun fact: Dancing is one of the only activities that lights up ALL parts of the brain simultaneously — it\'s a full brain workout!',
+    tip:'Any dancing counts — even 3 min alone in your room hits all the same brain areas as a class.',
     fx:{ dopamine:+10, serotonin:+7, bdnf:+7, neutro:+4, inflam:+5, hippocampus:+5 } },
 
   { k:['football','soccer','basketball','tennis','badminton','cricket','rugby','volleyball','hockey','netball'],
     type:'activity', emoji:'⚽',
     msg:'Team sport is a double win — your body army trains AND the brain army bonds with teammates!',
     sci:'Fun fact: Team sports boost oxytocin (the trust chemical) AND BDNF at the same time — almost nothing else does both!',
+    tip:'Show up even when you don\'t feel like it — the mood boost kicks in within the first few minutes.',
     fx:{ neutro:+5, dopamine:+9, serotonin:+7, bdnf:+6, inflam:+5, amygdala:+5 } },
 
   { k:['hike','hiking','trail','nature walk','forest','park'],
     type:'activity', emoji:'🥾',
     msg:'Nature walks quiet the Amygdala\'s alarm system — green spaces literally calm the panic centre of the brain!',
     sci:'Fun fact: 90 minutes walking in nature reduces activity in the worry part of the brain — proven by brain scans!',
+    tip:'Leave headphones out — natural sounds reduce anxiety more than music does during a walk.',
     fx:{ serotonin:+8, amygdala:+7, bdnf:+6, inflam:+5, neutro:+4 } },
 
   { k:['stretch','stretching','flexibility','pilates'],
     type:'activity', emoji:'🤸',
     msg:'Stretching releases tension trapped in the muscles and lets the Calm Guard do its job properly!',
     sci:'Fun fact: Slow stretching activates your parasympathetic nervous system — the signal that tells the whole army to stand down from red alert!',
+    tip:'Hold each stretch for 30–60 seconds — anything less barely signals the muscle to relax.',
     fx:{ inflam:+5, amygdala:+5, serotonin:+4, prefrontal:+3 } },
 
   { k:['journal','journaling','gratitude','grateful','diary','wrote in'],
     type:'activity', emoji:'📓',
     msg:'Writing feelings down hands them to The Commander to sort — the Calm Guard relaxes once the kingdom has a plan!',
     sci:'Fun fact: Writing about worries for just 8 minutes reduces anxiety brain signals measurably — it\'s like defragging your hard drive!',
+    tip:'Write without editing — messy unfiltered thoughts on paper work better than polished ones.',
     fx:{ amygdala:+8, serotonin:+6, prefrontal:+5, hippocampus:+4 } },
 
   { k:['draw','drawing','paint','painting','art','sketch','colouring','coloring'],
     type:'activity', emoji:'🎨',
     msg:'Art puts The Commander in charge of the whole kingdom — creative flow calms stress and lets The Builders work freely!',
     sci:'Fun fact: Making art drops the stress hormone cortisol after just 45 minutes — even if you think you\'re bad at it!',
+    tip:'It doesn\'t need to look good — the process, not the result, is what drops cortisol.',
     fx:{ amygdala:+7, dopamine:+6, serotonin:+5, prefrontal:+5 } },
 
   { k:['video game','gaming','gamed','played games'],
     type:'activity', emoji:'🎮',
     msg:'Games fire up Reward Rangers and can train The Commander — but too much keeps the army up past bedtime!',
     sci:'Fun fact: Action games improve reaction time and hand-eye coordination — some surgeons play games to warm up before surgery!',
+    tip:'Cap sessions at 90 min — after that dopamine dips and it stops feeling rewarding anyway.',
     fx:{ dopamine:+6, prefrontal:+3, amygdala:-3 } },
 
   { k:['sat all day','sedentary','didn\'t move','sitting all day','desk all day'],
     type:'activity', emoji:'🪑',
     msg:'The whole army fell asleep on the job! Sitting too long lets inflammation creep through the kingdom unchecked!',
     sci:'Fun fact: Sitting for more than 3 hours continuously has the same bad effect on inflammation as smoking a cigarette!',
+    tip:'Stand up every 45 min — even 2 minutes of movement resets inflammation and circulation.',
     fx:{ inflam:-8, neutro:-4, bdnf:-5, serotonin:-5, dopamine:-4 } },
 
   { k:['played outside','outdoor play','playground','cycling','biking','bike ride','scooter','skateboard'],
     type:'activity', emoji:'🌳',
     msg:'Outside play is the secret cheat code — sunlight, movement AND fresh air all level up the army at once!',
     sci:'Fun fact: Kids who play outside have 50% more Vitamin D and score higher on memory tests than kids who stay indoors!',
+    tip:'Even 20 min outside reverses much of the damage from 8 hours sitting — prioritise it daily.',
     fx:{ serotonin:+6, dopamine:+7, neutro:+4, inflam:+4, bdnf:+5, skin:+3 } },
 
   { k:['cook','cooking','baked','baking','made food','meal prep'],
     type:'activity', emoji:'👨‍🍳',
     msg:'Cooking trains The Commander — planning, sequencing and creativity all in one! Plus you know what goes in your kingdom!',
     sci:'Fun fact: People who cook at home have lower inflammation markers on average — they eat more nutrients and fewer additives!',
+    tip:'Cook in bulk when you have energy — one session can cover 3–4 meals and saves you all week.',
     fx:{ prefrontal:+5, dopamine:+5, amygdala:+3, inflam:+3 } },
 
   { k:['fasting','intermittent fast','skipped breakfast','16:8'],
     type:'activity', emoji:'⏰',
     msg:'Short fasting activates the kingdom\'s autophagy clean-up crew — they clear out broken soldiers and build stronger ones!',
     sci:'Fun fact: Going 16 hours without eating triggers a cellular recycling process — your body literally eats its own damaged cells to rebuild better ones!',
+    tip:'Break the fast with protein and fat, not carbs — prevents the blood sugar spike and keeps you fuller longer.',
     fx:{ inflam:+6, gut:+5, bdnf:+5, nk:+4 } },
 ];
 
@@ -1558,6 +1635,9 @@ function showToast(label, r, changedUnits){
       </div>`;
   }).join('');
 
+  const tipEl = document.getElementById('toastTip');
+  if(r.tip){ tipEl.textContent='💡 '+r.tip; tipEl.style.display=''; }
+  else { tipEl.style.display='none'; }
   clearTimeout(toastTimer);
   toast.classList.add('show');
   toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
@@ -1617,7 +1697,8 @@ function logLine(label, r, changes, scale){
     `<div class="changes">${changes.join('<br>')}</div>`+
     `${r.emoji} <b>${label}</b>${scaleBadge}`+
     `<div class="sci">${r.msg}</div>`+
-    `<div class="sci" style="color:#3a4878;margin-top:2px">${r.sci}</div>`;
+    `<div class="sci" style="color:#3a4878;margin-top:2px">${r.sci}</div>`+
+    (r.tip?`<div class="log-tip">💡 ${r.tip}</div>`:'');
   log.prepend(d);
 }
 
