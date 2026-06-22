@@ -604,12 +604,13 @@
       <div class="sleep-last" id="sleepLast"></div>
 
       <div class="panel-title" style="margin-top:14px">😊 Mood Check-in</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">How are you feeling right now? Tap once when you wake up and again before bed — your brain army adjusts based on your mood.</div>
       <div class="mood-btns">
-        <button class="mood-btn" onclick="logMood(0)" title="Terrible">😣</button>
-        <button class="mood-btn" onclick="logMood(1)" title="Low">😔</button>
-        <button class="mood-btn" onclick="logMood(2)" title="Okay">😐</button>
-        <button class="mood-btn" onclick="logMood(3)" title="Good">🙂</button>
-        <button class="mood-btn" onclick="logMood(4)" title="Great">😄</button>
+        <button class="mood-btn" onclick="logMood(0)" title="Terrible">😣<div style="font-size:9px;color:var(--muted);margin-top:3px">Awful</div></button>
+        <button class="mood-btn" onclick="logMood(1)" title="Low">😔<div style="font-size:9px;color:var(--muted);margin-top:3px">Low</div></button>
+        <button class="mood-btn" onclick="logMood(2)" title="Okay">😐<div style="font-size:9px;color:var(--muted);margin-top:3px">Okay</div></button>
+        <button class="mood-btn" onclick="logMood(3)" title="Good">🙂<div style="font-size:9px;color:var(--muted);margin-top:3px">Good</div></button>
+        <button class="mood-btn" onclick="logMood(4)" title="Great">😄<div style="font-size:9px;color:var(--muted);margin-top:3px">Great</div></button>
       </div>
       <div class="mood-last" id="moodLast"></div>
 
