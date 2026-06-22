@@ -390,29 +390,25 @@
   }
 
   /* ── Goals ── */
-  .goal-add-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
-  .goal-add-row input { flex:1; min-width:0; background:var(--panel-2); border:1px solid var(--line);
-    color:var(--text); border-radius:10px; padding:10px 12px; font-size:14px; }
-  .goal-add-row input::placeholder { color:var(--muted); }
-  .goal-pri-select { background:var(--panel-2); border:1px solid var(--line); color:var(--text);
-    border-radius:10px; padding:10px 10px; font-size:13px; cursor:pointer; }
-  .goal-add-btn { background:#1e3a5f; border:1px solid #2a4a7a; color:#5aa9ff;
-    border-radius:10px; padding:10px 16px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .goal-refresh-btn { display:block; width:100%; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--muted); border-radius:10px; padding:9px; font-size:13px; cursor:pointer;
+    margin-bottom:14px; transition:all .15s; }
+  .goal-refresh-btn:hover { border-color:#3a4a66; color:var(--text); }
   .goal-list { display:flex; flex-direction:column; gap:8px; }
-  .goal-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px;
+  .goal-item { display:flex; align-items:flex-start; gap:10px; padding:13px 14px;
     background:var(--panel); border:1px solid var(--line); border-radius:12px; }
   .goal-item.pri-high   { border-left:3px solid #f87171; }
   .goal-item.pri-medium { border-left:3px solid #fbbf24; }
   .goal-item.pri-low    { border-left:3px solid #4ade80; }
-  .goal-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px;
-    white-space:nowrap; flex-shrink:0; margin-top:2px; }
+  .goal-icon { font-size:22px; flex-shrink:0; line-height:1; margin-top:1px; }
+  .goal-body { flex:1; min-width:0; }
+  .goal-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px;
+    border-radius:999px; margin-bottom:5px; }
   .goal-badge.high   { background:rgba(248,113,113,.15); color:#f87171; }
   .goal-badge.medium { background:rgba(251,191,36,.15);  color:#fbbf24; }
   .goal-badge.low    { background:rgba(74,222,128,.15);  color:#4ade80; }
-  .goal-text { flex:1; font-size:14px; line-height:1.5; color:var(--text); }
-  .goal-del { background:none; border:none; color:var(--muted); cursor:pointer;
-    font-size:16px; line-height:1; padding:0 2px; flex-shrink:0; }
-  .goal-del:hover { color:#f87171; }
+  .goal-action { font-size:14px; font-weight:700; color:var(--text); margin-bottom:3px; line-height:1.4; }
+  .goal-reason { font-size:11px; color:var(--muted); line-height:1.4; }
   .goal-empty { color:var(--muted); font-size:14px; text-align:center; padding:30px 0; }
   .goal-section-label { font-size:10px; font-weight:700; letter-spacing:1.2px;
     text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
@@ -770,18 +766,9 @@
   <!-- TAB: Goals -->
   <div class="mtab" id="mtab-goals">
     <div class="panel">
-      <div class="panel-title">💡 My Goals &amp; Suggestions</div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Write down anything you want to work on — rate it by priority so you know what to tackle first.</p>
-      <div class="goal-add-row">
-        <input id="goalInput" type="text" placeholder="e.g. Drink more water, go to bed earlier…" maxlength="120"
-          onkeydown="if(event.key==='Enter')addGoal()"/>
-        <select id="goalPri" class="goal-pri-select">
-          <option value="high">🔴 High</option>
-          <option value="medium" selected>🟡 Medium</option>
-          <option value="low">🟢 Low</option>
-        </select>
-        <button class="goal-add-btn" onclick="addGoal()">+ Add</button>
-      </div>
+      <div class="panel-title">💡 What To Do Next</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Your army analysed your stats and history — here's exactly what you should do today, ranked by priority.</p>
+      <button class="goal-refresh-btn" onclick="renderGoals()">🔄 Refresh suggestions</button>
       <div class="goal-list" id="goalList"></div>
     </div>
   </div>
@@ -1895,6 +1882,7 @@ function submit(text, type){
   autoCheckMissions(text, type);
   if(type==='food'){ updateDiversity(text); checkNutrientFoods(text); }
   checkAchievements();
+  renderGoals();
 }
 
 function buildFoodText(raw){
@@ -2982,49 +2970,107 @@ function renderAchievements(){
   }
 }
 
-// ─── Goals ───────────────────────────────────────────────────────────────────
+// ─── Goals (auto-suggestions) ────────────────────────────────────────────────
 const PRI_ORDER = { high:0, medium:1, low:2 };
-const PRI_LABEL = { high:'🔴 High', medium:'🟡 Medium', low:'🟢 Low' };
+const PRI_LABEL = { high:'🔴 High priority', medium:'🟡 Medium priority', low:'🟢 Low priority' };
 
-function getGoals(){ return JSON.parse(localStorage.getItem('ba_goals')||'[]'); }
-function saveGoals(g){ localStorage.setItem('ba_goals',JSON.stringify(g)); }
+const UNIT_TIPS = {
+  gut:        { icon:'🥛', action:'Eat kefir, yogurt, kimchi or kombucha',        reason:'Your Gut Microbiome is low — 70% of your immune army lives here' },
+  neutro:     { icon:'🍊', action:'Eat oranges, kiwi or any vitamin C food',       reason:'Your Speed Squad is depleted — vitamin C powers them up fast' },
+  nk:         { icon:'🍄', action:'Try mushrooms, pumpkin seeds or exercise',       reason:'Shadow Strikers are low — these are your main virus killers' },
+  tcell:      { icon:'😴', action:'Get 8+ hours sleep tonight',                     reason:'Hunter Corps rebuild during deep sleep — nothing else works as fast' },
+  inflam:     { icon:'🧄', action:'Use turmeric + black pepper and avoid junk food',reason:'Your Fire Brigade is raging — inflammation damages every system' },
+  liver:      { icon:'💧', action:'Drink more water and cut back on alcohol',        reason:'Liver Cleanup Crew is struggling — they filter everything you put in' },
+  skin:       { icon:'✨', action:'Moisturise and eat sweet potato or carrot',       reason:'Wall Guards are weak — your first line of defence needs repairing' },
+  lung:       { icon:'🌬️', action:'Get fresh air, deep breaths or exercise outside', reason:'Air Patrol is down — lungs need movement and clean air to recover' },
+  bdnf:       { icon:'🏃', action:'Go for a run, walk or any workout today',         reason:'Brain Builders are low — exercise is the fastest BDNF trigger known' },
+  hippocampus:{ icon:'📚', action:'Read, study or learn something new today',        reason:'Memory Keepers need practice — without stimulation they get weaker' },
+  prefrontal: { icon:'🧘', action:'Meditate, journal or do some focused reading',    reason:'The Commander needs training — stress and screens wear it down fast' },
+  amygdala:   { icon:'🌿', action:'Try 4-7-8 breathing or a nature walk',            reason:'Calm Guard is overwhelmed — your stress response is stuck on high' },
+  dopamine:   { icon:'🎯', action:'Exercise, listen to music or complete one task',  reason:'Reward Rangers are burned out — they need a real win today' },
+  serotonin:  { icon:'☀️', action:'Get outside in natural sunlight today',            reason:'Sunshine Squad is low — they need daylight, not artificial light' },
+};
 
-function addGoal(){
-  const inp = document.getElementById('goalInput');
-  const text = inp.value.trim(); if(!text) return;
-  const pri = document.getElementById('goalPri').value;
-  const goals = getGoals();
-  goals.push({ id: Date.now(), text, priority: pri, added: new Date().toISOString().slice(0,10) });
-  saveGoals(goals);
-  inp.value = '';
-  renderGoals();
-}
+function generateSuggestions(){
+  const suggs=[];
+  const add=(icon,action,reason,priority)=>suggs.push({icon,action,reason,priority});
 
-function deleteGoal(id){
-  saveGoals(getGoals().filter(g=>g.id!==id));
-  renderGoals();
+  // ── Unit-based ──
+  ALL_UNITS.forEach(u=>{
+    const t=UNIT_TIPS[u.id]; if(!t) return;
+    if(u.val<25)       add(t.icon, t.action, `${t.reason} (${Math.round(u.val)}%)`, 'high');
+    else if(u.val<50)  add(t.icon, t.action, `${t.reason} (${Math.round(u.val)}%)`, 'medium');
+    else if(u.val<70)  add(t.icon, t.action, `${t.reason} (${Math.round(u.val)}%)`, 'low');
+  });
+
+  // ── Virus risk ──
+  const vr=calcVirusRisk();
+  if(vr>60)      add('🦠','Sleep, probiotics and vitamin C — your defences need urgent help',`Virus risk is critically high at ${Math.round(vr)}%`,'high');
+  else if(vr>35) add('🦠','Strengthen your defences with sleep and probiotic foods',`Virus risk is at ${Math.round(vr)}% — above the safe zone`,'medium');
+
+  // ── Recent history gaps (last 2 days) ──
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-2);
+  const recent=history.filter(e=>e.date&&new Date(e.date)>=cutoff);
+  const logged=t=>recent.some(e=>t.some(k=>e.label.toLowerCase().includes(k)));
+
+  if(!logged(['sleep','slept']))
+    add('😴','Log your sleep and aim for 8 hours tonight','No sleep logged in the past 2 days — it\'s the single biggest factor in immune health','high');
+  if(!logged(['exercise','run','ran','gym','walk','swim','yoga','workout','cycling','hiit','weights']))
+    add('🏃','Do any form of exercise today — even a 20 min walk','No exercise in 2 days — BDNF and NK cells both drop without movement','medium');
+  if(!logged(['vegetable','veg','salad','broccoli','spinach','kale','fruit','apple','berri','banana']))
+    add('🥦','Add vegetables or fruit to your next meal','No veg or fruit logged recently — gut soldiers are missing their main fuel','medium');
+  if(!logged(['water','hydrat']))
+    add('💧','Drink a glass of water now and aim for 2L today','Hydration hasn\'t been logged — even mild thirst reduces brain performance','low');
+  if(logged(['sugar','candy','sweets','soda','cola','cake','donut','biscuit','cookie']))
+    add('🍬','Balance recent sugar with vitamin C or probiotic food','Sugar in your recent logs weakens Neutrophils for hours after eating','medium');
+  if(logged(['junk','fast food','burger','chips','crisps','pizza','takeaway','fried','processed']))
+    add('🥦','Eat probiotics or veg today to repair the gut wall','Recent junk food causes gut wall damage — it needs rebuilding quickly','medium');
+
+  // ── Profile-based ──
+  const prof=JSON.parse(localStorage.getItem('ba_profile')||'{}');
+  if(prof.smoke&&prof.smoke!=='no')
+    add('🚬','Every hour without smoking lets the Air Patrol start recovering','Smoking is the single fastest way to destroy Lung Defence and NK cells','high');
+
+  // ── Nutrient gaps ──
+  const ntState=getNutrientState();
+  const missingNt=NUTRIENT_DEF.filter(n=>!ntState.ticked.includes(n.id));
+  if(missingNt.length>6)
+    add('🥗','Check the Nutrients tab to see which foods fill your gaps',`${missingNt.length} key nutrients not logged yet this week`,'medium');
+
+  // ── Lifespan ──
+  try{
+    const life=calcLifeExpectancy();
+    if(life.expected<78) add('🕰️','Work on sleep, exercise and stress reduction to extend your healthy years',`Estimated lifespan is ${Math.round(life.expected)} — lifestyle changes make the biggest difference`,'medium');
+  }catch(e){}
+
+  // Sort and cap
+  suggs.sort((a,b)=>PRI_ORDER[a.priority]-PRI_ORDER[b.priority]);
+  return suggs.slice(0,14);
 }
 
 function renderGoals(){
-  const el = document.getElementById('goalList'); if(!el) return;
-  const goals = getGoals().sort((a,b)=>PRI_ORDER[a.priority]-PRI_ORDER[b.priority]);
-  if(!goals.length){
-    el.innerHTML=`<div class="goal-empty">No goals yet — add one above!</div>`;
+  const el=document.getElementById('goalList'); if(!el) return;
+  const suggs=generateSuggestions();
+  if(!suggs.length){
+    el.innerHTML=`<div class="goal-empty">🎉 Your army looks great — keep up what you\'re doing!</div>`;
     return;
   }
-  let html = '', lastPri = null;
-  goals.forEach(g=>{
-    if(g.priority !== lastPri){
-      html += `<div class="goal-section-label">${PRI_LABEL[g.priority]} priority</div>`;
-      lastPri = g.priority;
+  let html='', lastPri=null;
+  suggs.forEach(g=>{
+    if(g.priority!==lastPri){
+      html+=`<div class="goal-section-label">${PRI_LABEL[g.priority]}</div>`;
+      lastPri=g.priority;
     }
-    html += `<div class="goal-item pri-${g.priority}">
-      <span class="goal-badge ${g.priority}">${PRI_LABEL[g.priority]}</span>
-      <span class="goal-text">${g.text}</span>
-      <button class="goal-del" onclick="deleteGoal(${g.id})" title="Remove">✕</button>
+    html+=`<div class="goal-item pri-${g.priority}">
+      <div class="goal-icon">${g.icon}</div>
+      <div class="goal-body">
+        <div class="goal-badge ${g.priority}">${PRI_LABEL[g.priority]}</div>
+        <div class="goal-action">${g.action}</div>
+        <div class="goal-reason">${g.reason}</div>
+      </div>
     </div>`;
   });
-  el.innerHTML = html;
+  el.innerHTML=html;
 }
 
 // ─── Enemy Intel & Body Clock ─────────────────────────────────────────────────
