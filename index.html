@@ -927,6 +927,12 @@ const RULES = [
     sci:'Fun fact: Every new thing you learn causes The Builders to build a brand new bridge in your brain — reading makes more bridges!',
     fx:{ hippocampus:+10, prefrontal:+9, bdnf:+8, dopamine:+5 } },
 
+  { k:['school','class','lesson','college','university','homework','revision','exam','test','lecture'],
+    type:'activity', emoji:'🏫',
+    msg:'School sends Brain Command into full training mode! The Commander sharpens up and Memory Keepers get busy writing new knowledge into your brain book!',
+    sci:'Fun fact: Learning new things at school triggers BDNF — the brain\'s own fertiliser — which grows brand new connections between your neurons!',
+    fx:{ prefrontal:+8, hippocampus:+9, bdnf:+9, dopamine:+6, serotonin:+4 } },
+
   { k:['social','friends','family','socialised','conversation','talked','people','laughed','laugh'],
     type:'activity', emoji:'🤝',
     msg:'Spending time with friends sends the Sunshine Squad and Reward Rangers into celebration mode!',
@@ -944,6 +950,12 @@ const RULES = [
     msg:'Washing hands defeats invaders before they even reach the castle gates — easy win!',
     sci:'Fun fact: Washing hands for just 20 seconds wipes out most of the bad guys trying to sneak inside!',
     fx:{ skin:+3 } },
+
+  { k:['skincare','moisturis','moisturiz','face wash','cleanser','toner','serum','skin routine','skin care'],
+    type:'activity', emoji:'✨',
+    msg:'Skincare strengthens the Wall Guards and keeps the castle\'s outer defences shining and strong!',
+    sci:'Fun fact: A healthy skin barrier is your body\'s number one physical defence — moisturising helps skin cells lock together like armoured bricks!',
+    fx:{ skin:+10, inflam:+5, serotonin:+4, amygdala:+4 } },
 
   { k:['sunscreen','sun cream','spf'],
     type:'activity', emoji:'🧴',
@@ -1619,7 +1631,7 @@ document.getElementById('inpAct').addEventListener('keydown', e=>{
 });
 
 [[['drank kefir','2 glasses of water','pumpkin seeds','chia seeds','blueberries','dark chocolate','ate junk food','2 beers'],'food'],
- [['30 minutes running','slept 8 hours','cold shower','danced','read a book','meditated','stressed out','sat all day'],'activity']]
+ [['30 minutes running','slept 8 hours','went to school','did skincare','read a book','meditated','stressed out','sat all day'],'activity']]
   .forEach(([examples, type])=>{
     const container = document.getElementById(type==='food'?'chipsFood':'chipsAct');
     examples.forEach(ex=>{
