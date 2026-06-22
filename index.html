@@ -346,6 +346,23 @@
   .badge-icon { font-size:22px; margin-bottom:4px; }
   .badge-name { font-size:11px; font-weight:700; }
   .badge-desc { font-size:10px; color:var(--muted); margin-top:2px; line-height:1.3; }
+  .badge-item.elite-earned { background:rgba(167,139,250,.08); border-color:rgba(167,139,250,.45); }
+  .badge-item.elite-locked { opacity:.35; filter:grayscale(.6); border-color:rgba(167,139,250,.2); }
+  .elite-section-title { grid-column:1/-1; text-align:center; margin:12px 0 4px;
+    font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#a78bfa; }
+  .elite-section-lock { grid-column:1/-1; text-align:center; padding:12px;
+    background:rgba(167,139,250,.05); border:1px dashed rgba(167,139,250,.25); border-radius:12px;
+    font-size:12px; color:var(--muted); }
+  .elite-banner {
+    background:linear-gradient(135deg,#1a0a30,#0d1a30);
+    border:1px solid rgba(167,139,250,.5); border-radius:16px;
+    padding:20px 16px; text-align:center; margin-bottom:14px;
+    animation:elitePulse 2.5s ease-in-out infinite;
+  }
+  @keyframes elitePulse {
+    0%,100%{box-shadow:0 0 0 0 rgba(167,139,250,.0)}
+    50%     {box-shadow:0 0 22px 4px rgba(167,139,250,.3)}
+  }
 
   /* ── Enemy Intel & Body Clock ── */
   .intel-tabs { display:flex; gap:6px; margin-bottom:12px; }
@@ -1588,6 +1605,7 @@ function applyRule(label, r, scale=1){
                ' · ' + now.toLocaleDateString([], {day:'numeric',month:'short'});
   history.push({ label, r, changedUnits, time, scale });
   saveState();
+  logToday();
 }
 
 function logLine(label, r, changes, scale){
@@ -2530,7 +2548,22 @@ const ACHIEVEMENT_DEFS=[
   {id:'fortress',   icon:'🛡️',name:'Fortress',        desc:'Virus risk below 15%'},
   {id:'life_85',    icon:'🕰️',name:'Centenarian Path',desc:'Estimated lifespan above 85'},
 ];
+const ELITE_DEFS=[
+  {id:'elite_body',   icon:'💎',name:'Diamond Body',    desc:'All body units above 90'},
+  {id:'elite_brain',  icon:'🧬',name:'Neural Elite',    desc:'All brain units above 90'},
+  {id:'elite_immune', icon:'⚔️', name:'Immune Legend',  desc:'All body units above 95'},
+  {id:'elite_sleep',  icon:'🌙',name:'Sleep God',       desc:'Log 8+ hours sleep 20 times'},
+  {id:'elite_mission',icon:'⚡',name:'Mission General', desc:'Complete 50 missions total'},
+  {id:'elite_days',   icon:'📅',name:'Daily Warrior',   desc:'Log on 20 different days'},
+  {id:'elite_virus',  icon:'🔥',name:'Virus Crusher',   desc:'Virus risk below 5%'},
+  {id:'elite_gods',   icon:'🌟',name:'Army of Gods',    desc:'Every unit at 100'},
+];
 function getEarned(){ return JSON.parse(localStorage.getItem('ba_achievements')||'[]'); }
+function logToday(){
+  const days=JSON.parse(localStorage.getItem('ba_log_days')||'[]');
+  const today=new Date().toISOString().slice(0,10);
+  if(!days.includes(today)){ days.push(today); localStorage.setItem('ba_log_days',JSON.stringify(days)); }
+}
 function getMoodStreak(){
   const log=JSON.parse(localStorage.getItem('ba_mood')||'[]');
   if(!log.length) return 0;
@@ -2542,14 +2575,20 @@ function getMoodStreak(){
   return max;
 }
 let achieveTimer=null;
-function showAchievement(a){
+function showAchievement(a, isElite=false){
   clearTimeout(achieveTimer);
   const t=document.getElementById('achieveToast');
   document.getElementById('achieveIcon').textContent=a.icon;
   document.getElementById('achieveName').textContent=a.name;
   document.getElementById('achieveDesc').textContent=a.desc;
+  document.querySelector('.achieve-title').textContent=isElite?'💎 Elite Badge Unlocked!':'🏆 Achievement Unlocked!';
+  t.style.borderColor=isElite?'rgba(167,139,250,.8)':'';
   t.classList.add('show');
-  achieveTimer=setTimeout(()=>t.classList.remove('show'),3500);
+  achieveTimer=setTimeout(()=>{
+    t.classList.remove('show');
+    t.style.borderColor='';
+    document.querySelector('.achieve-title').textContent='🏆 Achievement Unlocked!';
+  },3500);
 }
 function checkAchievements(){
   const earned=getEarned();
@@ -2588,28 +2627,80 @@ function checkAchievements(){
       setTimeout(()=>showLegendCelebration(), 3800);
     }
   }
+  // Elite badges — only unlocked after all basic achievements are earned
+  if(earned.length>=ACHIEVEMENT_DEFS.length){
+    const eliteEarned=JSON.parse(localStorage.getItem('ba_elite')||'[]');
+    const logDays=JSON.parse(localStorage.getItem('ba_log_days')||'[]');
+    const eliteChecks={
+      elite_body:   ()=>BODY_UNITS.every(u=>u.val>=90),
+      elite_brain:  ()=>BRAIN_UNITS.every(u=>u.val>=90),
+      elite_immune: ()=>BODY_UNITS.every(u=>u.val>=95),
+      elite_sleep:  ()=>sleepLog.filter(s=>s.h>=8).length>=20,
+      elite_mission:()=>total>=50,
+      elite_days:   ()=>logDays.length>=20,
+      elite_virus:  ()=>calcVirusRisk()<5,
+      elite_gods:   ()=>ALL_UNITS.every(u=>u.val>=100),
+    };
+    let anyEliteNew=false;
+    ELITE_DEFS.forEach(a=>{
+      if(eliteEarned.includes(a.id)) return;
+      if(eliteChecks[a.id]&&eliteChecks[a.id]()){
+        eliteEarned.push(a.id); anyEliteNew=true;
+        setTimeout(()=>showAchievement(a,true), 2200);
+      }
+    });
+    if(anyEliteNew){
+      localStorage.setItem('ba_elite',JSON.stringify(eliteEarned));
+      renderAchievements();
+      if(eliteEarned.length===ELITE_DEFS.length){
+        setTimeout(()=>showEliteCelebration(), 3800);
+      }
+    }
+  }
 }
 function showLegendCelebration(){
   const t=document.getElementById('achieveToast');
   document.getElementById('achieveIcon').textContent='👑';
   document.getElementById('achieveName').textContent='LEGEND STATUS!';
-  document.getElementById('achieveDesc').textContent='Every single achievement unlocked. Your body army is unstoppable!';
+  document.getElementById('achieveDesc').textContent='Every achievement unlocked. Elite badges now available!';
+  document.querySelector('.achieve-title').textContent='🏆 Achievement Unlocked!';
   t.style.borderColor='rgba(251,191,36,.8)';
   t.classList.add('show');
   clearTimeout(achieveTimer);
-  achieveTimer=setTimeout(()=>{ t.classList.remove('show'); t.style.borderColor=''; },6000);
+  achieveTimer=setTimeout(()=>{ t.classList.remove('show'); t.style.borderColor=''; document.querySelector('.achieve-title').textContent='🏆 Achievement Unlocked!'; },6000);
+}
+function showEliteCelebration(){
+  const t=document.getElementById('achieveToast');
+  document.getElementById('achieveIcon').textContent='🌟';
+  document.getElementById('achieveName').textContent='ARMY OF GODS!';
+  document.getElementById('achieveDesc').textContent='Every elite badge earned. You have built the ultimate body army!';
+  document.querySelector('.achieve-title').textContent='👑 ULTIMATE LEGEND';
+  t.style.borderColor='rgba(167,139,250,.9)';
+  t.classList.add('show');
+  clearTimeout(achieveTimer);
+  achieveTimer=setTimeout(()=>{ t.classList.remove('show'); t.style.borderColor=''; document.querySelector('.achieve-title').textContent='🏆 Achievement Unlocked!'; },7000);
 }
 function renderAchievements(){
   const earned=getEarned(), el=document.getElementById('badgeGrid'); if(!el) return;
   el.innerHTML='';
-  const allDone=earned.length===ACHIEVEMENT_DEFS.length;
-  if(allDone){
+  const allBasicDone=earned.length>=ACHIEVEMENT_DEFS.length;
+  const eliteEarned=JSON.parse(localStorage.getItem('ba_elite')||'[]');
+  const allEliteDone=allBasicDone&&eliteEarned.length===ELITE_DEFS.length;
+
+  if(allEliteDone){
+    el.innerHTML=`<div class="elite-banner" style="grid-column:1/-1">
+      <div class="legend-icon">🌟</div>
+      <div class="legend-title" style="color:#a78bfa">ARMY OF GODS!</div>
+      <div class="legend-sub">Every achievement and every elite badge earned.<br>Your body army is truly unstoppable!</div>
+    </div>`;
+  } else if(allBasicDone){
     el.innerHTML=`<div class="legend-banner" style="grid-column:1/-1">
       <div class="legend-icon">👑</div>
       <div class="legend-title">LEGEND STATUS!</div>
-      <div class="legend-sub">You've unlocked every achievement.<br>Your body army is the strongest it can possibly be!</div>
+      <div class="legend-sub">All basic achievements unlocked!<br>Elite badges are now available — keep pushing!</div>
     </div>`;
   }
+
   ACHIEVEMENT_DEFS.forEach(a=>{
     const e=earned.includes(a.id);
     el.innerHTML+=`<div class="badge-item ${e?'earned':'locked'}" title="${a.desc}">
@@ -2618,6 +2709,20 @@ function renderAchievements(){
       <div class="badge-desc">${a.desc}</div>
     </div>`;
   });
+
+  el.innerHTML+=`<div class="elite-section-title">💎 Elite Badges</div>`;
+  if(!allBasicDone){
+    el.innerHTML+=`<div class="elite-section-lock">🔒 Complete all achievements above to unlock elite badges</div>`;
+  } else {
+    ELITE_DEFS.forEach(a=>{
+      const e=eliteEarned.includes(a.id);
+      el.innerHTML+=`<div class="badge-item ${e?'elite-earned':'elite-locked'}" title="${a.desc}">
+        <div class="badge-icon">${a.icon}</div>
+        <div class="badge-name">${a.name}</div>
+        <div class="badge-desc">${a.desc}</div>
+      </div>`;
+    });
+  }
 }
 
 // ─── Enemy Intel & Body Clock ─────────────────────────────────────────────────
