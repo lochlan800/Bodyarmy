@@ -389,6 +389,34 @@
     50%     {box-shadow:0 0 22px 4px rgba(167,139,250,.3)}
   }
 
+  /* ── Goals ── */
+  .goal-add-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .goal-add-row input { flex:1; min-width:0; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--text); border-radius:10px; padding:10px 12px; font-size:14px; }
+  .goal-add-row input::placeholder { color:var(--muted); }
+  .goal-pri-select { background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:10px; padding:10px 10px; font-size:13px; cursor:pointer; }
+  .goal-add-btn { background:#1e3a5f; border:1px solid #2a4a7a; color:#5aa9ff;
+    border-radius:10px; padding:10px 16px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .goal-list { display:flex; flex-direction:column; gap:8px; }
+  .goal-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; }
+  .goal-item.pri-high   { border-left:3px solid #f87171; }
+  .goal-item.pri-medium { border-left:3px solid #fbbf24; }
+  .goal-item.pri-low    { border-left:3px solid #4ade80; }
+  .goal-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px;
+    white-space:nowrap; flex-shrink:0; margin-top:2px; }
+  .goal-badge.high   { background:rgba(248,113,113,.15); color:#f87171; }
+  .goal-badge.medium { background:rgba(251,191,36,.15);  color:#fbbf24; }
+  .goal-badge.low    { background:rgba(74,222,128,.15);  color:#4ade80; }
+  .goal-text { flex:1; font-size:14px; line-height:1.5; color:var(--text); }
+  .goal-del { background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:16px; line-height:1; padding:0 2px; flex-shrink:0; }
+  .goal-del:hover { color:#f87171; }
+  .goal-empty { color:var(--muted); font-size:14px; text-align:center; padding:30px 0; }
+  .goal-section-label { font-size:10px; font-weight:700; letter-spacing:1.2px;
+    text-transform:uppercase; color:var(--muted); margin:14px 0 6px; }
+
   /* ── Enemy Intel & Body Clock ── */
   .intel-tabs { display:flex; gap:6px; margin-bottom:12px; }
   .intel-tab { flex:1; padding:7px 4px; border-radius:8px; border:1px solid var(--line);
@@ -533,6 +561,7 @@
   <button class="main-nav-btn"        id="mnav-badges"    onclick="switchMainTab('badges')">🏆 Badges</button>
   <button class="main-nav-btn"        id="mnav-intel"     onclick="switchMainTab('intel')">🦠 Intel</button>
   <button class="main-nav-btn"        id="mnav-patrol"    onclick="switchMainTab('patrol')">⛶ Patrol</button>
+  <button class="main-nav-btn"        id="mnav-goals"     onclick="switchMainTab('goals')">💡 Goals</button>
 </nav>
 
 <div class="wrap">
@@ -738,6 +767,25 @@
   </div>
 
   <!-- TAB: Patrol -->
+  <!-- TAB: Goals -->
+  <div class="mtab" id="mtab-goals">
+    <div class="panel">
+      <div class="panel-title">💡 My Goals &amp; Suggestions</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Write down anything you want to work on — rate it by priority so you know what to tackle first.</p>
+      <div class="goal-add-row">
+        <input id="goalInput" type="text" placeholder="e.g. Drink more water, go to bed earlier…" maxlength="120"
+          onkeydown="if(event.key==='Enter')addGoal()"/>
+        <select id="goalPri" class="goal-pri-select">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button class="goal-add-btn" onclick="addGoal()">+ Add</button>
+      </div>
+      <div class="goal-list" id="goalList"></div>
+    </div>
+  </div>
+
   <div class="mtab" id="mtab-patrol">
     <div id="fsBod">
       <div id="fsBodWrap">
@@ -1526,7 +1574,7 @@ function showTab(tab){
 }
 
 function switchMainTab(name){
-  const tabs = ['body','troops','log','orders','supplies','badges','intel','patrol'];
+  const tabs = ['body','troops','log','orders','supplies','badges','intel','patrol','goals'];
   tabs.forEach(t => {
     document.getElementById('mtab-'+t).classList.toggle('active', t===name);
     document.getElementById('mnav-'+t).classList.toggle('active', t===name);
@@ -2934,6 +2982,51 @@ function renderAchievements(){
   }
 }
 
+// ─── Goals ───────────────────────────────────────────────────────────────────
+const PRI_ORDER = { high:0, medium:1, low:2 };
+const PRI_LABEL = { high:'🔴 High', medium:'🟡 Medium', low:'🟢 Low' };
+
+function getGoals(){ return JSON.parse(localStorage.getItem('ba_goals')||'[]'); }
+function saveGoals(g){ localStorage.setItem('ba_goals',JSON.stringify(g)); }
+
+function addGoal(){
+  const inp = document.getElementById('goalInput');
+  const text = inp.value.trim(); if(!text) return;
+  const pri = document.getElementById('goalPri').value;
+  const goals = getGoals();
+  goals.push({ id: Date.now(), text, priority: pri, added: new Date().toISOString().slice(0,10) });
+  saveGoals(goals);
+  inp.value = '';
+  renderGoals();
+}
+
+function deleteGoal(id){
+  saveGoals(getGoals().filter(g=>g.id!==id));
+  renderGoals();
+}
+
+function renderGoals(){
+  const el = document.getElementById('goalList'); if(!el) return;
+  const goals = getGoals().sort((a,b)=>PRI_ORDER[a.priority]-PRI_ORDER[b.priority]);
+  if(!goals.length){
+    el.innerHTML=`<div class="goal-empty">No goals yet — add one above!</div>`;
+    return;
+  }
+  let html = '', lastPri = null;
+  goals.forEach(g=>{
+    if(g.priority !== lastPri){
+      html += `<div class="goal-section-label">${PRI_LABEL[g.priority]} priority</div>`;
+      lastPri = g.priority;
+    }
+    html += `<div class="goal-item pri-${g.priority}">
+      <span class="goal-badge ${g.priority}">${PRI_LABEL[g.priority]}</span>
+      <span class="goal-text">${g.text}</span>
+      <button class="goal-del" onclick="deleteGoal(${g.id})" title="Remove">✕</button>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
 // ─── Enemy Intel & Body Clock ─────────────────────────────────────────────────
 const ENEMIES=[
   {emoji:'🤧',name:'Common Cold (Rhinovirus)',  desc:'200+ strains — your most frequent attacker. Infiltrates via nose and throat.',                              counters:['Neutrophils ⚡','Skin Barrier 🛡️','Vitamin C 🍊','Lung Defence 🌬️']},
@@ -3044,6 +3137,7 @@ function initNewFeatures(){
   renderDiversity();
   renderMissions();
   renderAchievements();
+  renderGoals();
   renderEnemyIntel();
   renderBodyClock();
   const sleepLog=JSON.parse(localStorage.getItem('ba_sleep')||'[]');
